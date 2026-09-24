@@ -50,4 +50,6 @@ Fonctions de boucle infini (loop())
 void loop() {
   // SOFT_TIMER_Update(); // A decommenter pour utiliser des compteurs logiciels
   delay(10);// Delais pour décharger le CPU
+  MOTOR_SetSpeed(RIGHT, 0.5);
+  MOTOR_SetSpeed(LEFT, 0.5);
 }
