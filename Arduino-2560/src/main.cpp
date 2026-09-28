@@ -11,7 +11,7 @@ Inclure les librairies de functions que vous voulez utiliser
 */
 #include <LibRobus.h>
 
-#define OUTPUT_LED_PIN 31
+#define OUTPUT_LED_PIN 53
 
 /*
 Fonctions d'initialisation (setup)
@@ -25,6 +25,7 @@ void setup() {
 
     // initialisation
     pinMode(OUTPUT_LED_PIN, OUTPUT);
+    digitalWrite(OUTPUT_LED_PIN, 0);
 }
 
 /*
@@ -33,7 +34,8 @@ Fonctions de boucle infinie
 */
 void loop() {
     if (Serial1.available() > 0) {
-        Serial.println(Serial1.parseInt());
-        // digitalWrite(OUTPUT_LED_PIN, Serial1.parseInt());
+        int newVal = Serial1.parseInt();
+        Serial.println(newVal);
+        digitalWrite(OUTPUT_LED_PIN, newVal);
     }
 }
