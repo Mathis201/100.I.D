@@ -1,5 +1,9 @@
 #pragma once
 
 void updateMotorInfo(float deltaTimeMs);
-void sendMotorsToTargets(float leftTarget, float rightTarget);
 void stopMotors();
+
+bool areProfilesDone();
+void updateMotorProfiles();
+void requestStraightDistance(float distanceMm, float targetEndVelocity = 0.0);
+void requestTurnDegrees(float degrees);
