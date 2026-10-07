@@ -7,6 +7,7 @@ Date: Derniere date de modification
 */
 
 #include <LibRobus.h>
+
 int limite_x_g = -1;
 int limite_x_d = 1;
 int limite_y = 10;
@@ -18,6 +19,25 @@ bool fin = 0;
 
 int vertpin = 48;
 int rougepin = 49;
+
+// 1 = ligne sur le bord avant de la case [colonne][rangee]
+bool lignes_avant[3][10] = {
+  // r0 r1 r2 r3 r4 r5 r6 r7 r8 r9
+  {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },   // colonne gauche
+  {  0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },   // colonne centre
+  {  0, 0, 0, 0, 1, 0, 0, 0, 0, 0 }    // colonne droite
+};
+
+// 1 = ligne verticale sur le bord GAUCHE de la colonne c, a la rangee r
+// (index 1 = entre gauche et centre, index 2 = entre centre et droite)
+// Index 0 et 3 = bords exterieurs (deja geres par les limites, laisser a 0)
+bool lignes_cotes[4][10] = {
+  // r0 r1 r2 r3 r4 r5 r6 r7 r8 r9
+  {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },   // bord exterieur gauche
+  {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },   // entre gauche et centre
+  {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },   // entre centre et droite
+  {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }    // bord exterieur droit
+};
 
 void avancerCm(float distanceCm) {
   const float ticks_par_cm = 130;
@@ -169,9 +189,24 @@ bool verif_limite_x_d(){
   }
 }
 
+bool ligne_devant(){
+  return lignes_avant[pos_x + 1][pos_y];
+}
+
+bool ligne_cote(int cote){            // -1 = gauche, +1 = droite
+  int col = pos_x + 1;
+  if (cote == -1) return lignes_cotes[col][pos_y];
+  else            return lignes_cotes[col + 1][pos_y];
+}
+
+bool devant_libre(){
+  return !ligne_devant() && !verif_mur();
+}
+
 bool essayerCote(int cote){
   if (cote == -1 && !verif_limite_x_g()) return false;
   if (cote == +1 && !verif_limite_x_d()) return false;
+  if (ligne_cote(cote)) return false;
 
   tournerDeg(90 * cote);        // -90 = gauche, +90 = droite
   delay(100);
@@ -180,7 +215,6 @@ bool essayerCote(int cote){
   if (libre){
     avancerCm(50);
     pos_x += cote;
-
   }
 
   tournerDeg(-90 * cote);
@@ -190,7 +224,7 @@ bool essayerCote(int cote){
 
 void decision(){
   while (!fin) {
-    if (!verif_mur()) {
+    if (devant_libre()) {
       avancerCm(50);
       pos_y += 1;
     }
@@ -202,7 +236,7 @@ void decision(){
       }
     }
 
-    if ((pos_y >= limite_y - 2) && (!verif_mur())) {
+    if ((pos_y >= limite_y - 2) && devant_libre()) {
       avancerCm(110);
       tournerDeg(360);
       fin = true;
@@ -230,7 +264,8 @@ void loop() {
 
   else if (ROBUS_IsBumper(LEFT)){ //mode test
     tournerDeg(90);
-    }
-  else if (ROBUS_IsBumper(RIGHT))
+  }
+  else if (ROBUS_IsBumper(RIGHT)){
     avancerCm(50);
   }
+}
