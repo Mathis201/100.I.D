@@ -5,9 +5,10 @@ Auteurs: Les membres auteurs du script
 Description: Breve description du script
 Date: Derniere date de modification
 */
-
-#include "motor_management.h"
 #include <LibRobus.h>
+
+#include "grid_navigation.h"
+#include "motor_management.h"
 
 enum RobotStates {
     WAIT_FOR_START,
