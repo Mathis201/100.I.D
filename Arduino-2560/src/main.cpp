@@ -87,7 +87,7 @@ void loop() {
     }
     case FINISHED: {
         stopMotors();
-        beep(3);
+        beep(1);
         currentState = WAIT_FOR_START;
         break;
     }

@@ -3,7 +3,7 @@
 
 constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
-constexpr float kTrackWidthMm = 190.5;
+constexpr float kTrackWidthMm = 187.6;
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
 
@@ -12,7 +12,7 @@ constexpr float maxRecordedSpeed = 915; // mm / s
 constexpr float kMaxSpeed = 650; // mm / s
 constexpr float kAccel = 700;    // mm / s ^ 2
 
-constexpr float kP = 0.02;
+constexpr float kP = 0.0125;
 constexpr float kS = 0.0;
 constexpr float kProfileRefreshDelayMs = 20;
 
@@ -44,8 +44,8 @@ static float calculateMotorOutput(float motorPosition, float motorTarget) {
 }
 
 static void initMotorProfiles(float leftTarget, float rightTarget, float leftFinalVelocity, float rightFinalVelocity) {
-    initProfile0(millis() / 1000.0, currentLeftPosition, leftTarget, kMaxSpeed, kAccel, currentLeftVelocity, leftFinalVelocity);
-    initProfile1(millis() / 1000.0, currentRightPosition, rightTarget, kMaxSpeed, kAccel, currentRightVelocity, rightFinalVelocity);
+    initProfile0(millis() / 1000.0, currentLeftPosition, leftTarget, kMaxSpeed, kAccel, 0.0, leftFinalVelocity);
+    initProfile1(millis() / 1000.0, currentRightPosition, rightTarget, kMaxSpeed, kAccel, 0.0, rightFinalVelocity);
 
     lastProfileTimeMs = millis();
     targetLeftPosition = currentLeftPosition;
