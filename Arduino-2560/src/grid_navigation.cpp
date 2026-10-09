@@ -1,8 +1,10 @@
 #include "grid_navigation.h"
-#include <LibRobus.h>
 
-constexpr static int gridXSize = 10;
-constexpr static int gridYSize = 3;
+#define SIMULATION 1
+
+#if !SIMULATION
+#include <LibRobus.h>
+#endif
 
 // hardcoded walls, encoded as coordinates
 constexpr static int xTape[][2] = {{}};
@@ -204,6 +206,7 @@ void updateWallAtPos(int squareX, int squareY, int currentOrientation, bool wall
 }
 
 void printSquareInfoAboutPos(int squareX, int squareY, int *info) {
+#if !SIMULATION
     Serial.print("(");
     Serial.print(squareX);
     Serial.print(", ");
@@ -218,6 +221,7 @@ void printSquareInfoAboutPos(int squareX, int squareY, int *info) {
     Serial.print(" ");
     Serial.println(info[REAR]);
     Serial.println("");
+#endif
 }
 
 int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
@@ -240,7 +244,6 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
         nextMove[0] = currentPosX;
         nextMove[1] = currentPosY;
         nextMove[2] = currentOrientation;
-        Serial.println("No way out, 4 walls detected");
         return nextMove;
     }
 
@@ -324,10 +327,12 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
 }
 
 void printExploredGrid() {
+#if !SIMULATION
     for (int i = 0; i < gridXSize; i++) {
         for (int j = 0; j < gridYSize; j++) {
             Serial.print(gridExplored[i][j]);
         }
         Serial.println();
     }
+#endif
 }
