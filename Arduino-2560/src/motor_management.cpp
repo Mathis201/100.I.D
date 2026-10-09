@@ -4,9 +4,10 @@
 
 constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
-constexpr float kTrackWidthMm = 187.6;
+constexpr float kTrackWidthMm = 192.2;
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
+constexpr float distancePerCoordinate = 500; // mm
 
 constexpr float maxRecordedSpeed = 915; // mm / s
 
@@ -53,6 +54,30 @@ static void initMotorProfiles(float leftTarget, float rightTarget, float leftFin
     targetRightPosition = currentRightPosition;
 }
 
+static void requestStraightDistance(float distanceMm, float targetEndVelocity = 0.0) {
+    initMotorProfiles(currentLeftPosition + distanceMm, currentRightPosition + distanceMm, targetEndVelocity, targetEndVelocity);
+}
+
+static void requestTurnDegrees(float degrees) {
+    float distanceMm = ((degrees * PI / 180) * kTrackWidthMm) / 2;
+    initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0);
+}
+
+static int orientationToDegrees(int orientation) {
+    switch (orientation) {
+    case FRONT:
+        return 0;
+    case LEFT:
+        return 90;
+    case RIGHT:
+        return -90;
+    case REAR:
+        return 180;
+    default:
+        return 0;
+    }
+}
+
 void updateMotorInfo(float currentTimeMs) {
     // update motor positions
     currentLeftPosition = ENCODER_Read(LEFT) * fTicksToMm;
@@ -92,10 +117,10 @@ bool areProfilesDone() {
 
 void updateMotorProfiles() {
     if ((millis() - lastProfileTimeMs) >= kProfileRefreshDelayMs) {
-        Serial.print("Projected Left: ");
-        Serial.print(targetLeftPosition);
-        Serial.print(", Actual Left: ");
-        Serial.println(currentLeftPosition);
+        // Serial.print("Projected Left: ");
+        // Serial.print(targetLeftPosition);
+        // Serial.print(", Actual Left: ");
+        // Serial.println(currentLeftPosition);
 
         float leftOutput = calculateMotorOutput(currentLeftPosition, targetLeftPosition);
         float rightOutput = calculateMotorOutput(currentRightPosition, targetRightPosition);
@@ -123,11 +148,47 @@ void updateMotorProfiles() {
     }
 }
 
-void requestStraightDistance(float distanceMm, float targetEndVelocity) {
-    initMotorProfiles(currentLeftPosition + distanceMm, currentRightPosition + distanceMm, targetEndVelocity, targetEndVelocity);
+void requestOrientation(int currentOrientation, int requestedOrientation) {
+    int currentDegrees = orientationToDegrees(currentOrientation);
+    int requestedDegrees = orientationToDegrees(requestedOrientation);
+
+    int delta = requestedDegrees - currentDegrees;
+    // wrap around if too big (REAR is 180, RIGHT is -90, can be simplified)
+    if (delta > 180) {
+        delta = 180 - delta;
+    } else if (delta < -180) {
+        delta = 360 + delta;
+    }
+
+    requestTurnDegrees(delta);
 }
 
-void requestTurnDegrees(float degrees) {
-    float distanceMm = ((degrees * PI / 180) * kTrackWidthMm) / 2;
-    initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0);
+void requestXPosition(int currentGridX, int requestedGridX, int currentOrientation) {
+    // guard against wrong orientations
+    if (!(currentOrientation == FRONT || currentOrientation == REAR)) {
+        return;
+    }
+    int deltaXMm = (requestedGridX - currentGridX) * distancePerCoordinate;
+
+    // if facing backwards (towards negative x), allow it to go in reverse
+    if (currentOrientation == REAR) {
+        deltaXMm = -deltaXMm;
+    }
+
+    requestStraightDistance(deltaXMm);
+}
+
+void requestYPosition(int currentGridY, int requestedGridY, int currentOrientation) {
+    // guard against wrong orientations
+    if (!(currentOrientation == LEFT || currentOrientation == RIGHT)) {
+        return;
+    }
+    int deltaYMm = (requestedGridY - currentGridY) * distancePerCoordinate;
+
+    // if facing right (towards negative y), allow it to go in reverse
+    if (currentOrientation == RIGHT) {
+        deltaYMm = -deltaYMm;
+    }
+
+    requestStraightDistance(deltaYMm);
 }

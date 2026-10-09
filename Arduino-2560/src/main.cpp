@@ -14,16 +14,34 @@ enum RobotStates {
     WAIT_FOR_START,
     FIND_NEXT_MOVE,
     MOVE,
+    UPDATE_WALLS,
     FINISHED
 };
 
+constexpr int pinRed = 48;
+constexpr int pinGreen = 49;
+
 constexpr float transitionTime = 40;
 
-int loopCounter = 0;
+// info about start of maze
+constexpr int startPosX = 0;
+constexpr int startPosY = 1;
+constexpr int startOrientation = FRONT;
+
+// info about current position in the maze
+int currentPosX = 0;
+int currentPosY = 0;
+int currentOrientation = 0;
+
+// info about wanted position in the maze
+int targetPosX = 0;
+int targetPosY = 0;
+int targetOrientation = 0;
 
 RobotStates currentState;
-float targetTimerTime = 0;
-bool timerStarted = false;
+
+float targetTransitionTime = 0;
+bool transitionTimerStarted = false;
 
 void beep(int count) {
     for (int i = 0; i < count; i++) {
@@ -32,11 +50,13 @@ void beep(int count) {
         AX_BuzzerOFF();
         delay(100);
     }
-    delay(400);
 }
 
 void setup() {
     BoardInit();
+    // set proximity detector pin modes
+    pinMode(pinGreen, INPUT);
+    pinMode(pinRed, INPUT);
 
     beep(1);
 
@@ -45,48 +65,88 @@ void setup() {
     currentState = WAIT_FOR_START;
 }
 
+// called in a very fast loop, nothing blocking should be put here
 void loop() {
+    // read motor encoders every loop
     updateMotorInfo(millis());
+
+    if (ROBUS_IsBumper(RIGHT)) {
+        currentState = FINISHED;
+    }
 
     switch (currentState) {
     case WAIT_FOR_START: {
-        loopCounter = 0;
         if (ROBUS_IsBumper(REAR)) {
             delay(300);
-            currentState = FIND_NEXT_MOVE;
+            // reset position in grid
+            currentPosX = startPosX;
+            currentPosY = startPosY;
+            currentOrientation = startOrientation;
+
+            // reset walls
+            initWalls(startPosX, startPosY);
+
+            // verify if placed in front of wall at start
+            currentState = UPDATE_WALLS;
         }
         break;
     }
     case FIND_NEXT_MOVE: {
-        timerStarted = false;
-
-        if (loopCounter >= 8) {
+        if (isAtEndOfGrid(currentPosX)) {
             currentState = FINISHED;
-        } else {
-            if (loopCounter % 2 == 0) {
-                requestStraightDistance(500);
-            } else {
-                requestTurnDegrees(90);
-            }
-            currentState = MOVE;
         }
+
+        transitionTimerStarted = false;
+        int *moveInfo = findNextMove(currentPosX, currentPosY, currentOrientation);
+        targetPosX = moveInfo[0];
+        targetPosY = moveInfo[1];
+        targetOrientation = moveInfo[2];
+
+        if (targetOrientation != currentOrientation) {
+            requestOrientation(currentOrientation, targetOrientation);
+        } else if (targetPosX != currentPosX) {
+            requestXPosition(currentPosX, targetPosX, currentOrientation);
+        } else if (targetPosY != currentPosY) {
+            requestYPosition(currentPosY, targetPosY, currentOrientation);
+        }
+
+        currentState = MOVE;
         break;
     }
     case MOVE: {
-        if (areProfilesDone() && !timerStarted) {
-            targetTimerTime = millis() + transitionTime;
-            timerStarted = true;
+        if (areProfilesDone() && !transitionTimerStarted) {
+            targetTransitionTime = millis() + transitionTime;
+            transitionTimerStarted = true;
         } else {
             updateMotorProfiles();
         }
 
-        if (timerStarted && millis() >= targetTimerTime) {
-            loopCounter++;
-            currentState = FIND_NEXT_MOVE;
+        if (transitionTimerStarted && millis() >= targetTransitionTime) {
+            currentPosX = targetPosX;
+            currentPosY = targetPosY;
+            currentOrientation = targetOrientation;
+            currentState = UPDATE_WALLS;
+        }
+        break;
+    }
+    case UPDATE_WALLS: {
+        bool wallDetected = !digitalRead(pinRed) || !digitalRead(pinGreen);
+        updateWallAtPos(currentPosX, currentPosY, currentOrientation, wallDetected, false);
+        Serial.print(currentPosX);
+        Serial.print(", ");
+        Serial.print(currentPosY);
+        Serial.print(" at orientation ");
+        Serial.println(currentOrientation);
+
+        currentState = FIND_NEXT_MOVE;
+
+        if (currentPosX == 9) {
+            currentState = FINISHED;
         }
         break;
     }
     case FINISHED: {
+        printExploredGrid();
         stopMotors();
         beep(1);
         currentState = WAIT_FOR_START;
