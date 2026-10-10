@@ -23,3 +23,4 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation);
 int *getWallsAtPos(int squareX, int squareY);
 
 void printExploredGrid();
+void printSquareInfoAboutPos(int squareX, int squareY, int *info);

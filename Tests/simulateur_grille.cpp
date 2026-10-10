@@ -86,7 +86,19 @@ int main() {
 
     while (!isAtEndOfGrid(currentPosX)) {
         printSimulatedGrid(currentPosX, currentPosY, currentOrientation);
-        std::cin.get();
+        std::string input;
+        while (input != "c") {
+            std::cin >> input;
+            if (input == "e") {
+                printExploredGrid();
+            }
+            if (input == "w") {
+                printSquareInfoAboutPos(currentPosX, currentPosY, getWallsAtPos(currentPosX, currentPosY));
+            }
+            if (input == "q") {
+                return 0;
+            }
+        }
 
         int *moveInfo = findNextMove(currentPosX, currentPosY, currentOrientation);
         currentPosX = moveInfo[0];

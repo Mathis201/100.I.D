@@ -4,6 +4,8 @@
 
 #if !SIMULATION
 #include <LibRobus.h>
+#else
+#include <iostream>
 #endif
 
 // hardcoded walls, encoded as coordinates
@@ -66,7 +68,7 @@ static int *getNeighborSquare(int squareX, int squareY, int orientation) {
 }
 
 // from an input position, going in an orientation, find the next stop point based on current maze state
-// also marks every square in the path as explored
+// also handles explored grid status
 // returns an array [nextStopX, nextStopY, movementOrientation]
 static int *getNextStop(int currentPosX, int currentPosY, int movementOrientation, bool wasInDeadEnd) {
     // TODO: right now only moves one space
@@ -205,25 +207,6 @@ void updateWallAtPos(int squareX, int squareY, int currentOrientation, bool wall
     }
 }
 
-void printSquareInfoAboutPos(int squareX, int squareY, int *info) {
-#if !SIMULATION
-    Serial.print("(");
-    Serial.print(squareX);
-    Serial.print(", ");
-    Serial.print(squareY);
-    Serial.println("):");
-
-    Serial.print(" ");
-    Serial.println(info[FRONT]);
-    Serial.print(info[LEFT]);
-    Serial.print(" ");
-    Serial.println(info[RIGHT]);
-    Serial.print(" ");
-    Serial.println(info[REAR]);
-    Serial.println("");
-#endif
-}
-
 int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
     int *currentWalls = getWallsAtPos(currentPosX, currentPosY);
     int *neighborsExploredState = getNeighborsExploredState(currentPosX, currentPosY);
@@ -308,14 +291,13 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
                 return getNextStop(currentPosX, currentPosY, prioritizedOrientation, false);
             }
 
-            // if unknown, turn to see it
-            if (currentWalls[prioritizedOrientation] == -1) {
-                static int nextMove[3];
-                nextMove[0] = currentPosX;
-                nextMove[1] = currentPosY;
-                nextMove[2] = prioritizedOrientation;
-                return nextMove;
-            }
+            // otherwise, unknown or clear but not aligned
+            // turn to see it
+            static int nextMove[3];
+            nextMove[0] = currentPosX;
+            nextMove[1] = currentPosY;
+            nextMove[2] = prioritizedOrientation;
+            return nextMove;
         }
     }
 
@@ -327,12 +309,44 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
 }
 
 void printExploredGrid() {
+    for (int j = 0; j < gridYSize; j++) {
+        for (int i = 0; i < gridXSize; i++) {
+            int exploredStatus = gridExplored[i][gridYSize - (j + 1)];
 #if !SIMULATION
-    for (int i = 0; i < gridXSize; i++) {
-        for (int j = 0; j < gridYSize; j++) {
-            Serial.print(gridExplored[i][j]);
+            Serial.print(exploredStatus);
+#else
+            std::cout << exploredStatus;
+#endif
         }
+#if !SIMULATION
         Serial.println();
+#else
+        std::cout << std::endl;
+#endif
     }
+}
+
+void printSquareInfoAboutPos(int squareX, int squareY, int *info) {
+#if !SIMULATION
+    Serial.print("(");
+    Serial.print(squareX);
+    Serial.print(", ");
+    Serial.print(squareY);
+    Serial.println("):");
+
+    Serial.print(" ");
+    Serial.println(info[FRONT]);
+    Serial.print(info[LEFT]);
+    Serial.print(" ");
+    Serial.println(info[RIGHT]);
+    Serial.print(" ");
+    Serial.println(info[REAR]);
+    Serial.println("");
+#else
+    std::cout << "(" << squareX << ", " << squareY << "):" << std::endl;
+    std::cout << " " << info[FRONT] << std::endl;
+    std::cout << info[LEFT] << " " << info[RIGHT] << std::endl;
+    std::cout << " " << info[REAR] << std::endl
+              << std::endl;
 #endif
 }
