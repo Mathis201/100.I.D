@@ -70,8 +70,16 @@ static int *getNeighborSquare(int squareX, int squareY, int orientation) {
 // from an input position, going in an orientation, find the next stop point based on current maze state
 // also handles explored grid status
 // returns an array [nextStopX, nextStopY, movementOrientation]
-static int *getNextStop(int currentPosX, int currentPosY, int movementOrientation, bool wasInDeadEnd) {
+static int *handleNextStop(int currentPosX, int currentPosY, int movementOrientation, bool wasInDeadEnd) {
     // TODO: right now only moves one space
+    if (wasInDeadEnd) {
+        // add wall where we're leaving to avoid going back there
+        updateWallAtPos(currentPosX, currentPosY, movementOrientation, true, true);
+
+        // remove current square from explored (went back)
+        gridExplored[currentPosX][currentPosY] = 0;
+    }
+
     int *nextSquare = getNeighborSquare(currentPosX, currentPosY, movementOrientation);
     gridExplored[nextSquare[0]][nextSquare[1]] = 1;
 
@@ -242,40 +250,17 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
         }
 
         // otherwise move to the last free direction
-
-        // add wall where we're reversing to avoid going back there
-        updateWallAtPos(currentPosX, currentPosY, lastFreeDirection, true, true);
-
-        // remove current square from explored (went back)
-        gridExplored[currentPosX][currentPosY] = 0;
-
-        // go back from current spot
-        return getNextStop(currentPosX, currentPosY, lastFreeDirection, true);
+        return handleNextStop(currentPosX, currentPosY, lastFreeDirection, true);
     }
 
     // if not deadend or impossible, find which way to go next
 
-    // direction priorities
     int orientationPriorityOrder[4]{FRONT, LEFT, RIGHT, REAR};
-    // if not facing front, rearrange priorities
-    // current orientation should be 2nd most favored (front is always favored)
-    if (currentOrientation != FRONT) {
-        // find current orientation's priority
-        int currentOrientationIndex = 3;
-        for (int i = 1; i < 4; i++) {
-            if (orientationPriorityOrder[i] == currentOrientation) {
-                currentOrientationIndex = i;
-                break;
-            }
-        }
-
-        // place current orientation as 2nd priority (index 1)
-        // loop from current index down to index 1 and shift elements to the right
-        for (int i = currentOrientationIndex; i > 1; i--) {
-            orientationPriorityOrder[i] = orientationPriorityOrder[i - 1];
-        }
-        // place the current orientation in the space created by the shifts
-        orientationPriorityOrder[1] = currentOrientation;
+    // if facing right, rearrange priorities to priotize that way
+    // front is always most favored and rear least favored
+    if (currentOrientation == RIGHT) {
+        orientationPriorityOrder[1] = RIGHT;
+        orientationPriorityOrder[2] = LEFT;
     }
 
     // loop through priorities to find the next move to make
@@ -288,7 +273,7 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
             // if facing that way and not blocked off by walls, go that way
             if (currentOrientation == prioritizedOrientation &&
                 currentWalls[prioritizedOrientation] == 0) {
-                return getNextStop(currentPosX, currentPosY, prioritizedOrientation, false);
+                return handleNextStop(currentPosX, currentPosY, prioritizedOrientation, false);
             }
 
             // otherwise, unknown or clear but not aligned
