@@ -7,8 +7,8 @@ constexpr int startPosX = 0;
 constexpr int startPosY = 1;
 constexpr int startOrientation = FRONT;
 
-constexpr static int xWalls[][2] = {{1, 1}, {2, 4}, {1, 5}};
-constexpr static int yWalls[][2] = {{4, 2}, {4, 1}};
+constexpr static int xWalls[][2] = {{1, 1}, {2, 5}, {1, 5}};
+constexpr static int yWalls[][2] = {{4, 1}};
 
 bool isSimulatedWallThere(int currentPosX, int currentPosY, int currentOrientation) {
     int searchedX = currentPosX;

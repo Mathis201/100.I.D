@@ -1,6 +1,7 @@
 #include "grid_navigation.h"
 
 #define SIMULATION 1
+#define DEADENDS_POSSIBLE 0
 
 #if !SIMULATION
 #include <LibRobus.h>
@@ -30,6 +31,9 @@ static int yWalls[gridXSize][gridYSize + 1]{};
 
 // all squares of grid, 1 represents explored and 0 unexplored
 static int gridExplored[gridXSize][gridYSize]{};
+
+static int startPosX;
+static int startPosY;
 
 // get the neighbor square to a square based on a desired orientation
 // if not in the grid, return current square
@@ -67,29 +71,6 @@ static int *getNeighborSquare(int squareX, int squareY, int orientation) {
     return neighborSquare;
 }
 
-// from an input position, going in an orientation, find the next stop point based on current maze state
-// also handles explored grid status
-// returns an array [nextStopX, nextStopY, movementOrientation]
-static int *handleNextStop(int currentPosX, int currentPosY, int movementOrientation, bool wasInDeadEnd) {
-    // TODO: right now only moves one space
-    if (wasInDeadEnd) {
-        // add wall where we're leaving to avoid going back there
-        updateWallAtPos(currentPosX, currentPosY, movementOrientation, true, true);
-
-        // remove current square from explored (went back)
-        gridExplored[currentPosX][currentPosY] = 0;
-    }
-
-    int *nextSquare = getNeighborSquare(currentPosX, currentPosY, movementOrientation);
-    gridExplored[nextSquare[0]][nextSquare[1]] = 1;
-
-    static int nextStop[3];
-    nextStop[0] = nextSquare[0];
-    nextStop[1] = nextSquare[1];
-    nextStop[2] = movementOrientation;
-    return nextStop;
-}
-
 // get an array of the explored state of neighbors of a square, using orientation as index
 // if neighbor doesn't exist (on edge of grid), value is -1 for that neighbor
 static int *getNeighborsExploredState(int mainSquareX, int mainSquareY) {
@@ -119,6 +100,59 @@ static int *getNeighborsExploredState(int mainSquareX, int mainSquareY) {
     }
 
     return neighbors;
+}
+
+// from an input position, going in an orientation, find the next stop point based on current maze state
+// also handles explored grid status
+// returns an array [nextStopX, nextStopY, movementOrientation]
+static int *handleNextStop(int currentPosX, int currentPosY, int movementOrientation, bool wasInDeadEnd) {
+    static int currentStop[3];
+    currentStop[0] = currentPosX;
+    currentStop[1] = currentPosY;
+    currentStop[2] = movementOrientation;
+
+    bool canKeepGoing = true;
+    while (canKeepGoing) {
+        if (wasInDeadEnd && !(currentStop[0] == startPosX && currentStop[1] == startPosY)) {
+            // add wall where we came from to avoid going back there
+            updateWallAtPos(currentStop[0], currentStop[1], movementOrientation, true, true);
+
+            // remove current square from explored (went back)
+            gridExplored[currentStop[0]][currentStop[1]] = 0;
+        }
+
+        int *nextSquare = getNeighborSquare(currentStop[0], currentStop[1], movementOrientation);
+
+        // if next wasn't marked as explored, mark it
+        if (gridExplored[nextSquare[0]][nextSquare[1]] == 0) {
+            gridExplored[nextSquare[0]][nextSquare[1]] = 1;
+        }
+
+        int *nextWalls = getWallsAtPos(nextSquare[0], nextSquare[1]);
+        int *neighborsExploredState = getNeighborsExploredState(nextSquare[0], nextSquare[1]);
+        int numWalls = 0;
+        for (int i = 0; i < 4; i++) {
+            if (nextWalls[i] == 1) {
+                numWalls += 1;
+            }
+        }
+
+        wasInDeadEnd = (numWalls == 3);
+
+        canKeepGoing = false;
+        if (numWalls >= 2) {
+            if (nextWalls[movementOrientation] == 0 ||
+                (nextWalls[movementOrientation] == -1 && !DEADENDS_POSSIBLE)) {
+                if (neighborsExploredState[movementOrientation] == 0 || wasInDeadEnd) {
+                    canKeepGoing = true;
+                }
+            }
+        }
+
+        currentStop[0] = nextSquare[0];
+        currentStop[1] = nextSquare[1];
+    }
+    return currentStop;
 }
 
 bool isAtEndOfGrid(int currentPosX) {
@@ -171,6 +205,9 @@ void initWalls(int startX, int startY) {
 
     // set the start pos as explored
     gridExplored[startX][startY] = 1;
+
+    startPosX = startX;
+    startPosY = startY;
 }
 
 int *getWallsAtPos(int squareX, int squareY) {
