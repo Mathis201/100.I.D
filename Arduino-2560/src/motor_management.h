@@ -16,3 +16,7 @@ void requestXPosition(int currentGridX, int requestedGridX, int currentOrientati
 // Init a trapezoidal profile from one grid coordinate to another.
 // The robot has to be correctly orientated to allow the movement (facing LEFT or RIGHT).
 void requestYPosition(int currentGridY, int requestedGridY, int currentOrientation);
+
+void requestStraightDistance(float distanceMm, float targetEndVelocity = 0.0);
+
+void requestTurnDegrees(float degrees);

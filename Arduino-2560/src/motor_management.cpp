@@ -4,18 +4,18 @@
 
 constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
-constexpr float kTrackWidthMm = 192.2;
+constexpr float kTrackWidthMm = 186.9;
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
 constexpr float distancePerCoordinate = 500; // mm
 
 constexpr float maxRecordedSpeed = 915; // mm / s
 
-constexpr float kMaxSpeed = 650; // mm / s
-constexpr float kAccel = 700;    // mm / s ^ 2
+constexpr float kMaxSpeed = 600; // mm / s
+constexpr float kAccel = 550;    // mm / s ^ 2
 
-constexpr float kP = 0.0125;
-constexpr float kS = 0.0;
+constexpr float kP = 0.014;
+constexpr float kS = 0.025;
 constexpr float kProfileRefreshDelayMs = 20;
 
 constexpr float kVelocityRefreshDelayMs = 50;
@@ -52,15 +52,6 @@ static void initMotorProfiles(float leftTarget, float rightTarget, float leftFin
     lastProfileTimeMs = millis();
     targetLeftPosition = currentLeftPosition;
     targetRightPosition = currentRightPosition;
-}
-
-static void requestStraightDistance(float distanceMm, float targetEndVelocity = 0.0) {
-    initMotorProfiles(currentLeftPosition + distanceMm, currentRightPosition + distanceMm, targetEndVelocity, targetEndVelocity);
-}
-
-static void requestTurnDegrees(float degrees) {
-    float distanceMm = ((degrees * PI / 180) * kTrackWidthMm) / 2;
-    initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0);
 }
 
 static int orientationToDegrees(int orientation) {
@@ -117,11 +108,6 @@ bool areProfilesDone() {
 
 void updateMotorProfiles() {
     if ((millis() - lastProfileTimeMs) >= kProfileRefreshDelayMs) {
-        // Serial.print("Projected Left: ");
-        // Serial.print(targetLeftPosition);
-        // Serial.print(", Actual Left: ");
-        // Serial.println(currentLeftPosition);
-
         float leftOutput = calculateMotorOutput(currentLeftPosition, targetLeftPosition);
         float rightOutput = calculateMotorOutput(currentRightPosition, targetRightPosition);
 
@@ -142,10 +128,29 @@ void updateMotorProfiles() {
         if (!areProfilesDone()) {
             targetLeftPosition = getProfiled0PositionAtTime(millis() / 1000.0);
             targetRightPosition = getProfiled1PositionAtTime(millis() / 1000.0);
+        } else {
+            Serial.print("Projected Left: ");
+            Serial.print(targetLeftPosition);
+            Serial.print(", Actual Left: ");
+            Serial.println(currentLeftPosition);
+
+            Serial.print("Projected Right: ");
+            Serial.print(targetRightPosition);
+            Serial.print(", Actual Right: ");
+            Serial.println(currentRightPosition);
         }
 
         lastProfileTimeMs = millis();
     }
+}
+
+void requestStraightDistance(float distanceMm, float targetEndVelocity) {
+    initMotorProfiles(currentLeftPosition + distanceMm, currentRightPosition + distanceMm, targetEndVelocity, targetEndVelocity);
+}
+
+void requestTurnDegrees(float degrees) {
+    float distanceMm = ((degrees * PI / 180) * kTrackWidthMm) / 2;
+    initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0);
 }
 
 void requestOrientation(int currentOrientation, int requestedOrientation) {

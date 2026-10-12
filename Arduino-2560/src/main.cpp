@@ -21,7 +21,7 @@ enum RobotStates {
 constexpr int pinRed = 48;
 constexpr int pinGreen = 49;
 
-constexpr float transitionTime = 40;
+constexpr float transitionTime = 200;
 
 // info about start of maze
 constexpr int startPosX = 0;
@@ -92,25 +92,28 @@ void loop() {
         break;
     }
     case FIND_NEXT_MOVE: {
-        if (isMazeFinished(currentPosX)) {
+        if (isMazeFinished(currentPosX, currentPosY)) {
             currentState = FINISHED;
+        } else {
+            transitionTimerStarted = false;
+            int *moveInfo = findNextMove(currentPosX, currentPosY, currentOrientation);
+            targetPosX = moveInfo[0];
+            targetPosY = moveInfo[1];
+            targetOrientation = moveInfo[2];
+
+            if (targetOrientation != currentOrientation) {
+                requestOrientation(currentOrientation, targetOrientation);
+            } else if (targetPosX != currentPosX) {
+                requestXPosition(currentPosX, targetPosX, currentOrientation);
+            } else if (targetPosY != currentPosY) {
+                requestYPosition(currentPosY, targetPosY, currentOrientation);
+            }
+
+            // requestTurnDegrees(90);
+
+            currentState = MOVE;
         }
 
-        transitionTimerStarted = false;
-        int *moveInfo = findNextMove(currentPosX, currentPosY, currentOrientation);
-        targetPosX = moveInfo[0];
-        targetPosY = moveInfo[1];
-        targetOrientation = moveInfo[2];
-
-        if (targetOrientation != currentOrientation) {
-            requestOrientation(currentOrientation, targetOrientation);
-        } else if (targetPosX != currentPosX) {
-            requestXPosition(currentPosX, targetPosX, currentOrientation);
-        } else if (targetPosY != currentPosY) {
-            requestYPosition(currentPosY, targetPosY, currentOrientation);
-        }
-
-        currentState = MOVE;
         break;
     }
     case MOVE: {
@@ -126,23 +129,15 @@ void loop() {
             currentPosY = targetPosY;
             currentOrientation = targetOrientation;
             currentState = UPDATE_WALLS;
+            // currentState = FINISHED;
         }
         break;
     }
     case UPDATE_WALLS: {
         bool wallDetected = !digitalRead(pinRed) || !digitalRead(pinGreen);
         updateWallAtPos(currentPosX, currentPosY, currentOrientation, wallDetected, false);
-        Serial.print(currentPosX);
-        Serial.print(", ");
-        Serial.print(currentPosY);
-        Serial.print(" at orientation ");
-        Serial.println(currentOrientation);
 
         currentState = FIND_NEXT_MOVE;
-
-        if (currentPosX == 9) {
-            currentState = FINISHED;
-        }
         break;
     }
     case FINISHED: {
