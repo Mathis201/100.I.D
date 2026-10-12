@@ -1,7 +1,7 @@
 #include "grid_navigation.h"
 
 #define SIMULATION 1
-#define DEADENDS_POSSIBLE 0
+#define DEADENDS_POSSIBLE 1
 
 #if !SIMULATION
 #include <LibRobus.h>
@@ -29,11 +29,14 @@ static int xWalls[gridYSize][gridXSize + 1]{};
 // holds WallType values to represent walls
 static int yWalls[gridXSize][gridYSize + 1]{};
 
-// all squares of grid, 1 represents explored and 0 unexplored
+// all squares of grid, 0 represents unexplored and a number is the position of the square in the path
 static int gridExplored[gridXSize][gridYSize]{};
+static int currentExploredCount;
 
 static int startPosX;
 static int startPosY;
+
+static bool reachedEnd;
 
 // get the neighbor square to a square based on a desired orientation
 // if not in the grid, return current square
@@ -102,10 +105,20 @@ static int *getNeighborsExploredState(int mainSquareX, int mainSquareY) {
     return neighbors;
 }
 
+static void addSquareToExplored(int squareX, int squareY) {
+    currentExploredCount++;
+    gridExplored[squareX][squareY] = currentExploredCount;
+}
+
+static void removeSquareFromExplored(int squareX, int squareY) {
+    currentExploredCount--;
+    gridExplored[squareX][squareY] = 0;
+}
+
 // from an input position, going in an orientation, find the next stop point based on current maze state
 // also handles explored grid status
 // returns an array [nextStopX, nextStopY, movementOrientation]
-static int *handleNextStop(int currentPosX, int currentPosY, int movementOrientation, bool wasInDeadEnd) {
+static int *handleNextStopForwards(int currentPosX, int currentPosY, int movementOrientation, bool wasInDeadEnd) {
     static int currentStop[3];
     currentStop[0] = currentPosX;
     currentStop[1] = currentPosY;
@@ -118,14 +131,14 @@ static int *handleNextStop(int currentPosX, int currentPosY, int movementOrienta
             updateWallAtPos(currentStop[0], currentStop[1], movementOrientation, true, true);
 
             // remove current square from explored (went back)
-            gridExplored[currentStop[0]][currentStop[1]] = 0;
+            removeSquareFromExplored(currentStop[0], currentStop[1]);
         }
 
         int *nextSquare = getNeighborSquare(currentStop[0], currentStop[1], movementOrientation);
 
         // if next wasn't marked as explored, mark it
         if (gridExplored[nextSquare[0]][nextSquare[1]] == 0) {
-            gridExplored[nextSquare[0]][nextSquare[1]] = 1;
+            addSquareToExplored(nextSquare[0], nextSquare[1]);
         }
 
         int *nextWalls = getWallsAtPos(nextSquare[0], nextSquare[1]);
@@ -155,13 +168,62 @@ static int *handleNextStop(int currentPosX, int currentPosY, int movementOrienta
     return currentStop;
 }
 
-bool isAtEndOfGrid(int currentPosX) {
+static bool isAtEndOfGrid(int currentPosX) {
     return currentPosX == (gridXSize - 1);
+}
+
+static int *getNextMoveBackwards(int currentX, int currentY, int currentOrientation) {
+    static int nextMove[3];
+    nextMove[0] = currentX;
+    nextMove[1] = currentY;
+    nextMove[2] = currentOrientation;
+
+    bool canKeepGoing = true;
+    while (canKeepGoing) {
+        int currentPathPos = gridExplored[nextMove[0]][nextMove[1]];
+
+        // if target is first square, can't continue after that
+        if (currentPathPos == 1) {
+            canKeepGoing = false;
+        } else {
+            // find next neighbor to go to
+            int nextPosDirection = -1;
+            for (int i = 0; i < 4; i++) {
+                int *neighbor = getNeighborSquare(nextMove[0], nextMove[1], i);
+                // look for neighbor with explored counter one less than current (next in path)
+                if (gridExplored[neighbor[0]][neighbor[1]] == (currentPathPos - 1)) {
+                    nextPosDirection = i;
+                    break;
+                }
+            }
+
+            // if no neighbor found, end here
+            if (nextPosDirection == -1) {
+                canKeepGoing = false;
+            } else if (nextPosDirection != currentOrientation) {
+                // if not in the same direction as where we're heading, can't go further
+                canKeepGoing = false;
+
+                // if haven't moved further down from where we started, can turn in place
+                // otherwise will simply go to next move and orientation change will be triggered in a further call
+                if (nextMove[0] == currentX && nextMove[1] == currentY) {
+                    nextMove[2] = nextPosDirection;
+                }
+            } else {
+                // same direction, just move to the next square and continue looping
+                int *nextSquare = getNeighborSquare(nextMove[0], nextMove[1], nextPosDirection);
+                nextMove[0] = nextSquare[0];
+                nextMove[1] = nextSquare[1];
+            }
+        }
+    }
+
+    return nextMove;
 }
 
 // reinitialize the grid walls based on hardcoded obstacles
 // reinitialize explored grid to 0s, except for start pos provided
-void initWalls(int startX, int startY) {
+void initGrid(int startX, int startY) {
     for (int row = 0; row < gridYSize; row++) {
         for (int column = 0; column < gridXSize + 1; column++) {
             int initValue = WallType::WALL_UNKNOWN;
@@ -203,11 +265,12 @@ void initWalls(int startX, int startY) {
         }
     }
 
-    // set the start pos as explored
-    gridExplored[startX][startY] = 1;
+    currentExploredCount = 0;
+    addSquareToExplored(startX, startY);
 
     startPosX = startX;
     startPosY = startY;
+    reachedEnd = false;
 }
 
 int *getWallsAtPos(int squareX, int squareY) {
@@ -253,6 +316,22 @@ void updateWallAtPos(int squareX, int squareY, int currentOrientation, bool wall
 }
 
 int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
+    if (isAtEndOfGrid(currentPosX)) {
+        reachedEnd = true;
+    }
+
+    if (isMazeFinished(currentPosX, currentPosY)) {
+        static int nextMove[3];
+        nextMove[0] = currentPosX;
+        nextMove[1] = currentPosY;
+        nextMove[2] = currentOrientation;
+        return nextMove;
+    }
+
+    if (reachedEnd) {
+        return getNextMoveBackwards(currentPosX, currentPosY, currentOrientation);
+    }
+
     int *currentWalls = getWallsAtPos(currentPosX, currentPosY);
     int *neighborsExploredState = getNeighborsExploredState(currentPosX, currentPosY);
 
@@ -287,11 +366,10 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
         }
 
         // otherwise move to the last free direction
-        return handleNextStop(currentPosX, currentPosY, lastFreeDirection, true);
+        return handleNextStopForwards(currentPosX, currentPosY, lastFreeDirection, true);
     }
 
     // if not deadend or impossible, find which way to go next
-
     int orientationPriorityOrder[4]{FRONT, LEFT, RIGHT, REAR};
     // if facing right, rearrange priorities to priotize that way
     // front is always most favored and rear least favored
@@ -310,7 +388,7 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
             // if facing that way and not blocked off by walls, go that way
             if (currentOrientation == prioritizedOrientation &&
                 currentWalls[prioritizedOrientation] == 0) {
-                return handleNextStop(currentPosX, currentPosY, prioritizedOrientation, false);
+                return handleNextStopForwards(currentPosX, currentPosY, prioritizedOrientation, false);
             }
 
             // otherwise, unknown or clear but not aligned
@@ -330,14 +408,19 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
     return nextMove;
 }
 
+bool isMazeFinished(int currentPosX, int currentPosY) {
+    return reachedEnd && (currentPosX == startPosX) && (currentPosY == startPosY);
+}
+
 void printExploredGrid() {
     for (int j = 0; j < gridYSize; j++) {
         for (int i = 0; i < gridXSize; i++) {
             int exploredStatus = gridExplored[i][gridYSize - (j + 1)];
 #if !SIMULATION
             Serial.print(exploredStatus);
+            Serial.print(" ");
 #else
-            std::cout << exploredStatus;
+            std::cout << exploredStatus << " ";
 #endif
         }
 #if !SIMULATION

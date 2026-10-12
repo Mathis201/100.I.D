@@ -84,7 +84,7 @@ void loop() {
             currentOrientation = startOrientation;
 
             // reset walls
-            initWalls(startPosX, startPosY);
+            initGrid(startPosX, startPosY);
 
             // verify if placed in front of wall at start
             currentState = UPDATE_WALLS;
@@ -92,7 +92,7 @@ void loop() {
         break;
     }
     case FIND_NEXT_MOVE: {
-        if (isAtEndOfGrid(currentPosX)) {
+        if (isMazeFinished(currentPosX)) {
             currentState = FINISHED;
         }
 

@@ -7,8 +7,8 @@ constexpr int startPosX = 0;
 constexpr int startPosY = 1;
 constexpr int startOrientation = FRONT;
 
-constexpr static int xWalls[][2] = {{1, 1}, {2, 5}, {1, 5}};
-constexpr static int yWalls[][2] = {{4, 1}};
+constexpr static int xWalls[][2] = {{1, 1}, {2, 7}, {1, 5}};
+constexpr static int yWalls[][2] = {{4, 1}, {6, 2}};
 
 bool isSimulatedWallThere(int currentPosX, int currentPosY, int currentOrientation) {
     int searchedX = currentPosX;
@@ -79,15 +79,17 @@ void printSimulatedGrid(int currentPosX, int currentPosY, int currentOrientation
 }
 
 int main() {
-    initWalls(startPosX, startPosY);
+    initGrid(startPosX, startPosY);
     int currentPosX = startPosX;
     int currentPosY = startPosY;
     int currentOrientation = startOrientation;
 
-    while (!isAtEndOfGrid(currentPosX)) {
+    bool runAuto = false;
+
+    while (!isMazeFinished(currentPosX, currentPosY)) {
         printSimulatedGrid(currentPosX, currentPosY, currentOrientation);
         std::string input;
-        while (input != "c") {
+        while (input != "c" && !runAuto) {
             std::cin >> input;
             if (input == "e") {
                 printExploredGrid();
@@ -98,14 +100,21 @@ int main() {
             if (input == "q") {
                 return 0;
             }
+            if (input == "r") {
+                runAuto = true;
+            }
         }
 
         int *moveInfo = findNextMove(currentPosX, currentPosY, currentOrientation);
-        currentPosX = moveInfo[0];
-        currentPosY = moveInfo[1];
+
+        std::cout << std::endl;
         if (moveInfo[2] != currentOrientation) {
             std::cout << "Rotated from " << currentOrientation << " to " << moveInfo[2] << std::endl;
+        } else {
+            std::cout << "Moved from (" << currentPosX << ", " << currentPosY << ") to (" << moveInfo[0] << ", " << moveInfo[1] << ")" << std::endl;
         }
+        currentPosX = moveInfo[0];
+        currentPosY = moveInfo[1];
         currentOrientation = moveInfo[2];
 
         updateWallAtPos(currentPosX, currentPosY, currentOrientation,
@@ -113,7 +122,8 @@ int main() {
     }
 
     printSimulatedGrid(currentPosX, currentPosY, currentOrientation);
-    std::cout << "Finished";
+    std::cout << "Finished" << std::endl;
+    printExploredGrid();
 
     return 0;
 }
