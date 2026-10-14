@@ -8,8 +8,12 @@ constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
 #ifdef A
 constexpr float kTrackWidthMm = 186.9;
+constexpr float kP = 0.014;
+constexpr float kS = 0.025;
 #else
-constexpr float kTrackWidthMm = 186.9;
+constexpr float kTrackWidthMm = 188.3;
+constexpr float kP = 0.014;
+constexpr float kS = 0.025;
 #endif
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
@@ -20,8 +24,6 @@ constexpr float maxRecordedSpeed = 915; // mm / s
 constexpr float kMaxSpeed = 600; // mm / s
 constexpr float kAccel = 550;    // mm / s ^ 2
 
-constexpr float kP = 0.014;
-constexpr float kS = 0.025;
 constexpr float kProfileRefreshDelayMs = 20;
 
 constexpr float kVelocityRefreshDelayMs = 50;
@@ -134,17 +136,17 @@ void updateMotorProfiles() {
         targetLeftPosition = getProfiled0PositionAtTime(millis() / 1000.0);
         targetRightPosition = getProfiled1PositionAtTime(millis() / 1000.0);
 
-        // if (areProfilesDone()) {
-        //     Serial.print("Projected Left: ");
-        //     Serial.print(targetLeftPosition);
-        //     Serial.print(", Actual Left: ");
-        //     Serial.println(currentLeftPosition);
+        if (areProfilesDone()) {
+            Serial.print("Projected Left: ");
+            Serial.print(targetLeftPosition);
+            Serial.print(", Actual Left: ");
+            Serial.println(currentLeftPosition);
 
-        //     Serial.print("Projected Right: ");
-        //     Serial.print(targetRightPosition);
-        //     Serial.print(", Actual Right: ");
-        //     Serial.println(currentRightPosition);
-        // }
+            Serial.print("Projected Right: ");
+            Serial.print(targetRightPosition);
+            Serial.print(", Actual Right: ");
+            Serial.println(currentRightPosition);
+        }
 
         lastProfileTimeMs = millis();
     }

@@ -1,7 +1,7 @@
 #include "grid_navigation.h"
 
 #define SIMULATION 0
-#define DEADENDS_POSSIBLE 0
+#define DEADENDS_POSSIBLE 1
 
 #if !SIMULATION
 #include <LibRobus.h>
