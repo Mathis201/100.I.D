@@ -401,6 +401,34 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
         }
     }
 
+    // all neighbors explored
+    int currentPathPos = gridExplored[currentPosX][currentPosY];
+    if (currentPathPos != 1) {
+        int nextPosDirection = -1;
+        for (int i = 0; i < 4; i++) {
+            int *neighbor = getNeighborSquare(currentPosX, currentPosY, i);
+            // look for neighbor with explored counter one less than current (next in path)
+            if (gridExplored[neighbor[0]][neighbor[1]] == (currentPathPos - 1)) {
+                nextPosDirection = i;
+                break;
+            }
+        }
+
+        if (nextPosDirection != -1) {
+            // turn to free path if not currently facing that way
+            if (currentOrientation != nextPosDirection) {
+                static int nextMove[3];
+                nextMove[0] = currentPosX;
+                nextMove[1] = currentPosY;
+                nextMove[2] = nextPosDirection;
+                return nextMove;
+            }
+
+            // otherwise move to the last free direction
+            return handleNextStopForwards(currentPosX, currentPosY, lastFreeDirection, true);
+        }
+    }
+
     static int nextMove[3];
     nextMove[0] = currentPosX;
     nextMove[1] = currentPosY;
