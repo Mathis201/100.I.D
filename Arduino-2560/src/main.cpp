@@ -21,6 +21,9 @@ enum RobotStates {
 constexpr int pinRed = 48;
 constexpr int pinGreen = 49;
 
+constexpr int pin5hz = A0;
+constexpr int pinBA = A1;
+
 constexpr float transitionTime = 200;
 
 // info about start of maze
@@ -52,6 +55,13 @@ void beep(int count) {
     }
 }
 
+bool detection_sifflet() {
+    int val5Hz = analogRead(pin5hz);
+    int valBA = analogRead(pinBA);
+
+    return ((val5Hz - valBA) >= 100);
+}
+
 void setup() {
     BoardInit();
     // set proximity detector pin modes
@@ -76,7 +86,7 @@ void loop() {
 
     switch (currentState) {
     case WAIT_FOR_START: {
-        if (ROBUS_IsBumper(REAR)) {
+        if (ROBUS_IsBumper(REAR) || detection_sifflet()) {
             delay(300);
             // reset position in grid
             currentPosX = startPosX;
@@ -89,6 +99,7 @@ void loop() {
             // verify if placed in front of wall at start
             currentState = UPDATE_WALLS;
         }
+        delay(100);
         break;
     }
     case FIND_NEXT_MOVE: {

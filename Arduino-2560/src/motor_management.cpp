@@ -2,9 +2,15 @@
 #include "trapeze.h"
 #include <LibRobus.h>
 
+#define B
+
 constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
+#ifdef A
 constexpr float kTrackWidthMm = 186.9;
+#else
+constexpr float kTrackWidthMm = 186.9;
+#endif
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
 constexpr float distancePerCoordinate = 500; // mm
