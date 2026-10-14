@@ -131,20 +131,20 @@ void updateMotorProfiles() {
 
         setMotorOutputs(leftOutput, rightOutput);
 
-        if (!areProfilesDone()) {
-            targetLeftPosition = getProfiled0PositionAtTime(millis() / 1000.0);
-            targetRightPosition = getProfiled1PositionAtTime(millis() / 1000.0);
-        } else {
-            Serial.print("Projected Left: ");
-            Serial.print(targetLeftPosition);
-            Serial.print(", Actual Left: ");
-            Serial.println(currentLeftPosition);
+        targetLeftPosition = getProfiled0PositionAtTime(millis() / 1000.0);
+        targetRightPosition = getProfiled1PositionAtTime(millis() / 1000.0);
 
-            Serial.print("Projected Right: ");
-            Serial.print(targetRightPosition);
-            Serial.print(", Actual Right: ");
-            Serial.println(currentRightPosition);
-        }
+        // if (areProfilesDone()) {
+        //     Serial.print("Projected Left: ");
+        //     Serial.print(targetLeftPosition);
+        //     Serial.print(", Actual Left: ");
+        //     Serial.println(currentLeftPosition);
+
+        //     Serial.print("Projected Right: ");
+        //     Serial.print(targetRightPosition);
+        //     Serial.print(", Actual Right: ");
+        //     Serial.println(currentRightPosition);
+        // }
 
         lastProfileTimeMs = millis();
     }

@@ -59,6 +59,11 @@ bool detection_sifflet() {
     int val5Hz = analogRead(pin5hz);
     int valBA = analogRead(pinBA);
 
+    // Serial.print("5 kHz: ");
+    // Serial.println(val5Hz);
+    // Serial.print("BA: ");
+    // Serial.println(valBA);
+
     return ((val5Hz - valBA) >= 100);
 }
 
@@ -159,4 +164,6 @@ void loop() {
         break;
     }
     }
+
+    delay(10);
 }

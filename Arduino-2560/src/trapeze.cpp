@@ -143,6 +143,11 @@ void initProfile0(float startTime, float startPos, float finalPos,
 
 float getProfiled0PositionAtTime(float currentTime) {
     float profileTime = currentTime - _startTime0;
+
+    if (profileTime > _tF0) {
+        profileTime = _tF0;
+    }
+
     if (profileTime < _tA0) {
         // still in rising part of curve
         return _startPos0 + _initialVelocity0 * profileTime + (_accel0 * profileTime * profileTime) / 2;
@@ -179,6 +184,11 @@ void initProfile1(float startTime, float startPos, float finalPos,
 
 float getProfiled1PositionAtTime(float currentTime) {
     float profileTime = currentTime - _startTime1;
+
+    if (profileTime > _tF1) {
+        profileTime = _tF1;
+    }
+
     if (profileTime < _tA1) {
         // still in rising part of curve
         return _startPos1 + _initialVelocity1 * profileTime + (_accel1 * profileTime * profileTime) / 2;
