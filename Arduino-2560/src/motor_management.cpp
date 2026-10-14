@@ -11,7 +11,7 @@ constexpr float kTrackWidthMm = 186.9;
 constexpr float kP = 0.014;
 constexpr float kS = 0.025;
 #else
-constexpr float kTrackWidthMm = 188.3;
+constexpr float kTrackWidthMm = 187;
 constexpr float kP = 0.014;
 constexpr float kS = 0.025;
 #endif
