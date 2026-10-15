@@ -38,6 +38,17 @@ static int startPosY;
 
 static bool reachedEnd;
 
+enum EndSequence {
+    NOT_AT_END,
+    LEAVE_GRID,
+    TURN_TO_MIDDLE,
+    MOVE_TO_MIDDLE,
+    TURN_TO_START,
+    MOVE_TO_START
+};
+
+EndSequence currentEndState;
+
 // get the neighbor square to a square based on a desired orientation
 // if not in the grid, return current square
 // returns [neighborX, neighborY]
@@ -178,46 +189,27 @@ static int *getNextMoveBackwards(int currentX, int currentY, int currentOrientat
     nextMove[1] = currentY;
     nextMove[2] = currentOrientation;
 
-    bool canKeepGoing = true;
-    while (canKeepGoing) {
-        int currentPathPos = gridExplored[nextMove[0]][nextMove[1]];
-
-        // if target is first square, can't continue after that
-        if (currentPathPos == 1) {
-            canKeepGoing = false;
-        } else {
-            // find next neighbor to go to
-            int nextPosDirection = -1;
-            for (int i = 0; i < 4; i++) {
-                int *neighbor = getNeighborSquare(nextMove[0], nextMove[1], i);
-                // look for neighbor with explored counter one less than current (next in path)
-                if (gridExplored[neighbor[0]][neighbor[1]] == (currentPathPos - 1)) {
-                    nextPosDirection = i;
-                    break;
-                }
-            }
-
-            // if no neighbor found, end here
-            if (nextPosDirection == -1) {
-                canKeepGoing = false;
-            } else if (nextPosDirection != currentOrientation) {
-                // if not in the same direction as where we're heading, can't go further
-                canKeepGoing = false;
-
-                // if haven't moved further down from where we started, can turn in place
-                // otherwise will simply go to next move and orientation change will be triggered in a further call
-                if (nextMove[0] == currentX && nextMove[1] == currentY) {
-                    nextMove[2] = nextPosDirection;
-                }
-            } else {
-                // same direction, just move to the next square and continue looping
-                int *nextSquare = getNeighborSquare(nextMove[0], nextMove[1], nextPosDirection);
-                nextMove[0] = nextSquare[0];
-                nextMove[1] = nextSquare[1];
-            }
+    if (currentEndState == LEAVE_GRID) {
+        nextMove[0] = currentX + 1;
+        currentEndState = TURN_TO_MIDDLE;
+    } else if (currentEndState == TURN_TO_MIDDLE) {
+        int desiredOrientation;
+        if (currentY == 0) {
+            desiredOrientation = LEFT;
+        } else if (currentY == (gridYSize - 1)) {
+            desiredOrientation = RIGHT;
         }
+        nextMove[2] = desiredOrientation;
+        currentEndState = MOVE_TO_MIDDLE;
+    } else if (currentEndState == MOVE_TO_MIDDLE) {
+        nextMove[1] = 1;
+        currentEndState = TURN_TO_START;
+    } else if (currentEndState == TURN_TO_START) {
+        nextMove[2] = REAR;
+        currentEndState = MOVE_TO_START;
+    } else if (currentEndState == MOVE_TO_START) {
+        nextMove[0] = 0;
     }
-
     return nextMove;
 }
 
@@ -271,6 +263,8 @@ void initGrid(int startX, int startY) {
     startPosX = startX;
     startPosY = startY;
     reachedEnd = false;
+
+    currentEndState = NOT_AT_END;
 }
 
 int *getWallsAtPos(int squareX, int squareY) {
@@ -317,6 +311,9 @@ void updateWallAtPos(int squareX, int squareY, int currentOrientation, bool wall
 
 int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
     if (isAtEndOfGrid(currentPosX)) {
+        if (currentEndState == NOT_AT_END) {
+            currentEndState = LEAVE_GRID;
+        }
         reachedEnd = true;
     }
 
