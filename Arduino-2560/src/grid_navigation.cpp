@@ -40,11 +40,11 @@ static bool reachedEnd;
 
 enum EndSequence {
     NOT_AT_END,
-    LEAVE_GRID,
     TURN_TO_MIDDLE,
     MOVE_TO_MIDDLE,
     TURN_TO_START,
-    MOVE_TO_START
+    MOVE_TO_START_1,
+    MOVE_TO_START_2
 };
 
 EndSequence currentEndState;
@@ -189,10 +189,7 @@ static int *getNextMoveBackwards(int currentX, int currentY, int currentOrientat
     nextMove[1] = currentY;
     nextMove[2] = currentOrientation;
 
-    if (currentEndState == LEAVE_GRID) {
-        nextMove[0] = currentX + 1;
-        currentEndState = TURN_TO_MIDDLE;
-    } else if (currentEndState == TURN_TO_MIDDLE) {
+    if (currentEndState == TURN_TO_MIDDLE) {
         int desiredOrientation;
         if (currentY == 0) {
             desiredOrientation = LEFT;
@@ -206,9 +203,12 @@ static int *getNextMoveBackwards(int currentX, int currentY, int currentOrientat
         currentEndState = TURN_TO_START;
     } else if (currentEndState == TURN_TO_START) {
         nextMove[2] = REAR;
-        currentEndState = MOVE_TO_START;
-    } else if (currentEndState == MOVE_TO_START) {
-        nextMove[0] = 0;
+        currentEndState = MOVE_TO_START_1;
+    } else if (currentEndState == MOVE_TO_START_1) {
+        nextMove[0] = 5;
+        currentEndState = MOVE_TO_START_2;
+    } else if (currentEndState == MOVE_TO_START_2) {
+        nextMove[0] = -1;
     }
     return nextMove;
 }
@@ -312,7 +312,7 @@ void updateWallAtPos(int squareX, int squareY, int currentOrientation, bool wall
 int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
     if (isAtEndOfGrid(currentPosX)) {
         if (currentEndState == NOT_AT_END) {
-            currentEndState = LEAVE_GRID;
+            currentEndState = TURN_TO_MIDDLE;
         }
         reachedEnd = true;
     }
@@ -434,7 +434,7 @@ int *findNextMove(int currentPosX, int currentPosY, int currentOrientation) {
 }
 
 bool isMazeFinished(int currentPosX, int currentPosY) {
-    return reachedEnd && (currentPosX == startPosX) && (currentPosY == startPosY);
+    return reachedEnd && (currentPosX <= startPosX) && (currentPosY == startPosY);
 }
 
 void printExploredGrid() {

@@ -7,7 +7,7 @@
 #define REAR 3
 #endif
 
-constexpr static int gridXSize = 10;
+constexpr static int gridXSize = 11;
 constexpr static int gridYSize = 3;
 
 // sets up the walls at the start of a maze run

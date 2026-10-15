@@ -11,11 +11,12 @@ constexpr float kTrackWidthMm = 188;
 constexpr float kP = 0.035;
 constexpr float kS = 0;
 #else
-constexpr float kTrackWidthMm = 188;
+constexpr float kTrackWidthMm = 189;
 constexpr float kP = 0.035;
 constexpr float kS = 0;
 
-constexpr float rightTurnMultiplier = 1;
+constexpr float rightTurnMultiplier = 1.01;
+constexpr float leftTurnMultiplier = 0.995;
 #endif
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
@@ -162,6 +163,10 @@ void requestTurnDegrees(float degrees) {
 #ifdef B
     if (degrees < 0) {
         degrees *= rightTurnMultiplier;
+    }
+
+    if (degrees > 0) {
+        degrees *= leftTurnMultiplier;
     }
 #endif
     float distanceMm = ((degrees * PI / 180) * kTrackWidthMm) / 2;
