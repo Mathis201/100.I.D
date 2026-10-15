@@ -12,7 +12,7 @@ constexpr float kP = 0.014;
 constexpr float kS = 0.025;
 #else
 constexpr float kTrackWidthMm = 189;
-constexpr float kP = 0.045;
+constexpr float kP = 0.035;
 constexpr float kS = 0.0;
 
 constexpr float rightTurnMultiplier = 1.01;
