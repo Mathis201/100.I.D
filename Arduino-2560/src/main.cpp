@@ -59,12 +59,14 @@ bool detection_sifflet() {
     int val5Hz = analogRead(pin5hz);
     int valBA = analogRead(pinBA);
 
-    // Serial.print("5 kHz: ");
-    // Serial.println(val5Hz);
-    // Serial.print("BA: ");
-    // Serial.println(valBA);
+    Serial.print("5 kHz: ");
+    Serial.print(val5Hz);
+    Serial.print("BA: ");
+    Serial.print(valBA);
+    Serial.print(", différence: ");
+    Serial.println(val5Hz - valBA);
 
-    return ((val5Hz - valBA) >= 100);
+    return ((val5Hz - valBA) >= 70);
 }
 
 void setup() {
@@ -104,7 +106,7 @@ void loop() {
             // verify if placed in front of wall at start
             currentState = UPDATE_WALLS;
         }
-        delay(100);
+
         break;
     }
     case FIND_NEXT_MOVE: {

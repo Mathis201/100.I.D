@@ -11,9 +11,11 @@ constexpr float kTrackWidthMm = 186.9;
 constexpr float kP = 0.014;
 constexpr float kS = 0.025;
 #else
-constexpr float kTrackWidthMm = 187;
-constexpr float kP = 0.014;
-constexpr float kS = 0.025;
+constexpr float kTrackWidthMm = 189;
+constexpr float kP = 0.045;
+constexpr float kS = 0.0;
+
+constexpr float rightTurnMultiplier = 1.01;
 #endif
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
@@ -157,6 +159,11 @@ void requestStraightDistance(float distanceMm, float targetEndVelocity) {
 }
 
 void requestTurnDegrees(float degrees) {
+#ifdef B
+    if (degrees < 0) {
+        degrees *= rightTurnMultiplier;
+    }
+#endif
     float distanceMm = ((degrees * PI / 180) * kTrackWidthMm) / 2;
     initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0);
 }
