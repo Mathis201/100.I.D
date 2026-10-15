@@ -76,7 +76,7 @@ static int orientationToDegrees(int orientation) {
     case REAR:
         return 180;
     case B_RETURN_CORRECTION:
-        return 175;
+        return 176.5;
     default:
         return 0;
     }

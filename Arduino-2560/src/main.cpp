@@ -55,6 +55,27 @@ void beep(int count) {
     }
 }
 
+void celebrer() {
+    // Refrain traditionnel de La Cucaracha : frequences en hertz.
+    int notes[17] = {
+        523, 523, 523, 698, 880,
+        523, 523, 523, 698, 880,
+        698, 698, 659, 659, 587, 587, 523};
+    int durees[17] = {
+        150, 150, 200, 300, 450,
+        150, 150, 200, 300, 450,
+        200, 200, 200, 200, 200, 200, 1300};
+
+    // Deux repetitions de 5 secondes chacune.
+    for (int repetition = 0; repetition < 2; repetition++) {
+        for (int note = 0; note < 17; note++) {
+            // Petite pause entre les notes pour bien distinguer les bips.
+            AX_BuzzerON(notes[note], durees[note] - 30);
+            delay(durees[note]);
+        }
+    }
+}
+
 bool detection_sifflet() {
     int val5Hz = analogRead(pin5hz);
     int valBA = analogRead(pinBA);
@@ -87,9 +108,9 @@ void loop() {
     // read motor encoders every loop
     updateMotorInfo(millis());
 
-    if (ROBUS_IsBumper(RIGHT)) {
-        currentState = FINISHED;
-    }
+    // if (ROBUS_IsBumper(RIGHT)) {
+    //     currentState = FINISHED;
+    // }
 
     switch (currentState) {
     case WAIT_FOR_START: {
@@ -111,6 +132,8 @@ void loop() {
     }
     case FIND_NEXT_MOVE: {
         if (isMazeFinished(currentPosX, currentPosY)) {
+            stopMotors();
+            celebrer();
             currentState = FINISHED;
         } else {
             transitionTimerStarted = false;
@@ -159,9 +182,7 @@ void loop() {
         break;
     }
     case FINISHED: {
-        printExploredGrid();
         stopMotors();
-        beep(1);
         currentState = WAIT_FOR_START;
         break;
     }
