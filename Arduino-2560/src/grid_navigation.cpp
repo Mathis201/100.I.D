@@ -10,7 +10,7 @@
 #endif
 
 // hardcoded walls, encoded as coordinates
-constexpr static int xTape[][2] = {{}};
+constexpr static int xTape[][2] = {{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 7}, {1, 8}, {1, 9}};
 constexpr static int yTape[][2] = {{1, 1}, {1, 2}, {3, 1}, {3, 2}, {5, 1}, {5, 2}, {7, 1}, {7, 2}, {9, 1}, {9, 2}};
 
 enum WallType {
