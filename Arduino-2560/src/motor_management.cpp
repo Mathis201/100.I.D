@@ -2,7 +2,7 @@
 #include "trapeze.h"
 #include <LibRobus.h>
 
-#define B
+// #define B
 
 constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
@@ -75,6 +75,8 @@ static int orientationToDegrees(int orientation) {
         return -90;
     case REAR:
         return 180;
+    case B_RETURN_CORRECTION:
+        return 175;
     default:
         return 0;
     }
@@ -190,13 +192,13 @@ void requestOrientation(int currentOrientation, int requestedOrientation) {
 
 void requestXPosition(int currentGridX, int requestedGridX, int currentOrientation) {
     // guard against wrong orientations
-    if (!(currentOrientation == FRONT || currentOrientation == REAR)) {
+    if (!(currentOrientation == FRONT || currentOrientation == REAR || currentOrientation == B_RETURN_CORRECTION)) {
         return;
     }
     int deltaXMm = (requestedGridX - currentGridX) * distancePerCoordinate;
 
     // if facing backwards (towards negative x), allow it to go in reverse
-    if (currentOrientation == REAR) {
+    if (currentOrientation == REAR || currentOrientation == B_RETURN_CORRECTION) {
         deltaXMm = -deltaXMm;
     }
 

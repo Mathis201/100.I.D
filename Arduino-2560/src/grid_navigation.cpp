@@ -2,6 +2,7 @@
 
 #define SIMULATION 0
 #define DEADENDS_POSSIBLE 0
+// #define B
 
 #if !SIMULATION
 #include <LibRobus.h>
@@ -44,6 +45,7 @@ enum EndSequence {
     MOVE_TO_MIDDLE,
     TURN_TO_START,
     MOVE_TO_START_1,
+    B_CORRECT_TURN,
     MOVE_TO_START_2
 };
 
@@ -206,10 +208,18 @@ static int *getNextMoveBackwards(int currentX, int currentY, int currentOrientat
         currentEndState = MOVE_TO_START_1;
     } else if (currentEndState == MOVE_TO_START_1) {
         nextMove[0] = 5;
+#ifdef B
+        currentEndState = B_CORRECT_TURN;
+#else
+        currentEndState = MOVE_TO_START_2;
+#endif
+    } else if (currentEndState == B_CORRECT_TURN) {
+        nextMove[2] = B_RETURN_CORRECTION;
         currentEndState = MOVE_TO_START_2;
     } else if (currentEndState == MOVE_TO_START_2) {
         nextMove[0] = -1;
     }
+
     return nextMove;
 }
 
