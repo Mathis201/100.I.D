@@ -7,15 +7,15 @@
 constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
 #ifdef A
-constexpr float kTrackWidthMm = 186.9;
-constexpr float kP = 0.014;
-constexpr float kS = 0.025;
-#else
-constexpr float kTrackWidthMm = 189;
+constexpr float kTrackWidthMm = 188;
 constexpr float kP = 0.035;
-constexpr float kS = 0.0;
+constexpr float kS = 0;
+#else
+constexpr float kTrackWidthMm = 188;
+constexpr float kP = 0.035;
+constexpr float kS = 0;
 
-constexpr float rightTurnMultiplier = 1.01;
+constexpr float rightTurnMultiplier = 1;
 #endif
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
