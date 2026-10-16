@@ -2,7 +2,7 @@
 
 #define SIMULATION 0
 #define DEADENDS_POSSIBLE 0
-// #define B
+#define B
 
 #if !SIMULATION
 #include <LibRobus.h>

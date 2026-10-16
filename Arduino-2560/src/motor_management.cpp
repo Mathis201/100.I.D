@@ -2,7 +2,7 @@
 #include "trapeze.h"
 #include <LibRobus.h>
 
-// #define B
+#define B
 
 constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
@@ -25,7 +25,7 @@ constexpr float distancePerCoordinate = 500; // mm
 constexpr float maxRecordedSpeed = 915; // mm / s
 
 constexpr float kMaxSpeed = 600; // mm / s
-constexpr float kAccel = 550;    // mm / s ^ 2
+constexpr float kAccel = 600;    // mm / s ^ 2
 
 constexpr float kProfileRefreshDelayMs = 20;
 
