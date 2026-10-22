@@ -16,54 +16,27 @@ Variables globales et defines
  -> defines...
  -> L'ensemble des fonctions y ont acces
 */
+enum RobotStates {
+    WAIT_FOR_START,
+    FOLLOW_LINE,
+    DO_GREEN,
+    DO_BLUE,
+    DO_YELLOW,
+    DO_ORANGE,
+    DO_PINK,
+    DROP_CUP,
+    FINISHED
+};
 
-bool bumperArr;
-int vertpin = 48;
-int rougepin = 49;
-bool vert = false;
-bool rouge = false;
-int etat = 0; // = 0 arrêt 1 = avance 2 = recule 3 = TourneDroit 4 = TourneGauche
-int etatPast = 0;
-float vitesse = 0.40;
+enum PinkStates {
+    TURN_IN_PLACE,
+    MOVE_TO_QUILLE,
+    RETURN_TO_LINE
+};
 
 /*
 Vos propres fonctions sont creees ici
 */
-
-void beep(int count) {
-    for (int i = 0; i < count; i++) {
-        AX_BuzzerON();
-        delay(100);
-        AX_BuzzerOFF();
-        delay(100);
-    }
-    delay(400);
-}
-
-void arret() {
-    MOTOR_SetSpeed(RIGHT, 0);
-    MOTOR_SetSpeed(LEFT, 0);
-};
-
-void avance() {
-    MOTOR_SetSpeed(RIGHT, vitesse);
-    MOTOR_SetSpeed(LEFT, vitesse);
-};
-
-void recule() {
-    MOTOR_SetSpeed(RIGHT, -0.5 * vitesse);
-    MOTOR_SetSpeed(LEFT, -vitesse);
-};
-
-void tourneDroit() {
-    MOTOR_SetSpeed(RIGHT, 0.5 * vitesse);
-    MOTOR_SetSpeed(LEFT, -0.5 * vitesse);
-};
-
-void tourneGauche() {
-    MOTOR_SetSpeed(RIGHT, -0.5 * vitesse);
-    MOTOR_SetSpeed(LEFT, 0.5 * vitesse);
-};
 
 /*
 Fonctions d'initialisation (setup)
@@ -73,12 +46,6 @@ Fonctions d'initialisation (setup)
 */
 void setup() {
     BoardInit();
-
-    // initialisation
-    pinMode(vertpin, INPUT);
-    pinMode(rougepin, INPUT);
-    delay(100);
-    beep(3);
 }
 
 /*
@@ -86,60 +53,4 @@ Fonctions de boucle infini
  -> Se fait appeler perpetuellement suite au "setup"
 */
 void loop() {
-    etatPast = etat;
-    bumperArr = ROBUS_IsBumper(3);
-    if (bumperArr) {
-        if (etat == 0) {
-            beep(2);
-            etat = 1;
-        } else {
-            beep(1);
-            etat = 0;
-        }
-    }
-
-    vert = digitalRead(vertpin);
-    rouge = digitalRead(rougepin);
-    if (etat > 0) {
-        if (vert && rouge) { // aucun obstacle => avance
-            etat = 1;
-        }
-        if (!vert && !rouge) { // obstacle devant => recule
-            etat = 2;
-        }
-        if (!vert && rouge) { // obstacle à gauche => tourne droit
-            etat = 3;
-        }
-        if (vert && !rouge) { // obstacle à droite => tourne gauche
-            etat = 4;
-        }
-    }
-
-    if (etatPast != etat) {
-        arret();
-        delay(50);
-    } else {
-        switch (etat) {
-        case 0:
-            arret();
-            break;
-        case 1:
-            avance();
-            break;
-        case 2:
-            recule();
-            break;
-        case 3:
-            tourneDroit();
-            break;
-        case 4:
-            tourneGauche();
-            break;
-        default:
-            avance();
-            etat = 1;
-            break;
-        }
-    }
-    delay(200);
 }
