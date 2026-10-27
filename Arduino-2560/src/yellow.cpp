@@ -110,7 +110,31 @@ void yellow() {
          break;
 
          case TURN_2:// Deuxième tournant pour contourner le mur
-         
+         if (StartRotation == false) { 
+            ENCODER_ReadReset(LEFT);
+            ENCODER_ReadReset(RIGHT);
+
+            StartRotation = true;
+        }
+
+        MOTOR_SetSpeed(LEFT,-0.5); // Rotation de 90 degrés
+        MOTOR_SetSpeed(RIGHT,0.5);
+
+        int32_t impulsionLeft = ENCODER_Read(LEFT);
+        int32_t impulsionRight = ENCODER_Read(RIGHT);
+
+        if (abs(impulsionLeft) >= Impulsion_90 && // Condition pour arreter de tourner
+         abs(impulsionRight) >= Impulsion_90) // Condition pour arreter de tourner
+        {
+            MOTOR_SetSpeed(LEFT,0);
+            MOTOR_SetSpeed(RIGHT,0);
+
+            StartRotation = false;
+            CurrentStates = FORWARD_2;
+        }
+
+        break;
+
 
 
 
