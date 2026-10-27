@@ -18,11 +18,14 @@ enum RobotStates {
 RobotStates CurrentStates = WAIT_FOR_WALL;
 
 float lireDistanceMur() {
-    return 30.0;
+    uint16_t valeurIR = ROBUS_ReadIR(0);
 }
     
 
 bool StartRotation = false;
+const int32_t Impulsion_90 = 1984;
+const int SEUIL_IR = 500;
+
 
 
 void yellow() {
@@ -30,12 +33,9 @@ void yellow() {
         case WAIT_FOR_WALL:
         // Lire la distance du capteur:
 
-        // Convertir la lecture en cm
+        uint16_t valeurIR = ROBUS_ReadIR(0);
 
-        // J'ai inveter une distance du mur pour programmer
-        float distance = lireDistanceMur();
-
-        if (distance <= 15){
+        if (valeurIR >= SEUIL_IR){
 
             MOTOR_SetSpeed(LEFT,0);
             MOTOR_SetSpeed(RIGHT,0);
@@ -62,8 +62,8 @@ void yellow() {
         int32_t impulsionLeft = ENCODER_Read(LEFT);
         int32_t impulsionRight = ENCODER_Read(RIGHT);
 
-        if (abs(impulsionLeft) >= 1000 &&
-         abs(impulsionRight) >= 1000)
+        if (abs(impulsionLeft) >= Impulsion_90 &&
+         abs(impulsionRight) >= Impulsion_90)
         {
             MOTOR_SetSpeed(LEFT,0);
             MOTOR_SetSpeed(RIGHT,0);
@@ -73,6 +73,9 @@ void yellow() {
         }
 
         break;
+
+        case FORWARD_1:
+        
 
     }
 
