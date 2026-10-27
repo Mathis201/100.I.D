@@ -117,7 +117,7 @@ void yellow() {
             StartRotation = true;
         }
 
-        MOTOR_SetSpeed(LEFT,-0.5); // Rotation de 90 degrés
+        MOTOR_SetSpeed(LEFT,-0.5); // Rotation de 90 degrés à gauche
         MOTOR_SetSpeed(RIGHT,0.5);
 
         int32_t impulsionLeft = ENCODER_Read(LEFT);
@@ -129,7 +129,7 @@ void yellow() {
             MOTOR_SetSpeed(LEFT,0);
             MOTOR_SetSpeed(RIGHT,0);
 
-            StartRotation = false;
+            StartRotation = false; 
             CurrentStates = FORWARD_2;
         }
 
