@@ -15,18 +15,19 @@ enum RobotStates {
     FINISHED
 };
 
-RobotStates CurrentStates = WAIT_FOR_WALL;
+RobotStates CurrentStates = WAIT_FOR_WALL; // 
 
-float lireDistanceMur() {
+float lireDistanceMur() { // fonction pour trouver la distance du robot au mur
     uint16_t valeurIR = ROBUS_ReadIR(0);
 }
     
-
-bool StartRotation = false;
-const int32_t Impulsion_90 = 1984;
-const int SEUIL_IR = 500;
-
-
+// Liste de constante pour le programme
+bool StartRotation = false; // Condition pour la rotation
+bool StartForward = false; // Condition pour avancer
+const int32_t Impulsion_90 = 1984;// Calcul de combien d'impulsion des roues pour faire 90 degrés
+const int SEUIL_IR = 500; // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
+const float kp = 0.0001;
+const int32_t impulsion_forward_1 = 4010;
 
 void yellow() {
     switch(CurrentStates) {
@@ -35,7 +36,7 @@ void yellow() {
 
         uint16_t valeurIR = ROBUS_ReadIR(0);
 
-        if (valeurIR >= SEUIL_IR){
+        if (valeurIR >= SEUIL_IR){ // Condition pour arreter devant le mur
 
             MOTOR_SetSpeed(LEFT,0);
             MOTOR_SetSpeed(RIGHT,0);
@@ -47,23 +48,23 @@ void yellow() {
         }
         break;
 
-        case TURN_1:
+        case TURN_1: // Premier virage de 90 degrés
 
-        if (StartRotation == false) {
+        if (StartRotation == false) { 
             ENCODER_ReadReset(LEFT);
             ENCODER_ReadReset(RIGHT);
 
             StartRotation = true;
         }
 
-        MOTOR_SetSpeed(LEFT,0.5);
+        MOTOR_SetSpeed(LEFT,0.5); // Rotation de 90 degrés
         MOTOR_SetSpeed(RIGHT,-0.5);
 
         int32_t impulsionLeft = ENCODER_Read(LEFT);
         int32_t impulsionRight = ENCODER_Read(RIGHT);
 
-        if (abs(impulsionLeft) >= Impulsion_90 &&
-         abs(impulsionRight) >= Impulsion_90)
+        if (abs(impulsionLeft) >= Impulsion_90 && // Condition pour arreter de tourner
+         abs(impulsionRight) >= Impulsion_90) // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT,0);
             MOTOR_SetSpeed(RIGHT,0);
@@ -74,8 +75,44 @@ void yellow() {
 
         break;
 
-        case FORWARD_1:
-        
+        case FORWARD_1:// Avancement du robot
+        if (StartForward == false) {
+            ENCODER_ReadReset(LEFT);
+            ENCODER_ReadReset(RIGHT);
+
+            StartForward = true;
+
+        }
+
+        MOTOR_SetSpeed(LEFT,0.5);
+        MOTOR_SetSpeed(RIGHT,0.5);
+
+        int32_t impulsionLeft = ENCODER_Read(LEFT);
+        int32_t impulsionRight = ENCODER_Read(RIGHT);
+
+        int32_t erreur = impulsionLeft - impulsionRight; // PID pour avancer
+        float correction = kp * erreur;
+        float vitesseLeft = 0.5 - correction;
+        float vitesseRight = 0.5 + correction;
+
+        MOTOR_SetSpeed(LEFT,vitesseLeft); // correction pour aller droit
+        MOTOR_SetSpeed(RIGHT,vitesseRight);
+
+        if (impulsionLeft >= impulsion_forward_1 && // Conidtion pour arreter le moteur d'avancer
+         impulsionRight>= impulsion_forward_1) {
+
+            MOTOR_SetSpeed(LEFT,0);
+            MOTOR_SetSpeed(RIGHT,0);
+            
+            StartForward = false;
+            CurrentStates = TURN_2;
+         }
+         break;
+
+         case TURN_2:// Deuxième tournant pour contourner le mur
+         
+
+
 
     }
 
