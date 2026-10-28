@@ -95,8 +95,8 @@ void yellow() {
         MOTOR_SetSpeed(LEFT, 0.5);
         MOTOR_SetSpeed(RIGHT, 0.5);
 
-        int32_t impulsionLeft = ENCODER_Read(LEFT);
-        int32_t impulsionRight = ENCODER_Read(RIGHT);
+        impulsionLeft = ENCODER_Read(LEFT);
+        impulsionRight = ENCODER_Read(RIGHT);
 
         int32_t erreur = impulsionLeft - impulsionRight; // PID pour avancer
         float correction = kp * erreur;
@@ -128,8 +128,8 @@ void yellow() {
         MOTOR_SetSpeed(LEFT, -0.5); // Rotation de 90 degrés à gauche
         MOTOR_SetSpeed(RIGHT, 0.5);
 
-        int32_t impulsionLeft = ENCODER_Read(LEFT);
-        int32_t impulsionRight = ENCODER_Read(RIGHT);
+        impulsionLeft = ENCODER_Read(LEFT);
+        impulsionRight = ENCODER_Read(RIGHT);
 
         if (abs(impulsionLeft) >= Impulsion_90 && // Condition pour arreter de tourner
             abs(impulsionRight) >= Impulsion_90)  // Condition pour arreter de tourner

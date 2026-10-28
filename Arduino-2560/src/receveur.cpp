@@ -1,17 +1,9 @@
 #include <Arduino.h>
 #include <IRremote.hpp>
-#include <LibRobus.h>
 
 const int Adresse_receveur = 12;
 
-void setup() {
-    // put your setup code here, to run once:
-    BoardInit();
-
-    IrReceiver.begin(6);
-}
-
-bool Départ() {
+bool Depart() {
     if (IrReceiver.decode() == true) {
 
         if (IrReceiver.decodedIRData.address == Adresse_receveur) {
