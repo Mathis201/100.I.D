@@ -36,7 +36,7 @@ bool isCurrentColorActionFinished(ColorAction currentColorAction) {
 
 void setup() {
     BoardInit();
-
+    
     currentRobotState = WAIT_FOR_START;
 }
 
