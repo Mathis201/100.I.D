@@ -1,56 +1,130 @@
-/*
-Projet: Le nom du script
-Equipe: Votre numero d'equipe
-Auteurs: Les membres auteurs du script
-Description: Breve description du script
-Date: Derniere date de modification
-*/
-
-/*
-Inclure les librairies de functions que vous voulez utiliser
-*/
+#include "actions/blue.h"
+#include "actions/green.h"
+#include "actions/orange.h"
+#include "actions/pink.h"
+#include "actions/yellow.h"
 #include <LibRobus.h>
 
-/*
-Variables globales et defines
- -> defines...
- -> L'ensemble des fonctions y ont acces
-*/
+#undef PINK
+
 enum RobotStates {
     WAIT_FOR_START,
     FOLLOW_LINE,
-    DO_GREEN,
-    DO_BLUE,
-    DO_YELLOW,
-    DO_ORANGE,
-    DO_PINK,
+    DO_COLOR_ACTION,
+    FINISH_COLOR,
     DROP_CUP,
     FINISHED
 };
 
-enum PinkStates {
-    TURN_IN_PLACE,
-    MOVE_TO_QUILLE,
-    RETURN_TO_LINE
+enum ColorAction {
+    BLUE,
+    YELLOW,
+    GREEN,
+    PINK,
+    ORANGE,
+    NO_ACTION
 };
 
-/*
-Vos propres fonctions sont creees ici
-*/
+RobotStates currentRobotState;
+ColorAction currentColorAction;
 
-/*
-Fonctions d'initialisation (setup)
- -> Se fait appeler au debut du programme
- -> Se fait appeler seulement un fois
- -> Generalement on y initilise les varibbles globales
-*/
-void setup() {
-    BoardInit();
+void updateCurrentColorAction(ColorAction currentColorAction) {
 }
 
-/*
-Fonctions de boucle infini
- -> Se fait appeler perpetuellement suite au "setup"
-*/
+bool isCurrentColorActionFinished(ColorAction currentColorAction) {
+}
+
+void setup() {
+    BoardInit();
+
+    currentRobotState = WAIT_FOR_START;
+}
+
 void loop() {
+    // TODO: add check for remote signal (sound)
+
+    switch (currentRobotState) {
+    case WAIT_FOR_START:
+        // TODO: add check for start remote signal
+        break;
+
+    case FOLLOW_LINE:
+        // TODO: replace this to trigger when color detected
+        if (false) {
+            // TODO: currentColorAction = detectedColor
+            switch (currentColorAction) {
+            case BLUE:
+                initBlueAction();
+                break;
+            case YELLOW:
+                initYellowAction();
+                break;
+            case GREEN:
+                initGreenAction();
+                break;
+            case PINK:
+                initPinkAction();
+                break;
+            case ORANGE:
+                initOrangeAction();
+                break;
+            default:
+                break;
+            }
+
+            // switch robot state to do action
+            currentRobotState = DO_COLOR_ACTION;
+        }
+
+        break;
+
+    case DO_COLOR_ACTION:
+        bool isColorActionFinished;
+        // update current color action and check if finished
+        switch (currentColorAction) {
+        case BLUE:
+            updateBlueAction();
+            isColorActionFinished = isBlueActionFinished();
+            break;
+        case YELLOW:
+            updateYellowAction();
+            isColorActionFinished = isYellowActionFinished();
+            break;
+        case GREEN:
+            updateGreenAction();
+            isColorActionFinished = isGreenActionFinished();
+            break;
+        case PINK:
+            updatePinkAction();
+            isColorActionFinished = isPinkActionFinished();
+            break;
+        case ORANGE:
+            updateOrangeAction();
+            isColorActionFinished = isOrangeActionFinished();
+            break;
+        default:
+            break;
+        }
+
+        // if finished, switch state
+        if (isColorActionFinished) {
+            currentRobotState = FINISH_COLOR;
+        }
+
+        break;
+
+    case FINISH_COLOR:
+        currentColorAction = NO_ACTION;
+
+        // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
+        break;
+
+    case DROP_CUP:
+        break;
+
+    case FINISHED:
+        break;
+    }
+
+    delay(20);
 }
