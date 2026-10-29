@@ -3,10 +3,15 @@
 #include "actions/orange.h"
 #include "actions/pink.h"
 #include "actions/yellow.h"
-#include "capteurs/receveur.h"
+#include "capteurs/color_leds.h"
+#include "capteurs/line_sensor.h"
+#include "capteurs/receveur_ir.h"
 #include <LibRobus.h>
 
-#undef PINK
+#include "constants.h"
+
+#define REMOTE_START_COMMAND 1
+#define REMOTE_WAKE_COMMAND 2
 
 enum RobotStates {
     WAIT_FOR_START,
@@ -17,20 +22,8 @@ enum RobotStates {
     FINISHED
 };
 
-enum ColorAction {
-    BLUE,
-    YELLOW,
-    GREEN,
-    PINK,
-    ORANGE,
-    NO_ACTION
-};
-
-constexpr int remoteStartCommand = 1;
-constexpr int remoteWakeCommand = 2;
-
 RobotStates currentRobotState;
-ColorAction currentColorAction;
+ActionColors currentColorAction;
 
 void beep(int count) {
     for (int i = 0; i < count; i++) {
@@ -43,18 +36,22 @@ void beep(int count) {
 
 void setup() {
     BoardInit();
+    initLineSensor();
+    initColorLeds();
 
     currentRobotState = WAIT_FOR_START;
 }
 
 void loop() {
-    // TODO: add check for remote signal (sound)
     int remoteCommand = getRemoteReadCommand();
-    if (remoteCommand == remoteStartCommand) {
+    if (remoteCommand == REMOTE_START_COMMAND) {
         beep(2);
-    } else if (remoteCommand == remoteWakeCommand) {
+    } else if (remoteCommand == REMOTE_WAKE_COMMAND) {
         beep(3);
     }
+
+    lightUpLed(ActionColors::YELLOW);
+    getNormalizedLineReading();
 
     switch (currentRobotState) {
     case WAIT_FOR_START:
@@ -66,19 +63,19 @@ void loop() {
         if (false) {
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
-            case BLUE:
+            case ActionColors::BLUE:
                 initBlueAction();
                 break;
-            case YELLOW:
+            case ActionColors::YELLOW:
                 initYellowAction();
                 break;
-            case GREEN:
+            case ActionColors::GREEN:
                 initGreenAction();
                 break;
-            case PINK:
+            case ActionColors::PINK_:
                 initPinkAction();
                 break;
-            case ORANGE:
+            case ActionColors::ORANGE:
                 initOrangeAction();
                 break;
             default:
@@ -95,23 +92,23 @@ void loop() {
         bool isColorActionFinished;
         // update current color action and check if finished
         switch (currentColorAction) {
-        case BLUE:
+        case ActionColors::BLUE:
             updateBlueAction();
             isColorActionFinished = isBlueActionFinished();
             break;
-        case YELLOW:
+        case ActionColors::YELLOW:
             updateYellowAction();
             isColorActionFinished = isYellowActionFinished();
             break;
-        case GREEN:
+        case ActionColors::GREEN:
             updateGreenAction();
             isColorActionFinished = isGreenActionFinished();
             break;
-        case PINK:
+        case ActionColors::PINK_:
             updatePinkAction();
             isColorActionFinished = isPinkActionFinished();
             break;
-        case ORANGE:
+        case ActionColors::ORANGE:
             updateOrangeAction();
             isColorActionFinished = isOrangeActionFinished();
             break;
@@ -127,8 +124,6 @@ void loop() {
         break;
 
     case FINISH_COLOR:
-        currentColorAction = NO_ACTION;
-
         // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
         break;
 
