@@ -3,3 +3,4 @@
 
 void initColorLeds();
 void lightUpLed(ActionColors color);
+void timerLed();

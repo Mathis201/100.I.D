@@ -53,7 +53,7 @@ void loop() {
         beep(3);
     }
 
-    lightUpLed(ActionColors::YELLOW);
+    // lightUpLed(ActionColors::BLUE);
     getNormalizedLineReading();
 
     switch (currentRobotState) {
