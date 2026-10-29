@@ -2,6 +2,10 @@
 #include <Arduino.h>
 #include <IRremote.hpp>
 
+constexpr int irAddress = 12;
+constexpr int startCommand = 1;
+constexpr int wakeUpCommand = 2;
+
 int Bout_Start = 22;
 int Bout_Wake_Up = 24;
 int LedVerte = 26;
@@ -26,13 +30,13 @@ void loop() {
 
     if (digitalRead(Bout_Start) == false) {
         digitalWrite(LedVerte, LOW);
-        IrSender.sendNEC(12, 1, 3);
+        IrSender.sendNEC(irAddress, startCommand, 3);
         digitalWrite(LedVerte, HIGH);
     }
 
     if (digitalRead(Bout_Wake_Up) == false) {
         digitalWrite(LedVerte, LOW);
-        IrSender.sendNEC(12, 2, 3);
+        IrSender.sendNEC(irAddress, wakeUpCommand, 3);
         digitalWrite(LedVerte, HIGH);
     }
 

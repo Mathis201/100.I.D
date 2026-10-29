@@ -3,6 +3,7 @@
 #include "actions/orange.h"
 #include "actions/pink.h"
 #include "actions/yellow.h"
+#include "capteurs/receveur.h"
 #include <LibRobus.h>
 
 #undef PINK
@@ -25,23 +26,35 @@ enum ColorAction {
     NO_ACTION
 };
 
+constexpr int remoteStartCommand = 1;
+constexpr int remoteWakeCommand = 2;
+
 RobotStates currentRobotState;
 ColorAction currentColorAction;
 
-void updateCurrentColorAction(ColorAction currentColorAction) {
-}
-
-bool isCurrentColorActionFinished(ColorAction currentColorAction) {
+void beep(int count) {
+    for (int i = 0; i < count; i++) {
+        AX_BuzzerON();
+        delay(75);
+        AX_BuzzerOFF();
+        delay(75);
+    }
 }
 
 void setup() {
     BoardInit();
-    
+
     currentRobotState = WAIT_FOR_START;
 }
 
 void loop() {
     // TODO: add check for remote signal (sound)
+    int remoteCommand = getRemoteReadCommand();
+    if (remoteCommand == remoteStartCommand) {
+        beep(2);
+    } else if (remoteCommand == remoteWakeCommand) {
+        beep(3);
+    }
 
     switch (currentRobotState) {
     case WAIT_FOR_START:

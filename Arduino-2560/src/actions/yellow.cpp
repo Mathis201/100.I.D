@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <LibRobus.h>
 
-enum RobotStates {
+enum YellowStates {
     WAIT_FOR_WALL,
     TURN_1,
     FORWARD_1,
@@ -20,21 +20,17 @@ bool StartForward = false;         // Condition pour avancer
 const int32_t Impulsion_90 = 1984; // Calcul de combien d'impulsion des roues pour faire 90 degrés
 const int SEUIL_IR = 500;          // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
 const float kp = 0.0001;
-const int32_t impulsion_forward_1 = 4010;// imulsion pour avancer le long du mur 
-const int32_t impulsion_forward_2 = 4010; // impulsion pour avancer sur le cote du mur
-RobotStates CurrentStates = WAIT_FOR_WALL; // etat initial
+const int32_t impulsion_forward_1 = 4010;   // imulsion pour avancer le long du mur
+const int32_t impulsion_forward_2 = 4010;   // impulsion pour avancer sur le cote du mur
+YellowStates CurrentStates = WAIT_FOR_WALL; // etat initial
 
-
-uint16_t LireDistanceMur(){
+uint16_t LireDistanceMur() {
     return ROBUS_ReadIR(0);
-
-
 }
 void initYellowAction() {
     CurrentStates = WAIT_FOR_WALL;
     StartForward = false;
-    StartRotation = false; 
-
+    StartRotation = false;
 }
 
 bool isYellowActionFinished() {
@@ -43,10 +39,9 @@ bool isYellowActionFinished() {
 
 // TODO: merge la logique de sam dans les fonctions prédéfinies
 
-
 void updateYellowAction() {
     switch (CurrentStates) {
-    case WAIT_FOR_WALL:{
+    case WAIT_FOR_WALL: {
         // Lire la distance du capteur:
 
         uint16_t valeurIR = LireDistanceMur();
@@ -61,9 +56,9 @@ void updateYellowAction() {
             // Continue à suivre la ligne
         }
         break;
-        }
+    }
 
-    case TURN_1:{ // Premier virage de 90 degrés
+    case TURN_1: { // Premier virage de 90 degrés
 
         if (StartRotation == false) {
             ENCODER_ReadReset(LEFT);
@@ -89,9 +84,9 @@ void updateYellowAction() {
         }
 
         break;
-        }
+    }
 
-    case FORWARD_1:{ // Avancement du robot
+    case FORWARD_1: { // Avancement du robot
         if (StartForward == false) {
             ENCODER_ReadReset(LEFT);
             ENCODER_ReadReset(RIGHT);
@@ -123,9 +118,9 @@ void updateYellowAction() {
             CurrentStates = TURN_2;
         }
         break;
-        }
+    }
 
-    case TURN_2:{ // Deuxième tournant pour contourner le mur
+    case TURN_2: { // Deuxième tournant pour contourner le mur
         if (StartRotation == false) {
             ENCODER_ReadReset(LEFT);
             ENCODER_ReadReset(RIGHT);
@@ -150,10 +145,9 @@ void updateYellowAction() {
         }
 
         break;
-        }
+    }
 
-
-    case FORWARD_2:{
+    case FORWARD_2: {
         if (StartForward == false) {
             ENCODER_ReadReset(LEFT);
             ENCODER_ReadReset(RIGHT);
@@ -185,9 +179,9 @@ void updateYellowAction() {
             CurrentStates = TURN_3;
         }
         break;
-        }
-        
-    case TURN_3:{
+    }
+
+    case TURN_3: {
         if (StartRotation == false) {
             ENCODER_ReadReset(LEFT);
             ENCODER_ReadReset(RIGHT);
@@ -212,15 +206,12 @@ void updateYellowAction() {
         }
 
         break;
-
-    }
-    
-    case FORWARD_3:{
-
     }
 
+    case FORWARD_3: {
+    }
 
-    case TURN_4:{
+    case TURN_4: {
         if (StartRotation == false) {
             ENCODER_ReadReset(LEFT);
             ENCODER_ReadReset(RIGHT);
@@ -245,9 +236,6 @@ void updateYellowAction() {
         }
 
         break;
-
     }
-
     }
-
 }
