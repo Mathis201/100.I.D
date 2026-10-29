@@ -12,12 +12,12 @@ void initLineSensor() {
 }
 
 int getNormalizedLineReading() {
-    Serial.print("Left: ");
-    Serial.print(analogRead(LINE_SENSOR_LEFT_PIN));
-    Serial.print(", Middle: ");
-    Serial.print(analogRead(LINE_SENSOR_MIDDLE_PIN));
-    Serial.print(", Right: ");
-    Serial.println(analogRead(LINE_SENSOR_RIGHT_PIN));
+    // Serial.print("Left: ");
+    // Serial.print(analogRead(LINE_SENSOR_LEFT_PIN));
+    // Serial.print(", Middle: ");
+    // Serial.print(analogRead(LINE_SENSOR_MIDDLE_PIN));
+    // Serial.print(", Right: ");
+    // Serial.println(analogRead(LINE_SENSOR_RIGHT_PIN));
 
     return 0;
 }

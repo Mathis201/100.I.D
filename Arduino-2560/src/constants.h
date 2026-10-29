@@ -1,9 +1,10 @@
 #pragma once
 
-enum class ActionColors {
+enum ActionColors {
     BLUE,
     YELLOW,
     GREEN,
     PINK_,
-    ORANGE
+    ORANGE,
+    NO_COLOR
 };

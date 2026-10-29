@@ -7,6 +7,7 @@
 #include "capteurs/line_sensor.h"
 #include "capteurs/receveur_ir.h"
 #include <LibRobus.h>
+#include "capteurs/capteurcouleur.h"
 
 #include "constants.h"
 
@@ -39,10 +40,12 @@ void setup() {
     initLineSensor();
     initColorLeds();
 
+    initcapteurcouleur();
     currentRobotState = WAIT_FOR_START;
 }
 
 void loop() {
+    Serial.println(lirecouleuractuel());
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {
         beep(2);
@@ -133,6 +136,5 @@ void loop() {
     case FINISHED:
         break;
     }
-
     delay(20);
 }
