@@ -37,10 +37,19 @@ void updatePinkAction() {
         break;
     case MOVE_TO_QUILLE: // sinon ça pourrait être case QUILLE_DETECTED, puis l'approche de la quille va suivre
         // TODO: avancer vers la quille
+        //avancer(-vitesse)
+        //compter le nb de ticks / distance
+        //if(distance_parcourue == distance_cm)
+        //pinkstate = RETURN_TO_LINE
         break;
-    case TEST_FINISHED:
+    case RETURN_TO_LINE:
         // Retrouver le parcours, donc revenir en arrière, et dans la bonne direction
         // Faire le nb de ticks inverse (pour orientation et déplacement)?
+        //avancer(vitesse)
+        //if (distance_parcourue == distance_cm)
+        //pinkstate = TEST_FINISHED
+        break;
+    case TEST_FINISHED:
         break;
     }
 }
