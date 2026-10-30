@@ -7,7 +7,6 @@ constexpr float kWheelRadiusMm = 38.1;
 
 constexpr float kTrackWidthMm = 188;
 constexpr float kP = 0.035;
-constexpr float kS = 0;
 
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
@@ -19,10 +18,10 @@ constexpr float kMaxSpeed = 600; // mm / s
 constexpr float kAccel = 600;    // mm / s ^ 2
 
 constexpr float kProfileRefreshDelayMs = 20;
-
 constexpr float kVelocityRefreshDelayMs = 50;
 
 constexpr float kProfileEndDelay = 200;
+constexpr float kVelocityPredictionTime = 40;
 
 float currentLeftPosition = 0;
 float currentRightPosition = 0;
@@ -49,28 +48,28 @@ static float calculateMotorOutput(float motorPosition, float motorTarget) {
     return calculated;
 }
 
-static void initMotorProfiles(float leftTarget, float rightTarget, float leftFinalVelocity, float rightFinalVelocity) {
-    initProfile0(millis() / 1000.0, currentLeftPosition, leftTarget, kMaxSpeed, kAccel, 0.0, leftFinalVelocity);
-    initProfile1(millis() / 1000.0, currentRightPosition, rightTarget, kMaxSpeed, kAccel, 0.0, rightFinalVelocity);
+static void initMotorProfiles(float leftTarget, float rightTarget, float leftFinalVelocity, float rightFinalVelocity, bool straightLine = false) {
+    initProfile0(millis() / 1000.0,
+                 currentLeftPosition + currentLeftVelocity * (kVelocityPredictionTime / 1000),
+                 leftTarget,
+                 kMaxSpeed,
+                 kAccel,
+                 currentLeftVelocity,
+                 leftFinalVelocity,
+                 straightLine);
+
+    initProfile1(millis() / 1000.0,
+                 currentRightPosition + currentRightVelocity * (kVelocityPredictionTime / 1000),
+                 rightTarget,
+                 kMaxSpeed,
+                 kAccel,
+                 currentRightVelocity,
+                 rightFinalVelocity,
+                 straightLine);
 
     lastProfileTimeMs = millis();
     targetLeftPosition = currentLeftPosition;
     targetRightPosition = currentRightPosition;
-}
-
-static int orientationToDegrees(int orientation) {
-    switch (orientation) {
-    case FRONT:
-        return 0;
-    case LEFT:
-        return 90;
-    case RIGHT:
-        return -90;
-    case REAR:
-        return 180;
-    default:
-        return 0;
-    }
 }
 
 void updateMotorInfo(float currentTimeMs) {
@@ -106,31 +105,19 @@ void stopMotors() {
 }
 
 bool areProfilesDone() {
-    return isProfile0Done((millis()) / 1000.0) &&
-           isProfile1Done((millis()) / 1000.0);
+    return isProfile0Done((millis() - kProfileEndDelay) / 1000.0) &&
+           isProfile1Done((millis() - kProfileEndDelay) / 1000.0);
 }
 
 void updateMotorProfiles() {
     if ((millis() - lastProfileTimeMs) >= kProfileRefreshDelayMs) {
+        targetLeftPosition = getProfiled0PositionAtTime(millis() / 1000.0);
+        targetRightPosition = getProfiled1PositionAtTime(millis() / 1000.0);
+
         float leftOutput = calculateMotorOutput(currentLeftPosition, targetLeftPosition);
         float rightOutput = calculateMotorOutput(currentRightPosition, targetRightPosition);
 
-        if (leftOutput > 0) {
-            leftOutput += kS;
-        } else if (leftOutput < 0) {
-            leftOutput -= kS;
-        }
-
-        if (rightOutput > 0) {
-            rightOutput += kS;
-        } else if (rightOutput < 0) {
-            rightOutput -= kS;
-        }
-
         setMotorOutputs(leftOutput, rightOutput);
-
-        targetLeftPosition = getProfiled0PositionAtTime(millis() / 1000.0);
-        targetRightPosition = getProfiled1PositionAtTime(millis() / 1000.0);
 
         // if (areProfilesDone()) {
         // Serial.print("Projected Left: ");
@@ -157,21 +144,22 @@ void requestTurnDegrees(float degrees) {
     initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0);
 }
 
-float getAngleSince(long initialLeftTicks, long initialRightTicks)
-{
+void decelerateToStop() {
+    initMotorProfiles(0, 0, 0, 0, true);
+}
+
+float getAngleSince(long initialLeftTicks, long initialRightTicks) {
     float leftMm = (ENCODER_Read(LEFT) - initialLeftTicks) * fTicksToMm;
     float rightMm = (ENCODER_Read(RIGHT) - initialRightTicks) * fTicksToMm;
 
-    float angle = (rightMm - leftMm) / kTrackWidthMm * 180 / PI; //angle en degrés
+    float angle = (rightMm - leftMm) / kTrackWidthMm * 180 / PI; // angle en degrés
 
-    while (angle > 180.0)
-    {
-        angle -=360.0;
+    while (angle > 180.0) {
+        angle -= 360.0;
     }
-    while (angle < -180.0)
-    {
+    while (angle < -180.0) {
         angle += 360.0;
     }
-    
+
     return angle;
 }
