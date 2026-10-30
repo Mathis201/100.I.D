@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <LibRobus.h>
 #include "motors/motor_management.h"
+#include "capteurs/line_sensor.h"
+
 
 enum YellowStates {
     WAIT_FOR_WALL,
@@ -63,7 +65,7 @@ void updateYellowAction() {
 
 
         if (StartRotation == false) {
-            requestStraightDistance(500);
+            requestTurnDegrees(-90);
             
             StartRotation = true;
         }
@@ -76,7 +78,7 @@ void updateYellowAction() {
             MOTOR_SetSpeed(RIGHT, 0);
 
             StartRotation = false;
-            CurrentStates = FINISHED;
+            CurrentStates = FORWARD_1;
         }
 
         break;
@@ -84,28 +86,28 @@ void updateYellowAction() {
 
     case FORWARD_1: { // Avancement du robot
         if (StartForward == false) {
-            ENCODER_ReadReset(LEFT);
-            ENCODER_ReadReset(RIGHT);
+            requestStraightDistance(500);
 
             StartForward = true;
         }
+        updateMotorProfiles();
 
-        MOTOR_SetSpeed(LEFT, 0.5);
-        MOTOR_SetSpeed(RIGHT, 0.5);
+        
+        // MOTOR_SetSpeed(LEFT, 0.5);
+        // MOTOR_SetSpeed(RIGHT, 0.5);
 
-        int32_t impulsionLeft = ENCODER_Read(LEFT);
-        int32_t impulsionRight = ENCODER_Read(RIGHT);
+        // int32_t impulsionLeft = ENCODER_Read(LEFT);
+        // int32_t impulsionRight = ENCODER_Read(RIGHT);
 
-        int32_t erreur = impulsionLeft - impulsionRight; // PID pour avancer
-        float correction = kp * erreur;
-        float vitesseLeft = 0.5 - correction;
-        float vitesseRight = 0.5 + correction;
+        // int32_t erreur = impulsionLeft - impulsionRight; // PID pour avancer
+        // float correction = kp * erreur;
+        // float vitesseLeft = 0.5 - correction;
+        // float vitesseRight = 0.5 + correction;
 
-        MOTOR_SetSpeed(LEFT, vitesseLeft); // correction pour aller droit
-        MOTOR_SetSpeed(RIGHT, vitesseRight);
+        // MOTOR_SetSpeed(LEFT, vitesseLeft); // correction pour aller droit
+        // MOTOR_SetSpeed(RIGHT, vitesseRight);
 
-        if (impulsionLeft >= impulsion_forward_1 && // Conidtion pour arreter le moteur d'avancer
-            impulsionRight >= impulsion_forward_1) {
+        if (areProfilesDone()) {
 
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -118,20 +120,19 @@ void updateYellowAction() {
 
     case TURN_2: { // Deuxième tournant pour contourner le mur
         if (StartRotation == false) {
-            ENCODER_ReadReset(LEFT);
-            ENCODER_ReadReset(RIGHT);
+           requestTurnDegrees(90);
 
             StartRotation = true;
         }
+        updateMotorProfiles();
 
-        MOTOR_SetSpeed(LEFT, -0.5); // Rotation de 90 degrés à gauche
-        MOTOR_SetSpeed(RIGHT, 0.5);
+        // MOTOR_SetSpeed(LEFT, -0.5); // Rotation de 90 degrés à gauche
+        // MOTOR_SetSpeed(RIGHT, 0.5);
 
-        int32_t impulsionLeft = ENCODER_Read(LEFT);
-        int32_t impulsionRight = ENCODER_Read(RIGHT);
+        // int32_t impulsionLeft = ENCODER_Read(LEFT);
+        // int32_t impulsionRight = ENCODER_Read(RIGHT);
 
-        if (abs(impulsionLeft) >= Impulsion_90 && // Condition pour arreter de tourner
-            abs(impulsionRight) >= Impulsion_90)  // Condition pour arreter de tourner
+        if (areProfilesDone())  // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -145,28 +146,26 @@ void updateYellowAction() {
 
     case FORWARD_2: {
         if (StartForward == false) {
-            ENCODER_ReadReset(LEFT);
-            ENCODER_ReadReset(RIGHT);
+            requestStraightDistance(600);
 
             StartForward = true;
         }
+        updateMotorProfiles();
+        // MOTOR_SetSpeed(LEFT, 0.5);
+        // MOTOR_SetSpeed(RIGHT, 0.5);
 
-        MOTOR_SetSpeed(LEFT, 0.5);
-        MOTOR_SetSpeed(RIGHT, 0.5);
+        // int32_t impulsionLeft = ENCODER_Read(LEFT);
+        // int32_t impulsionRight = ENCODER_Read(RIGHT);
 
-        int32_t impulsionLeft = ENCODER_Read(LEFT);
-        int32_t impulsionRight = ENCODER_Read(RIGHT);
+        // int32_t erreur = impulsionLeft - impulsionRight; // PID pour avancer
+        // float correction = kp * erreur;
+        // float vitesseLeft = 0.5 - correction;
+        // float vitesseRight = 0.5 + correction;
 
-        int32_t erreur = impulsionLeft - impulsionRight; // PID pour avancer
-        float correction = kp * erreur;
-        float vitesseLeft = 0.5 - correction;
-        float vitesseRight = 0.5 + correction;
+        // MOTOR_SetSpeed(LEFT, vitesseLeft); // correction pour aller droit
+        // MOTOR_SetSpeed(RIGHT, vitesseRight);
 
-        MOTOR_SetSpeed(LEFT, vitesseLeft); // correction pour aller droit
-        MOTOR_SetSpeed(RIGHT, vitesseRight);
-
-        if (impulsionLeft >= impulsion_forward_2 && // Conidtion pour arreter le moteur d'avancer
-            impulsionRight >= impulsion_forward_2) {
+        if (areProfilesDone()) {
 
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -179,20 +178,18 @@ void updateYellowAction() {
 
     case TURN_3: {
         if (StartRotation == false) {
-            ENCODER_ReadReset(LEFT);
-            ENCODER_ReadReset(RIGHT);
+            requestTurnDegrees(90);
 
             StartRotation = true;
         }
+        updateMotorProfiles();
+        // MOTOR_SetSpeed(LEFT, -0.5); // Rotation de 90 degrés à gauche
+        // MOTOR_SetSpeed(RIGHT, 0.5);
 
-        MOTOR_SetSpeed(LEFT, -0.5); // Rotation de 90 degrés à gauche
-        MOTOR_SetSpeed(RIGHT, 0.5);
+        // int32_t impulsionLeft = ENCODER_Read(LEFT);
+        // int32_t impulsionRight = ENCODER_Read(RIGHT);
 
-        int32_t impulsionLeft = ENCODER_Read(LEFT);
-        int32_t impulsionRight = ENCODER_Read(RIGHT);
-
-        if (abs(impulsionLeft) >= Impulsion_90 && // Condition pour arreter de tourner
-            abs(impulsionRight) >= Impulsion_90)  // Condition pour arreter de tourner
+        if (areProfilesDone())  // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -205,24 +202,38 @@ void updateYellowAction() {
     }
 
     case FORWARD_3: {
+        if (StartForward == false){
+            requestStraightDistance(800);
+
+            StartForward = true;
+        }
+
+        updateMotorProfiles();
+        
+        if (areProfilesDone()){
+                MOTOR_SetSpeed(LEFT,0);
+                MOTOR_SetSpeed(RIGHT,0);
+
+            StartForward = false;
+            CurrentStates = TURN_4;
+        }
+       break; 
     }
 
     case TURN_4: {
         if (StartRotation == false) {
-            ENCODER_ReadReset(LEFT);
-            ENCODER_ReadReset(RIGHT);
+            requestTurnDegrees(-90);
 
             StartRotation = true;
         }
+        updateMotorProfiles();
+        // MOTOR_SetSpeed(LEFT, 0.5); // Rotation de 90 degrés
+        // MOTOR_SetSpeed(RIGHT, -0.5);
 
-        MOTOR_SetSpeed(LEFT, 0.5); // Rotation de 90 degrés
-        MOTOR_SetSpeed(RIGHT, -0.5);
+        // int32_t impulsionLeft = ENCODER_Read(LEFT);
+        // int32_t impulsionRight = ENCODER_Read(RIGHT);
 
-        int32_t impulsionLeft = ENCODER_Read(LEFT);
-        int32_t impulsionRight = ENCODER_Read(RIGHT);
-
-        if (abs(impulsionLeft) >= Impulsion_90 && // Condition pour arreter de tourner
-            abs(impulsionRight) >= Impulsion_90)  // Condition pour arreter de tourner
+        if (areProfilesDone())  // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -233,5 +244,6 @@ void updateYellowAction() {
 
         break;
     }
+    default: break;
     }
 }

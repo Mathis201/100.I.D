@@ -21,3 +21,9 @@ int getNormalizedLineReading() {
 
     return 0;
 }
+bool IsLineDetected(){
+    return false;
+
+
+
+}

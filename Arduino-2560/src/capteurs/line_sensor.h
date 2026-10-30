@@ -2,3 +2,4 @@
 
 void initLineSensor();
 int getNormalizedLineReading();
+bool IsLineDetected();
