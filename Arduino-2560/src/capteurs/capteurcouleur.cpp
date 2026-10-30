@@ -57,7 +57,7 @@ ActionColors lirecouleuractuel() {
 
     tcs.setInterrupt(false); // turn on LED
 
-    tcs.getRawData(&red, &green, &blue, &clear);
+    // tcs.getRawData(&red, &green, &blue, &clear);
     Couleur actuel{red, green, blue, clear};
 
     // Serial.print("R: ");

@@ -1,4 +1,5 @@
 #include "trapeze.h"
+#include "Arduino.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -23,6 +24,23 @@ static float _startTime1;
 static float _tA1;
 static float _tB1;
 static float _tF1;
+
+static void initLineVelocityProfile0(float startTime, float startPos, float currentVelocity, float targetVelocity, float accel) {
+    _startTime0 = startTime;
+    _maxSpeed0 = currentVelocity;
+    _accel0 = -accel;
+    _initialVelocity0 = currentVelocity;
+    _endVelocity0 = targetVelocity;
+    _startPos0 = startPos;
+
+    float deltaVelocity = targetVelocity - currentVelocity;
+    if (deltaVelocity < 0) {
+        _accel0 = -_accel0;
+    }
+
+    _tA0 = _tB0 = 0.0;
+    _tF0 = abs(deltaVelocity / accel);
+}
 
 static void initTrapezoidalProfile0(float startTime, float startPos, float finalPos,
                                     float maxSpeed, float accel, float initialVelocity, float endVelocity) {
@@ -74,6 +92,23 @@ static void initTriangularProfile0(float startTime, float startPos, float finalP
     _tA0 = (_maxSpeed0 - _initialVelocity0) / _accel0;
     _tB0 = _tA0; // no flat part between tA and tB
     _tF0 = (_maxSpeed0 - _endVelocity0) / _accel0 + _tA0;
+}
+
+static void initLineVelocityProfile1(float startTime, float startPos, float currentVelocity, float targetVelocity, float accel) {
+    _startTime1 = startTime;
+    _maxSpeed1 = currentVelocity;
+    _accel1 = -accel;
+    _initialVelocity1 = currentVelocity;
+    _endVelocity1 = targetVelocity;
+    _startPos1 = startPos;
+
+    float deltaVelocity = targetVelocity - currentVelocity;
+    if (deltaVelocity < 0) {
+        _accel1 = -_accel1;
+    }
+
+    _tA1 = _tB1 = 0.0;
+    _tF1 = abs(deltaVelocity / accel);
 }
 
 static void initTrapezoidalProfile1(float startTime, float startPos, float finalPos,
@@ -129,12 +164,16 @@ static void initTriangularProfile1(float startTime, float startPos, float finalP
 }
 
 void initProfile0(float startTime, float startPos, float finalPos,
-                  float maxSpeed, float accel, float initialVelocity, float endVelocity) {
+                  float maxSpeed, float accel, float initialVelocity, float endVelocity, bool straightLine) {
+    if (straightLine) {
+        initLineVelocityProfile0(startTime, startPos, initialVelocity, endVelocity, accel);
+        return;
+    }
     // vérifier si peut atteindre vitesse max
     // à cette accel, pour atteindre vitesse max et redescendre, distance nécessaire plus que distance demandée?
     // si oui, impossible de faire trapèze, utiliser triangle
-    float minPosNeeded = (2 * maxSpeed * maxSpeed - initialVelocity * initialVelocity - endVelocity * endVelocity) / (2 * accel);
-    if (minPosNeeded > abs(finalPos - startPos)) {
+    float posNeededTrapezoid = (2 * maxSpeed * maxSpeed - initialVelocity * initialVelocity - endVelocity * endVelocity) / (2 * accel);
+    if (posNeededTrapezoid > abs(finalPos - startPos)) {
         initTriangularProfile0(startTime, startPos, finalPos, accel, initialVelocity, endVelocity);
     } else {
         initTrapezoidalProfile0(startTime, startPos, finalPos, maxSpeed, accel, initialVelocity, endVelocity);
@@ -166,16 +205,25 @@ float getProfiled0PositionAtTime(float currentTime) {
 }
 
 bool isProfile0Done(float currentTime) {
+    // Serial.print(currentTime);
+    // Serial.print(" ");
+    // Serial.print(_startTime0);
+    // Serial.print(" ");
+    // Serial.println(_tF0);
     return ((currentTime - _startTime0) > _tF0);
 }
 
 void initProfile1(float startTime, float startPos, float finalPos,
-                  float maxSpeed, float accel, float initialVelocity, float endVelocity) {
+                  float maxSpeed, float accel, float initialVelocity, float endVelocity, bool straightLine) {
+    if (straightLine) {
+        initLineVelocityProfile1(startTime, startPos, initialVelocity, endVelocity, accel);
+        return;
+    }
     // vérifier si peut atteindre vitesse max
     // à cette accel, pour atteindre vitesse max et redescendre, distance nécessaire plus que distance demandée?
     // si oui, impossible de faire trapèze, utiliser triangle
-    float minPosNeeded = (2 * maxSpeed * maxSpeed - initialVelocity * initialVelocity - endVelocity * endVelocity) / (2 * accel);
-    if (minPosNeeded > abs(finalPos - startPos)) {
+    float posNeededTrapezoid = (2 * maxSpeed * maxSpeed - initialVelocity * initialVelocity - endVelocity * endVelocity) / (2 * accel);
+    if (posNeededTrapezoid > abs(finalPos - startPos)) {
         initTriangularProfile1(startTime, startPos, finalPos, accel, initialVelocity, endVelocity);
     } else {
         initTrapezoidalProfile1(startTime, startPos, finalPos, maxSpeed, accel, initialVelocity, endVelocity);
