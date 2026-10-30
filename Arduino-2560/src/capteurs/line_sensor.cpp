@@ -26,12 +26,14 @@ int getNormalizedLineReading() {
     int MaxGauche = 0;
     int MaxMilieu = 0;
     int MaxDroite = 0;
+    int MinGauche = valeurGauche;
+    int MinMilieu = valeurMilieu;
+    int MinDroite = valeurDroite;
 
     if (valeurGauche > MaxGauche){
         MaxGauche = valeurGauche;
         Serial.print("Valeur max Gauche est : ");
-        Serial.println(MaxGauche);
-    
+        Serial.println(MaxGauche);   
     }
 
     if (valeurMilieu > MaxMilieu) {
@@ -44,6 +46,24 @@ int getNormalizedLineReading() {
         Serial.print("Valeur max Droite est : ");
         Serial.println(MaxDroite); 
         }
+    if (valeurGauche < MinGauche){
+        MinGauche = valeurGauche;
+        Serial.print("Valeur min Gauche est: ");
+        Serial.println(MinGauche);
+
+    }
+     if (valeurMilieu < MinMilieu){
+        MinMilieu = valeurMilieu;
+        Serial.print("Valeur min Milieu est: ");
+        Serial.println(MinMilieu);
+    }
+
+     if (valeurDroite < MinDroite){
+        MinDroite = valeurDroite;
+        Serial.print("Valeur min Droit est: ");
+        Serial.println(MinDroite);
+        
+    }
 
     return 0;
 
