@@ -5,30 +5,47 @@ Auteurs: Les membres auteurs du script
 Description: Breve description du script
 Date: Derniere date de modification
 */
-
-/*
-Inclure les librairies de functions que vous voulez utiliser
-*/
 #include <LibRobus.h>
 
-/*
-Variables globales et defines
- -> defines...
- -> L'ensemble des fonctions y ont acces
-*/
 
-bool bumperArr;
-int vertpin = 48;
-int rougepin = 49;
-bool vert = false;
-bool rouge = false;
-int etat = 0; // = 0 arrêt 1 = avance 2 = recule 3 = TourneDroit 4 = TourneGauche
-int etatPast = 0;
-float vitesse = 0.40;
+// #include "grid_navigation.h"
+// #include "motor_management.h"
 
-/*
-Vos propres fonctions sont creees ici
-*/
+// enum RobotStates {
+//     WAIT_FOR_START,
+//     FIND_NEXT_MOVE
+//     MOVE,
+//     UPDATE_WALLS,
+//     FINISHED
+// };
+
+constexpr int pinRed = 48;
+constexpr int pinGreen = 49;
+
+constexpr int pin5hz = A0;
+constexpr int pinBA = A1;
+
+// constexpr float transitionTime = 200;
+
+// // info about start of maze
+// constexpr int startPosX = 0;
+// constexpr int startPosY = 1;
+// constexpr int startOrientation = FRONT;
+
+// // info about current position in the maze
+// int currentPosX = 0;
+// int currentPosY = 0;
+// int currentOrientation = 0;
+
+// // info about wanted position in the maze
+// int targetPosX = 0;
+// int targetPosY = 0;
+// int targetOrientation = 0;
+
+// RobotStates currentState;
+
+// float targetTransitionTime = 0;
+// bool transitionTimerStarted = false;
 
 void beep(int count) {
     for (int i = 0; i < count; i++) {
@@ -37,109 +54,121 @@ void beep(int count) {
         AX_BuzzerOFF();
         delay(100);
     }
-    delay(400);
 }
 
-void arret() {
-    MOTOR_SetSpeed(RIGHT, 0);
-    MOTOR_SetSpeed(LEFT, 0);
-};
+bool detection_sifflet() {
+    int val5Hz = analogRead(pin5hz);
+    int valBA = analogRead(pinBA);
 
-void avance() {
-    MOTOR_SetSpeed(RIGHT, vitesse);
-    MOTOR_SetSpeed(LEFT, vitesse);
-};
+    Serial.print("5 kHz: ");
+    Serial.print(val5Hz);
+    Serial.print("BA: ");
+    Serial.print(valBA);
+    Serial.print(", différence: ");
+    Serial.println(val5Hz - valBA);
 
-void recule() {
-    MOTOR_SetSpeed(RIGHT, -0.5 * vitesse);
-    MOTOR_SetSpeed(LEFT, -vitesse);
-};
+    return ((val5Hz - valBA) >= 70);
+}
 
-void tourneDroit() {
-    MOTOR_SetSpeed(RIGHT, 0.5 * vitesse);
-    MOTOR_SetSpeed(LEFT, -0.5 * vitesse);
-};
-
-void tourneGauche() {
-    MOTOR_SetSpeed(RIGHT, -0.5 * vitesse);
-    MOTOR_SetSpeed(LEFT, 0.5 * vitesse);
-};
-
-/*
-Fonctions d'initialisation (setup)
- -> Se fait appeler au debut du programme
- -> Se fait appeler seulement un fois
- -> Generalement on y initilise les varibbles globales
-*/
 void setup() {
-    BoardInit();
+    BoardInit();    
+    
+    Wire.begin();       
+    // set proximity detector pin modes
+    pinMode(pinGreen, INPUT);
+    pinMode(pinRed, INPUT);
 
-    // initialisation
-    pinMode(vertpin, INPUT);
-    pinMode(rougepin, INPUT);
-    delay(100);
-    beep(3);
+    beep(1);
+
+    ENCODER_Reset(LEFT);
+    ENCODER_Reset(RIGHT);
+    //currentState = WAIT_FOR_START;
 }
 
-/*
-Fonctions de boucle infini
- -> Se fait appeler perpetuellement suite au "setup"
-*/
+// called in a very fast loop, nothing blocking should be put here
 void loop() {
-    etatPast = etat;
-    bumperArr = ROBUS_IsBumper(3);
-    if (bumperArr) {
-        if (etat == 0) {
-            beep(2);
-            etat = 1;
-        } else {
-            beep(1);
-            etat = 0;
-        }
-    }
+    // read motor encoders every loop
+    // updateMotorInfo(millis());
 
-    vert = digitalRead(vertpin);
-    rouge = digitalRead(rougepin);
-    if (etat > 0) {
-        if (vert && rouge) { // aucun obstacle => avance
-            etat = 1;
-        }
-        if (!vert && !rouge) { // obstacle devant => recule
-            etat = 2;
-        }
-        if (!vert && rouge) { // obstacle à gauche => tourne droit
-            etat = 3;
-        }
-        if (vert && !rouge) { // obstacle à droite => tourne gauche
-            etat = 4;
-        }
-    }
+    // if (ROBUS_IsBumper(RIGHT)) {
+    //     currentState = FINISHED;
+    // }
 
-    if (etatPast != etat) {
-        arret();
-        delay(50);
-    } else {
-        switch (etat) {
-        case 0:
-            arret();
-            break;
-        case 1:
-            avance();
-            break;
-        case 2:
-            recule();
-            break;
-        case 3:
-            tourneDroit();
-            break;
-        case 4:
-            tourneGauche();
-            break;
-        default:
-            avance();
-            etat = 1;
-            break;
-        }
-    }
-    delay(200);
+    // switch (currentState) {
+    // case WAIT_FOR_START: {
+    //     if (ROBUS_IsBumper(REAR) || detection_sifflet()) {
+    //         delay(300);
+    //         // reset position in grid
+    //         currentPosX = startPosX;
+    //         currentPosY = startPosY;
+    //         currentOrientation = startOrientation;
+
+    //         // reset walls
+    //         initGrid(startPosX, startPosY);
+
+    //         // verify if placed in front of wall at start
+    //         currentState = UPDATE_WALLS;
+    //     }
+
+    //     break;
+    // }
+    // case FIND_NEXT_MOVE: {
+    //     if (isMazeFinished(currentPosX, currentPosY)) {
+    //         currentState = FINISHED;
+    //     } else {
+    //         transitionTimerStarted = false;
+    //         int *moveInfo = findNextMove(currentPosX, currentPosY, currentOrientation);
+    //         targetPosX = moveInfo[0];
+    //         targetPosY = moveInfo[1];
+    //         targetOrientation = moveInfo[2];
+
+    //         if (targetOrientation != currentOrientation) {
+    //             requestOrientation(currentOrientation, targetOrientation);
+    //         } else if (targetPosX != currentPosX) {
+    //             requestXPosition(currentPosX, targetPosX, currentOrientation);
+    //         } else if (targetPosY != currentPosY) {
+    //             requestYPosition(currentPosY, targetPosY, currentOrientation);
+    //         }
+
+    //         // requestTurnDegrees(90);
+
+    //         currentState = MOVE;
+    //     }
+
+    //     break;
+    // }
+    // case MOVE: {
+    //     if (areProfilesDone() && !transitionTimerStarted) {
+    //         targetTransitionTime = millis() + transitionTime;
+    //         transitionTimerStarted = true;
+    //     } else {
+    //         updateMotorProfiles();
+    //     }
+
+    //     if (transitionTimerStarted && millis() >= targetTransitionTime) {
+    //         currentPosX = targetPosX;
+    //         currentPosY = targetPosY;
+    //         currentOrientation = targetOrientation;
+    //         currentState = UPDATE_WALLS;
+    //         // currentState = FINISHED;
+    //     }
+    //     break;
+    // }
+    // case UPDATE_WALLS: {
+    //     bool wallDetected = !digitalRead(pinRed) || !digitalRead(pinGreen);
+    //     updateWallAtPos(currentPosX, currentPosY, currentOrientation, wallDetected, false);
+
+    //     currentState = FIND_NEXT_MOVE;
+    //     break;
+    // }
+    // case FINISHED: {
+    //     printExploredGrid();
+    //     stopMotors();
+    //     beep(1);
+    //     currentState = WAIT_FOR_START;
+    //     break;
+    // }
+    // }
+
+    delay(10);
 }
