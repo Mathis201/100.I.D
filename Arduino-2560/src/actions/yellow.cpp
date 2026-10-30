@@ -21,7 +21,7 @@ enum YellowStates {
 bool StartRotation = false;        // Condition pour la rotation
 bool StartForward = false;         // Condition pour avancer
 const int32_t Impulsion_90 = 1984; // Calcul de combien d'impulsion des roues pour faire 90 degrés
-const int SEUIL_IR = 500;          // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
+const int SEUIL_IR = 270;          // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
 const float kp = 0.0001;
 const int32_t impulsion_forward_1 = 4010;   // imulsion pour avancer le long du mur
 const int32_t impulsion_forward_2 = 4010;   // impulsion pour avancer sur le cote du mur a augmenter(sam)
@@ -31,7 +31,7 @@ uint16_t LireDistanceMur() {
     return ROBUS_ReadIR(0);
 }
 void initYellowAction() {
-    CurrentStates = TURN_1;
+    CurrentStates = WAIT_FOR_WALL;
     StartForward = false;
     StartRotation = false;
 }
@@ -48,6 +48,9 @@ void updateYellowAction() {
         // Lire la distance du capteur:
 
         uint16_t valeurIR = LireDistanceMur();
+        // Serial.println("Valeur IR : ");
+        // Serial.print(valeurIR);// test pour distance du mur
+        // delay (10000);
 
         if (valeurIR >= SEUIL_IR) { // Condition pour arreter devant le mur
 
@@ -93,19 +96,6 @@ void updateYellowAction() {
         updateMotorProfiles();
 
         
-        // MOTOR_SetSpeed(LEFT, 0.5);
-        // MOTOR_SetSpeed(RIGHT, 0.5);
-
-        // int32_t impulsionLeft = ENCODER_Read(LEFT);
-        // int32_t impulsionRight = ENCODER_Read(RIGHT);
-
-        // int32_t erreur = impulsionLeft - impulsionRight; // PID pour avancer
-        // float correction = kp * erreur;
-        // float vitesseLeft = 0.5 - correction;
-        // float vitesseRight = 0.5 + correction;
-
-        // MOTOR_SetSpeed(LEFT, vitesseLeft); // correction pour aller droit
-        // MOTOR_SetSpeed(RIGHT, vitesseRight);
 
         if (areProfilesDone()) {
 
@@ -126,11 +116,6 @@ void updateYellowAction() {
         }
         updateMotorProfiles();
 
-        // MOTOR_SetSpeed(LEFT, -0.5); // Rotation de 90 degrés à gauche
-        // MOTOR_SetSpeed(RIGHT, 0.5);
-
-        // int32_t impulsionLeft = ENCODER_Read(LEFT);
-        // int32_t impulsionRight = ENCODER_Read(RIGHT);
 
         if (areProfilesDone())  // Condition pour arreter de tourner
         {
@@ -151,19 +136,7 @@ void updateYellowAction() {
             StartForward = true;
         }
         updateMotorProfiles();
-        // MOTOR_SetSpeed(LEFT, 0.5);
-        // MOTOR_SetSpeed(RIGHT, 0.5);
-
-        // int32_t impulsionLeft = ENCODER_Read(LEFT);
-        // int32_t impulsionRight = ENCODER_Read(RIGHT);
-
-        // int32_t erreur = impulsionLeft - impulsionRight; // PID pour avancer
-        // float correction = kp * erreur;
-        // float vitesseLeft = 0.5 - correction;
-        // float vitesseRight = 0.5 + correction;
-
-        // MOTOR_SetSpeed(LEFT, vitesseLeft); // correction pour aller droit
-        // MOTOR_SetSpeed(RIGHT, vitesseRight);
+  
 
         if (areProfilesDone()) {
 
@@ -183,11 +156,7 @@ void updateYellowAction() {
             StartRotation = true;
         }
         updateMotorProfiles();
-        // MOTOR_SetSpeed(LEFT, -0.5); // Rotation de 90 degrés à gauche
-        // MOTOR_SetSpeed(RIGHT, 0.5);
-
-        // int32_t impulsionLeft = ENCODER_Read(LEFT);
-        // int32_t impulsionRight = ENCODER_Read(RIGHT);
+     
 
         if (areProfilesDone())  // Condition pour arreter de tourner
         {
@@ -227,11 +196,7 @@ void updateYellowAction() {
             StartRotation = true;
         }
         updateMotorProfiles();
-        // MOTOR_SetSpeed(LEFT, 0.5); // Rotation de 90 degrés
-        // MOTOR_SetSpeed(RIGHT, -0.5);
-
-        // int32_t impulsionLeft = ENCODER_Read(LEFT);
-        // int32_t impulsionRight = ENCODER_Read(RIGHT);
+    
 
         if (areProfilesDone())  // Condition pour arreter de tourner
         {

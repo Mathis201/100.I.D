@@ -40,7 +40,7 @@ void beep(int count) {
 
 void setup() {
     BoardInit();
-    // initLineSensor();
+    initLineSensor();
     // initColorLeds();
 
     // initcapteurcouleur();
@@ -54,10 +54,11 @@ void loop() {
     // } else if (remoteCommand == REMOTE_WAKE_COMMAND) {
     //     beep(3);
     // }
+    getNormalizedLineReading(); 
 
     updateMotorInfo(millis());
     // timerLed();
-
+     
     // ActionColors couleurActuelleLue = lirecouleuractuel();
     // // Serial.println(couleurActuelleLue);
     // if (couleurActuelleLue != ActionColors::NO_COLOR) {
