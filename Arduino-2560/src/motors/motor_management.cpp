@@ -156,3 +156,22 @@ void requestTurnDegrees(float degrees) {
     float distanceMm = ((degrees * PI / 180) * kTrackWidthMm) / 2;
     initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0);
 }
+
+float getAngleSince(long initialLeftTicks, long initialRightTicks)
+{
+    float leftMm = (ENCODER_Read(LEFT) - initialLeftTicks) * fTicksToMm;
+    float rightMm = (ENCODER_Read(RIGHT) - initialRightTicks) * fTicksToMm;
+
+    float angle = (rightMm - leftMm) / kTrackWidthMm * 180 / PI; //angle en degrés
+
+    while (angle > 180.0)
+    {
+        angle -=360.0;
+    }
+    while (angle < -180.0)
+    {
+        angle += 360.0;
+    }
+    
+    return angle;
+}
