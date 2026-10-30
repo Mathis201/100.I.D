@@ -3,11 +3,11 @@
 #include "actions/orange.h"
 #include "actions/pink.h"
 #include "actions/yellow.h"
+#include "capteurs/capteurcouleur.h"
 #include "capteurs/color_leds.h"
 #include "capteurs/line_sensor.h"
 #include "capteurs/receveur_ir.h"
 #include <LibRobus.h>
-#include "capteurs/capteurcouleur.h"
 
 #include "constants.h"
 
@@ -45,7 +45,6 @@ void setup() {
 }
 
 void loop() {
-    Serial.println(lirecouleuractuel());
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {
         beep(2);
@@ -53,8 +52,14 @@ void loop() {
         beep(3);
     }
 
-    // lightUpLed(ActionColors::BLUE);
-    getNormalizedLineReading();
+    // getNormalizedLineReading();
+    ActionColors couleurActuelleLue = lirecouleuractuel();
+    Serial.println(couleurActuelleLue);
+    if (couleurActuelleLue != ActionColors::NO_COLOR) {
+        lightUpLed(couleurActuelleLue);
+    }
+
+    timerLed();
 
     switch (currentRobotState) {
     case WAIT_FOR_START:
@@ -136,5 +141,6 @@ void loop() {
     case FINISHED:
         break;
     }
+
     delay(20);
 }
