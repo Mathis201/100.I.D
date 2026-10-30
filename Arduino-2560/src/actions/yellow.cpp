@@ -1,6 +1,7 @@
 #include "yellow.h"
 #include <Arduino.h>
 #include <LibRobus.h>
+#include "motors/motor_management.h"
 
 enum YellowStates {
     WAIT_FOR_WALL,
@@ -21,14 +22,14 @@ const int32_t Impulsion_90 = 1984; // Calcul de combien d'impulsion des roues po
 const int SEUIL_IR = 500;          // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
 const float kp = 0.0001;
 const int32_t impulsion_forward_1 = 4010;   // imulsion pour avancer le long du mur
-const int32_t impulsion_forward_2 = 4010;   // impulsion pour avancer sur le cote du mur
+const int32_t impulsion_forward_2 = 4010;   // impulsion pour avancer sur le cote du mur a augmenter(sam)
 YellowStates CurrentStates = WAIT_FOR_WALL; // etat initial
 
 uint16_t LireDistanceMur() {
     return ROBUS_ReadIR(0);
 }
 void initYellowAction() {
-    CurrentStates = WAIT_FOR_WALL;
+    CurrentStates = TURN_1;
     StartForward = false;
     StartRotation = false;
 }
@@ -60,27 +61,22 @@ void updateYellowAction() {
 
     case TURN_1: { // Premier virage de 90 degrés
 
-        if (StartRotation == false) {
-            ENCODER_ReadReset(LEFT);
-            ENCODER_ReadReset(RIGHT);
 
+        if (StartRotation == false) {
+            requestStraightDistance(500);
+            
             StartRotation = true;
         }
 
-        MOTOR_SetSpeed(LEFT, 0.5); // Rotation de 90 degrés
-        MOTOR_SetSpeed(RIGHT, -0.5);
+        updateMotorProfiles();
 
-        int32_t impulsionLeft = ENCODER_Read(LEFT);
-        int32_t impulsionRight = ENCODER_Read(RIGHT);
-
-        if (abs(impulsionLeft) >= Impulsion_90 && // Condition pour arreter de tourner
-            abs(impulsionRight) >= Impulsion_90)  // Condition pour arreter de tourner
+        if (areProfilesDone())  // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
 
             StartRotation = false;
-            CurrentStates = FORWARD_1;
+            CurrentStates = FINISHED;
         }
 
         break;

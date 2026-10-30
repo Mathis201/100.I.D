@@ -8,6 +8,7 @@
 #include "capteurs/line_sensor.h"
 #include "capteurs/receveur_ir.h"
 #include <LibRobus.h>
+#include "motors/motor_management.h"
 
 #include "constants.h"
 
@@ -52,6 +53,8 @@ void loop() {
         beep(3);
     }
 
+    updateMotorInfo(millis());
+
     // getNormalizedLineReading();
     ActionColors couleurActuelleLue = lirecouleuractuel();
     Serial.println(couleurActuelleLue);
@@ -64,11 +67,15 @@ void loop() {
     switch (currentRobotState) {
     case WAIT_FOR_START:
         // TODO: add check for start remote signal
+        if (ROBUS_IsBumper(RIGHT)) {
+            currentRobotState = FOLLOW_LINE;
+        }
         break;
 
     case FOLLOW_LINE:
         // TODO: replace this to trigger when color detected
-        if (false) {
+        if (true) {
+            currentColorAction = ActionColors::YELLOW;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:
@@ -133,6 +140,8 @@ void loop() {
 
     case FINISH_COLOR:
         // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
+        beep(5);
+        currentRobotState = WAIT_FOR_START;
         break;
 
     case DROP_CUP:
