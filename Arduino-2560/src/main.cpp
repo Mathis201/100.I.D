@@ -7,8 +7,8 @@
 #include "capteurs/color_leds.h"
 #include "capteurs/line_sensor.h"
 #include "capteurs/receveur_ir.h"
-#include <LibRobus.h>
 #include "motors/motor_management.h"
+#include <LibRobus.h>
 
 #include "constants.h"
 
@@ -27,6 +27,8 @@ enum RobotStates {
 RobotStates currentRobotState;
 ActionColors currentColorAction;
 
+int lastTime = 0;
+
 void beep(int count) {
     for (int i = 0; i < count; i++) {
         AX_BuzzerON();
@@ -38,31 +40,29 @@ void beep(int count) {
 
 void setup() {
     BoardInit();
-    initLineSensor();
-    initColorLeds();
+    // initLineSensor();
+    // initColorLeds();
 
-    initcapteurcouleur();
+    // initcapteurcouleur();
     currentRobotState = WAIT_FOR_START;
 }
 
 void loop() {
-    int remoteCommand = getRemoteReadCommand();
-    if (remoteCommand == REMOTE_START_COMMAND) {
-        beep(2);
-    } else if (remoteCommand == REMOTE_WAKE_COMMAND) {
-        beep(3);
-    }
+    // int remoteCommand = getRemoteReadCommand();
+    // if (remoteCommand == REMOTE_START_COMMAND) {
+    //     beep(2);
+    // } else if (remoteCommand == REMOTE_WAKE_COMMAND) {
+    //     beep(3);
+    // }
 
     updateMotorInfo(millis());
+    // timerLed();
 
-    // getNormalizedLineReading();
-    ActionColors couleurActuelleLue = lirecouleuractuel();
-    Serial.println(couleurActuelleLue);
-    if (couleurActuelleLue != ActionColors::NO_COLOR) {
-        lightUpLed(couleurActuelleLue);
-    }
-
-    timerLed();
+    // ActionColors couleurActuelleLue = lirecouleuractuel();
+    // // Serial.println(couleurActuelleLue);
+    // if (couleurActuelleLue != ActionColors::NO_COLOR) {
+    //     lightUpLed(couleurActuelleLue);
+    // }
 
     switch (currentRobotState) {
     case WAIT_FOR_START:
@@ -151,5 +151,7 @@ void loop() {
         break;
     }
 
-    delay(20);
+    delay(10);
+    Serial.println(millis() - lastTime);
+    lastTime = millis();
 }

@@ -2,8 +2,6 @@
 #include "trapeze.h"
 #include <LibRobus.h>
 
-#define A
-
 constexpr float kTicksPerRotation = 3200.0;
 constexpr float kWheelRadiusMm = 38.1;
 
@@ -108,8 +106,8 @@ void stopMotors() {
 }
 
 bool areProfilesDone() {
-    return isProfile0Done((millis() - kProfileEndDelay) / 1000.0) &&
-           isProfile1Done((millis() - kProfileEndDelay) / 1000.0);
+    return isProfile0Done((millis()) / 1000.0) &&
+           isProfile1Done((millis()) / 1000.0);
 }
 
 void updateMotorProfiles() {
@@ -134,17 +132,17 @@ void updateMotorProfiles() {
         targetLeftPosition = getProfiled0PositionAtTime(millis() / 1000.0);
         targetRightPosition = getProfiled1PositionAtTime(millis() / 1000.0);
 
-        if (areProfilesDone()) {
-            Serial.print("Projected Left: ");
-            Serial.print(targetLeftPosition);
-            Serial.print(", Actual Left: ");
-            Serial.println(currentLeftPosition);
+        // if (areProfilesDone()) {
+        // Serial.print("Projected Left: ");
+        // Serial.print(targetLeftPosition);
+        // Serial.print(", Actual Left: ");
+        // Serial.println(currentLeftPosition);
 
-            Serial.print("Projected Right: ");
-            Serial.print(targetRightPosition);
-            Serial.print(", Actual Right: ");
-            Serial.println(currentRightPosition);
-        }
+        // Serial.print("Projected Right: ");
+        // Serial.print(targetRightPosition);
+        // Serial.print(", Actual Right: ");
+        // Serial.println(currentRightPosition);
+        // }
 
         lastProfileTimeMs = millis();
     }
