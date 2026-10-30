@@ -9,3 +9,5 @@ void updateMotorProfiles();
 void requestStraightDistance(float distanceMm, float targetEndVelocity = 0.0);
 
 void requestTurnDegrees(float degrees);
+
+float getAngleSince(long initialLeftTicks, long initialRightTicks);
