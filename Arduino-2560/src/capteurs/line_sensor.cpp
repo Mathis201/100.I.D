@@ -1,5 +1,6 @@
 #include "line_sensor.h"
 #include "Arduino.h"
+#include <LibRobus.h>
 
 #define LINE_SENSOR_LEFT_PIN A7
 #define LINE_SENSOR_MIDDLE_PIN A6
@@ -23,47 +24,59 @@ int getNormalizedLineReading() {
     float valeurMilieu = analogRead(LINE_SENSOR_MIDDLE_PIN);
     float valeurDroite = analogRead(LINE_SENSOR_RIGHT_PIN);
 
-    int MaxGauche = 0;
-    int MaxMilieu = 0;
-    int MaxDroite = 0;
-    int MinGauche = valeurGauche;
-    int MinMilieu = valeurMilieu;
-    int MinDroite = valeurDroite;
+    static int MaxGauche = 0;
+    static int MaxMilieu = 0;
+    static int MaxDroite = 0;
+    static int MinGauche = valeurGauche;
+    static int MinMilieu = valeurMilieu;
+    static int MinDroite = valeurDroite;
 
     if (valeurGauche > MaxGauche){
         MaxGauche = valeurGauche;
-        Serial.print("Valeur max Gauche est : ");
-        Serial.println(MaxGauche);   
+           
     }
 
     if (valeurMilieu > MaxMilieu) {
         MaxMilieu = valeurMilieu;
-        Serial.print("Valeur max Milieu est : ");
-        Serial.println(MaxMilieu);
+     
     }
     if (valeurDroite > MaxDroite) {
         MaxDroite = valeurDroite;
-        Serial.print("Valeur max Droite est : ");
-        Serial.println(MaxDroite); 
+         
         }
     if (valeurGauche < MinGauche){
         MinGauche = valeurGauche;
-        Serial.print("Valeur min Gauche est: ");
-        Serial.println(MinGauche);
+        
 
     }
      if (valeurMilieu < MinMilieu){
         MinMilieu = valeurMilieu;
-        Serial.print("Valeur min Milieu est: ");
-        Serial.println(MinMilieu);
+        
     }
 
      if (valeurDroite < MinDroite){
         MinDroite = valeurDroite;
-        Serial.print("Valeur min Droit est: ");
-        Serial.println(MinDroite);
+        
         
     }
+    if(ROBUS_IsBumper(LEFT)) {
+         Serial.print("Valeur max Gauche est : ");
+    Serial.println(MaxGauche);
+    Serial.print("Valeur max Milieu est : ");
+    Serial.println(MaxMilieu);
+    Serial.print("Valeur max Droite est : ");
+    Serial.println(MaxDroite);
+    Serial.print("Valeur min Gauche est: ");
+    Serial.println(MinGauche);
+    Serial.print("Valeur min Milieu est: ");
+    Serial.println(MinMilieu);
+    Serial.print("Valeur min Droit est: ");
+    Serial.println(MinDroite);
+    }
+   
+
+
+
 
     return 0;
 
