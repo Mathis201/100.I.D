@@ -10,6 +10,7 @@
 #include "motors/motor_management.h"
 #include <LibRobus.h>
 #include "capteurs/capteur_distance_ir.h"
+#include "motors/servo_management.h"
 
 #include "constants.h"
 
@@ -42,6 +43,7 @@ void beep(int count) {
 void setup() {
     BoardInit();
     initLineSensor();
+    initServo();
     // initColorLeds();
 
     // initcapteurcouleur();
@@ -77,7 +79,7 @@ void loop() {
     case FOLLOW_LINE:
         // TODO: replace this to trigger when color detected
         if (true) {
-            currentColorAction = ActionColors::YELLOW;
+            currentColorAction = ActionColors::ORANGE;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:

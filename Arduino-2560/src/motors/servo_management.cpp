@@ -5,7 +5,6 @@
 const int indexArm = 0; //Servo qui monte et descend la pince
 const int indexClaw = 1; //Servo qui ouvre et ferme la pince
 
-
 void initServo(){ //active les servos, doit etre appelé à l'initialisation du robot
     SERVO_Enable(indexArm);
     SERVO_Enable(indexClaw);
@@ -30,14 +29,4 @@ void closeClaw(){ //ferme la pince
 
 void lowerArm(){ //baisse le bras 
     SERVO_SetAngle(indexArm, 0);
-}
-
-void pickUpCup(){ //prend le verre (ferme puis lève)
-    closeClaw();
-    raiseArm();
-}
-
-void dropCup(){ //drop le verre (baisse puis ouvre)
-    lowerArm();
-    openClaw();
 }

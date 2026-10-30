@@ -9,6 +9,3 @@ void raiseArm();
 void closeClaw();
 void lowerArm();
 
-void pickUpCup();
-void dropCup();
-
