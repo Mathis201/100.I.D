@@ -1,5 +1,6 @@
 #include "pink.h"
 #include <LibRobus.h>
+#include "capteurs/capteur_distance_ir.h"
 
 float vitesse = 0.15; // VOIR LA VALEUR DE VITESSE À METTRE ICI
 
@@ -26,12 +27,16 @@ void initPinkAction() {
 void updatePinkAction() {
     switch (pinkstate) {
     case TURN_IN_PLACE:
-        
-        // Quand on va détecter la quille, MOTOR_SetSpeed(LEFT/RIGHT, 0)
-        // pinkstate
+        //TODO: Tourner sur place, pas trop rapidement
+        float distance_cm = detecter_distance(0); //capteur IR 0
+        if (distance_cm <= 50)
+        {
+            pinkstate = MOVE_TO_QUILLE;
+            MOTOR_SetSpeed(LEFT/RIGHT, 0);  //Regarder si on met une décélération
+        }
         break;
     case MOVE_TO_QUILLE: // sinon ça pourrait être case QUILLE_DETECTED, puis l'approche de la quille va suivre
-        // avancer vers la quille
+        // TODO: avancer vers la quille
         break;
     case TEST_FINISHED:
         // Retrouver le parcours, donc revenir en arrière, et dans la bonne direction
