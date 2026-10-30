@@ -76,7 +76,9 @@ void loop() {
 
     case FOLLOW_LINE:
         // TODO: replace this to trigger when color detected
-        if (true) {
+        Adapt_Curve();
+        
+        if (false) {
             currentColorAction = ActionColors::YELLOW;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
@@ -102,6 +104,8 @@ void loop() {
             // switch robot state to do action
             currentRobotState = DO_COLOR_ACTION;
         }
+
+        
 
         break;
 

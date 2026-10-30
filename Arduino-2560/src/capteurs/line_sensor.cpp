@@ -105,9 +105,9 @@ Capteurs Binary_Conversion(){
     float Min_Right = 25;
     
 
-    Valeurs.C_Left = (abs(V_Left-Min_Left))/(Max_Left-Min_Left);
-    Valeurs.C_Middle = (abs(V_Middle-Min_Middle))/(Max_Middle-Min_Middle);
-    Valeurs.C_Right = (abs(V_Right-Min_Right))/(Max_Right-RIGHT);
+    Valeurs.C_Left = constrain((V_Left-Min_Left)/(Max_Left-Min_Left), 0, 1);
+    Valeurs.C_Middle = constrain((V_Middle-Min_Middle)/(Max_Middle-Min_Middle), 0, 1);
+    Valeurs.C_Right = constrain((V_Right-Min_Right)/(Max_Right-RIGHT), 0, 1);
     
 
     return Valeurs;
@@ -115,19 +115,21 @@ Capteurs Binary_Conversion(){
 
 void Adapt_Curve(){
 
+float KP = 0.17;
+
  Capteurs Valeurs = Binary_Conversion();
     
 if (Valeurs.C_Left>Valeurs.C_Right)
 {
-MOTOR_SetSpeed(LEFT, .5-Valeurs.C_Left/2);
-MOTOR_SetSpeed(RIGHT, .5/(Valeurs.C_Middle+.001));
+MOTOR_SetSpeed(LEFT, .25-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+MOTOR_SetSpeed(RIGHT, .25+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
     
 }
 
 else if (Valeurs.C_Right>Valeurs.C_Left)
 {
-MOTOR_SetSpeed(LEFT, 0.5/(Valeurs.C_Middle+0.001));
-MOTOR_SetSpeed(RIGHT, 0.5-Valeurs.C_Right/2);
+MOTOR_SetSpeed(LEFT, 0.25+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+MOTOR_SetSpeed(RIGHT, 0.25-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
     
 }
 }
