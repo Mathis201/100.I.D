@@ -9,6 +9,7 @@
 #include "capteurs/receveur_ir.h"
 #include "motors/motor_management.h"
 #include <LibRobus.h>
+#include "capteurs/capteur_distance_ir.h"
 
 #include "constants.h"
 
