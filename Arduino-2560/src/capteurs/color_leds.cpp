@@ -10,7 +10,7 @@
 constexpr int onPeriod = 10000; // ms
 
 unsigned long Time_Grid[5]{0, 0, 0, 0, 0};
-int First_Time[5] = {0};
+bool First_Time[5] = {true};
 
 void initColorLeds() {
     pinMode(BLUE_LED_PIN, OUTPUT);
