@@ -54,7 +54,13 @@ void lightUpLed(ActionColors color) {
     }
 
     digitalWrite(outputPin, LOW);
-    Time_Grid[static_cast<int>(color)] = millis() + onPeriod;
+    if (First_Time[static_cast<int>(color)] == true)
+    {
+        Time_Grid[static_cast<int>(color)] = millis() + onPeriod;
+        First_Time[static_cast<int>(color)] = false;
+    }
+    
+    
 }
 
 void timerLed() {
