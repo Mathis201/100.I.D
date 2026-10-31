@@ -10,7 +10,7 @@
 constexpr int onPeriod = 10000; // ms
 
 unsigned long Time_Grid[5]{0, 0, 0, 0, 0};
-bool First_Time[5] = {true};
+bool Is_OFF[5] = {true};
 
 void initColorLeds() {
     pinMode(BLUE_LED_PIN, OUTPUT);
@@ -54,11 +54,11 @@ void lightUpLed(ActionColors color) {
     }
 
     
-    if (First_Time[static_cast<int>(color)] == true)
+    if (Is_OFF[static_cast<int>(color)] == true)
     {
         digitalWrite(outputPin, LOW);
         Time_Grid[static_cast<int>(color)] = millis() + onPeriod;
-        First_Time[static_cast<int>(color)] = false;
+        Is_OFF[static_cast<int>(color)] = false;
         
     }
     
@@ -69,7 +69,7 @@ void timerLed() {
     if (Time_Grid[static_cast<int>(ActionColors::BLUE)] <= millis()) {
       
         digitalWrite(BLUE_LED_PIN, HIGH);
-        First_Time[static_cast<int>(ActionColors::BLUE)] = true;
+        Is_OFF[static_cast<int>(ActionColors::BLUE)] = true;
        
     }
 
@@ -77,28 +77,28 @@ void timerLed() {
       
 
         digitalWrite(YELLOW_LED_PIN, HIGH);
-        First_Time[static_cast<int>(ActionColors::YELLOW)] = true;
+        Is_OFF[static_cast<int>(ActionColors::YELLOW)] = true;
         
     }
 
     if (Time_Grid[static_cast<int>(ActionColors::GREEN)] <= millis()) {
      
         digitalWrite(GREEN_LED_PIN, HIGH);
-        First_Time[static_cast<int>(ActionColors::GREEN)] = true;
+        Is_OFF[static_cast<int>(ActionColors::GREEN)] = true;
        
     }
 
     if (Time_Grid[static_cast<int>(ActionColors::PINK_)] <= millis()) {
         
         digitalWrite(PINK_LED_PIN, HIGH);
-        First_Time[static_cast<int>(ActionColors::PINK_)] = true;
+        Is_OFF[static_cast<int>(ActionColors::PINK_)] = true;
         
     }
 
     if (Time_Grid[static_cast<int>(ActionColors::ORANGE)] <= millis()) {
         
         digitalWrite(ORANGE_LED_PIN, HIGH);
-        First_Time[static_cast<int>(ActionColors::ORANGE)] = true;
+        Is_OFF[static_cast<int>(ActionColors::ORANGE)] = true;
         
     }
 }
