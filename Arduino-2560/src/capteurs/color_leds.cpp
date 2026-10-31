@@ -59,11 +59,10 @@ void lightUpLed(ActionColors color) {
         digitalWrite(outputPin, LOW);
         Time_Grid[static_cast<int>(color)] = millis() + onPeriod;
         Is_OFF[static_cast<int>(color)] = false;
-        
     }
-    
-    
 }
+
+
 
 void timerLed() {
     if (Time_Grid[static_cast<int>(ActionColors::BLUE)] <= millis()) {
