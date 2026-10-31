@@ -30,13 +30,13 @@ void loop() {
 
     if (digitalRead(Bout_Start) == false) {
         digitalWrite(LedVerte, LOW);
-        IrSender.sendNEC(irAddress, startCommand, 3);
+        IrSender.sendNEC(irAddress, startCommand, 2);
         digitalWrite(LedVerte, HIGH);
     }
 
     if (digitalRead(Bout_Wake_Up) == false) {
         digitalWrite(LedVerte, LOW);
-        IrSender.sendNEC(irAddress, wakeUpCommand, 3);
+        IrSender.sendNEC(irAddress, wakeUpCommand, 2);
         digitalWrite(LedVerte, HIGH);
     }
 

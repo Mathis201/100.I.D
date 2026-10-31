@@ -3,14 +3,15 @@
 #include "actions/orange.h"
 #include "actions/pink.h"
 #include "actions/yellow.h"
+#include "capteurs/beeper.h"
+#include "capteurs/capteur_distance_ir.h"
 #include "capteurs/capteurcouleur.h"
 #include "capteurs/color_leds.h"
 #include "capteurs/line_sensor.h"
 #include "capteurs/receveur_ir.h"
 #include "motors/motor_management.h"
-#include <LibRobus.h>
-#include "capteurs/capteur_distance_ir.h"
 #include "motors/servo_management.h"
+#include <LibRobus.h>
 
 #include "constants.h"
 
@@ -26,27 +27,18 @@ enum RobotStates {
     FINISHED
 };
 
+constexpr int kColorReadingDelay = 300; // ms
+
 RobotStates currentRobotState;
 ActionColors currentColorAction;
 
 unsigned long lastTime = 0;
 unsigned long lastColorReadingTime = 0;
 
-void beep(int count) {
-    for (int i = 0; i < count; i++) {
-        AX_BuzzerON();
-        delay(75);
-        AX_BuzzerOFF();
-        delay(75);
-    }
-}
-
 void setup() {
     BoardInit();
-    initLineSensor();
-    initServo();
-    // initColorLeds();
 
+    initServo();
     initLineSensor();
     initColorLeds();
     initcapteurcouleur();
@@ -57,12 +49,13 @@ void setup() {
 void loop() {
     updateMotorInfo(millis());
     timerLed();
+    updateBeeper();
 
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {
-        beep(2);
+        requestBeep(2);
     } else if (remoteCommand == REMOTE_WAKE_COMMAND) {
-        beep(3);
+        requestBeep(3);
     }
 
     ActionColors couleurActuelleLue = ActionColors::NO_COLOR;
@@ -87,7 +80,7 @@ void loop() {
 
         // if (couleurActuelleLue != ActionColors::NO_COLOR) {
         if (true) {
-            currentColorAction = ActionColors::ORANGE;
+            currentColorAction = ActionColors::YELLOW;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:
@@ -112,8 +105,6 @@ void loop() {
             // switch robot state to do action
             currentRobotState = DO_COLOR_ACTION;
         }
-
-        
 
         break;
     }
@@ -156,7 +147,7 @@ void loop() {
 
     case FINISH_COLOR: {
         // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
-        beep(5);
+        requestBeep(5);
         currentRobotState = WAIT_FOR_START;
         break;
     }
