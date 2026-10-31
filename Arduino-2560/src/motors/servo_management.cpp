@@ -16,17 +16,17 @@ void disableServo(){ //désactive les servos, doit être appelé en fin de progr
 }
 
 void openClaw(){ //ouvre la pince 
-    SERVO_SetAngle(indexClaw, 0);
+    SERVO_SetAngle(indexClaw, 90);
 }
 
 void raiseArm(){ //monte le bras de 90deg
-    SERVO_SetAngle(indexArm, 90);
+    SERVO_SetAngle(indexArm, 175);
 }
 
 void closeClaw(){ //ferme la pince 
-    SERVO_SetAngle(indexClaw, 130);
+    SERVO_SetAngle(indexClaw, 22);
 }
 
 void lowerArm(){ //baisse le bras 
-    SERVO_SetAngle(indexArm, 0);
+    SERVO_SetAngle(indexArm, 90);
 }

@@ -80,7 +80,7 @@ void loop() {
 
         // if (couleurActuelleLue != ActionColors::NO_COLOR) {
         if (true) {
-            currentColorAction = ActionColors::YELLOW;
+            currentColorAction = ActionColors::ORANGE;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:

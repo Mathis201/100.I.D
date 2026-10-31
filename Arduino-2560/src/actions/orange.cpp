@@ -69,7 +69,7 @@ void updateOrangeAction() {
             timeTarget = millis() + onePeriod;
             hasTimerStarted = true;
         }
-        if (timeTarget >= millis()){
+        if (timeTarget <= millis()){
             orangeState = RAISE_ARM;
             hasTimerStarted = false;
         }  
@@ -81,7 +81,7 @@ void updateOrangeAction() {
             timeTarget = millis() + onePeriod;
             hasTimerStarted = true;
         }
-        if (timeTarget >= millis()){
+        if (timeTarget <= millis()){
             orangeState = RETURN_TO_LINE;
         }
         break;
