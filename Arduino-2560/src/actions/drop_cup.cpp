@@ -2,9 +2,9 @@
 #include "motors/servo_management.h"
 #include <LibRobus.h>
 
-const int onePeriod = 1000;
-unsigned long timeTarget = 0;
-bool hasTimerStarted = false;
+const int OnePeriod = 1000;
+unsigned long TimeTarget = 0;
+bool HasTimerStarted = false;
 
 enum dropCupStates {
     LOWER_ARM,
@@ -22,24 +22,24 @@ void updateDropCupAction(){
     {
     case LOWER_ARM:
         lowerArm();
-        if (!hasTimerStarted){
-            timeTarget = millis() + onePeriod;
-            hasTimerStarted = true;
+        if (!HasTimerStarted){
+            TimeTarget = millis() + OnePeriod;
+            HasTimerStarted = true;
         }
-        if (timeTarget <= millis()){
+        if (TimeTarget <= millis()){
             dropCupState = OPEN_CLAW;
-            hasTimerStarted = false;
+            HasTimerStarted = false;
         }  
         break;
     case OPEN_CLAW:
         openClaw();
-        if (!hasTimerStarted){
-            timeTarget = millis() + onePeriod;
-            hasTimerStarted = true;
+        if (!HasTimerStarted){
+            TimeTarget = millis() + OnePeriod;
+            HasTimerStarted = true;
         }
-        if (timeTarget <= millis()){
+        if (TimeTarget <= millis()){
             dropCupState = OPEN_CLAW;
-            hasTimerStarted = false;
+            HasTimerStarted = false;
         }  
         break;
     case TEST_FINISHED:
