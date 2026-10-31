@@ -136,8 +136,8 @@ unsigned long Now = millis();
 
 if (Valeurs.C_Middle>.90)
 {
-    MOTOR_SetSpeed(RIGHT, .3);
-    MOTOR_SetSpeed(LEFT, .31);
+    MOTOR_SetSpeed(RIGHT, base_speed);
+    MOTOR_SetSpeed(LEFT, base_speed+0.01);
 }
 
 
@@ -169,8 +169,8 @@ Past_Error = Live_Error;
 
 
 else{
-    MOTOR_SetSpeed(RIGHT, .3);
-    MOTOR_SetSpeed(LEFT, .31);
+    MOTOR_SetSpeed(RIGHT, base_speed);
+    MOTOR_SetSpeed(LEFT, base_speed+0.01);
 }
 
 
