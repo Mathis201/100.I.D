@@ -3,6 +3,7 @@
 #include "actions/orange.h"
 #include "actions/pink.h"
 #include "actions/yellow.h"
+#include "capteurs/capteur_distance_ir.h"
 #include "capteurs/capteurcouleur.h"
 #include "capteurs/color_leds.h"
 #include "capteurs/line_sensor.h"
@@ -46,32 +47,33 @@ void setup() {
     initServo();
     // initColorLeds();
 
-    // initcapteurcouleur();
+    initLineSensor();
+    initColorLeds();
+    initcapteurcouleur();
+
     currentRobotState = WAIT_FOR_START;
 }
 
 void loop() {
-    // int remoteCommand = getRemoteReadCommand();
-    // if (remoteCommand == REMOTE_START_COMMAND) {
-    //     beep(2);
-    // } else if (remoteCommand == REMOTE_WAKE_COMMAND) {
-    //     beep(3);
-    // }
-    getNormalizedLineReading(); 
-
     updateMotorInfo(millis());
-    // timerLed();
-     
-    // ActionColors couleurActuelleLue = lirecouleuractuel();
-    // // Serial.println(couleurActuelleLue);
-    // if (couleurActuelleLue != ActionColors::NO_COLOR) {
-    //     lightUpLed(couleurActuelleLue);
-    // }
+    timerLed();
+
+    ActionColors couleurActuelleLue = lirecouleuractuel();
+    // Serial.println(couleurActuelleLue);
+    if (couleurActuelleLue != ActionColors::NO_COLOR) {
+        lightUpLed(couleurActuelleLue);
+    }
+
+    int remoteCommand = getRemoteReadCommand();
+    if (remoteCommand == REMOTE_START_COMMAND) {
+        beep(2);
+    } else if (remoteCommand == REMOTE_WAKE_COMMAND) {
+        beep(3);
+    }
 
     switch (currentRobotState) {
     case WAIT_FOR_START:
-        // TODO: add check for start remote signal
-        if (ROBUS_IsBumper(RIGHT)) {
+        if (ROBUS_IsBumper(REAR) || remoteCommand == REMOTE_START_COMMAND) {
             currentRobotState = FOLLOW_LINE;
         }
         break;
@@ -104,6 +106,8 @@ void loop() {
             // switch robot state to do action
             currentRobotState = DO_COLOR_ACTION;
         }
+
+        
 
         break;
 
@@ -156,6 +160,6 @@ void loop() {
     }
 
     delay(10);
-    Serial.println(millis() - lastTime);
+    // Serial.println(millis() - lastTime);
     lastTime = millis();
 }

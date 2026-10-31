@@ -74,15 +74,71 @@ int getNormalizedLineReading() {
     Serial.println(MinDroite);
     }
    
-
-
-
-
     return 0;
-
-
-
 }
+
+
+
+
+
+
+struct Capteurs
+{
+    float C_Left;
+    float C_Middle;
+    float C_Right;
+};
+
+Capteurs Binary_Conversion(){
+
+    Capteurs Valeurs;
+
+    float V_Left = analogRead(LINE_SENSOR_LEFT_PIN);
+    float V_Middle = analogRead(LINE_SENSOR_MIDDLE_PIN);
+    float V_Right = analogRead(LINE_SENSOR_RIGHT_PIN);
+
+    float Max_Left = 708;
+    float Max_Middle = 508;
+    float Max_Right = 507;
+    float Min_Left = 33;
+    float Min_Middle = 26;
+    float Min_Right = 25;
+    
+
+    Valeurs.C_Left = constrain((V_Left-Min_Left)/(Max_Left-Min_Left), 0, 1);
+    Valeurs.C_Middle = constrain((V_Middle-Min_Middle)/(Max_Middle-Min_Middle), 0, 1);
+    Valeurs.C_Right = constrain((V_Right-Min_Right)/(Max_Right-RIGHT), 0, 1);
+    
+
+    return Valeurs;
+}
+
+void Adapt_Curve(){
+
+float KP = 0.17;
+
+ Capteurs Valeurs = Binary_Conversion();
+    
+if (Valeurs.C_Left>Valeurs.C_Right)
+{
+MOTOR_SetSpeed(LEFT, .25-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+MOTOR_SetSpeed(RIGHT, .25+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+    
+}
+
+else if (Valeurs.C_Right>Valeurs.C_Left)
+{
+MOTOR_SetSpeed(LEFT, 0.25+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+MOTOR_SetSpeed(RIGHT, 0.25-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+    
+}
+}
+
+
+
+
+
+
 bool IsLineDetected(){
     return false;
 
