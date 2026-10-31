@@ -3,7 +3,6 @@
 #include "actions/orange.h"
 #include "actions/pink.h"
 #include "actions/yellow.h"
-#include "capteurs/capteur_distance_ir.h"
 #include "capteurs/capteurcouleur.h"
 #include "capteurs/color_leds.h"
 #include "capteurs/line_sensor.h"
@@ -26,8 +25,6 @@ enum RobotStates {
     DROP_CUP,
     FINISHED
 };
-
-constexpr int kColorReadingDelay = 300; // ms
 
 RobotStates currentRobotState;
 ActionColors currentColorAction;
