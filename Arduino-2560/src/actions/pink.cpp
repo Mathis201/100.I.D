@@ -8,10 +8,11 @@ static long ticksDepartGauche;
 static long ticksDepartDroite;
 static float distance_cm;
 static float angleTourne;
-
+static float turnSpeed = 50.0;
 
 enum PinkStates {
     TURN_IN_PLACE,
+    STOP_TURN,
     MOVE_TO_QUILLE,
     RETURN_TO_LINE,
     RESTORE_ORIENTATION,
@@ -26,38 +27,45 @@ void initPinkAction() {
 
     ticksDepartGauche = ENCODER_Read(LEFT);
     ticksDepartDroite = ENCODER_Read(RIGHT);
-    requestTurnDegrees(360.0);
+    requestTurnDegrees(360.0, turnSpeed);
 }
 
 void updatePinkAction() {
     switch (pinkstate) {
     case TURN_IN_PLACE:
-        //TODO: Tourner sur place, pas trop rapidement
         distance_cm = detecter_distance(0); //capteur IR 0
+        updateMotorProfiles();
         if (distance_cm > 0.0 && distance_cm <= distanceMaxQuille)
         {
-            stopMotors(); //Regarder si on met une décélération
-            pinkstate = MOVE_TO_QUILLE;
-            requestStraightDistance(-(distance_cm + 2.0)*10.0);
-            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroite);
+            decelerateToStop();
+            pinkstate = STOP_TURN;
         }
         else if (areProfilesDone())
         {
-            requestTurnDegrees(360.0);  // À revoir, parce que le robot va refaire tous les tours après
+            requestTurnDegrees(360.0, turnSpeed);
             distanceMaxQuille += 10.0;  // On pourrait mettre initPinkAction et la distanceMaxQuille
         }
         break;
+    case STOP_TURN:
+        updateMotorProfiles();
+        if (areProfilesDone())
+        {   
+            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroite);
+            requestStraightDistance((distance_cm + 10.0) * 10.0);
+            pinkstate = MOVE_TO_QUILLE;
+        }
+        break;
     case MOVE_TO_QUILLE: // sinon ça pourrait être case QUILLE_DETECTED, puis l'approche de la quille va suivre
-        // TODO: avancer vers la quille
-        //if(distance_parcourue == distance_cm)
+        updateMotorProfiles();
         if (areProfilesDone())
         {
             stopMotors(); //décélération?
             pinkstate = RETURN_TO_LINE;
-            requestStraightDistance((distance_cm + 2.0) * 10.0);
+            requestStraightDistance(-(distance_cm + 10.0) * 10.0);
         }
         break;
     case RETURN_TO_LINE:
+        updateMotorProfiles();
         if (areProfilesDone())
         {
             stopMotors();
@@ -66,6 +74,7 @@ void updatePinkAction() {
         }
         break;
     case RESTORE_ORIENTATION:
+        updateMotorProfiles();
         if (areProfilesDone())
         {
             stopMotors();
