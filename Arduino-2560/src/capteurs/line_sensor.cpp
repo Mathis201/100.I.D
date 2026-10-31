@@ -97,12 +97,12 @@ Capteurs Binary_Conversion(){
     float V_Middle = analogRead(LINE_SENSOR_MIDDLE_PIN);
     float V_Right = analogRead(LINE_SENSOR_RIGHT_PIN);
 
-    float Max_Left = 708;
-    float Max_Middle = 508;
-    float Max_Right = 507;
-    float Min_Left = 33;
-    float Min_Middle = 26;
-    float Min_Right = 25;
+    float Max_Left = 823;
+    float Max_Middle = 781;
+    float Max_Right = 804;
+    float Min_Left = 36;
+    float Min_Middle = 31;
+    float Min_Right = 32;
     
 
     Valeurs.C_Left = constrain((V_Left-Min_Left)/(Max_Left-Min_Left), 0, 1);
@@ -115,21 +115,28 @@ Capteurs Binary_Conversion(){
 
 void Adapt_Curve(){
 
-float KP = 0.17;
-
+float KP = 0.2;
+float base_speed = .4;
  Capteurs Valeurs = Binary_Conversion();
-    
-if (Valeurs.C_Left>Valeurs.C_Right)
+
+if (Valeurs.C_Middle>.90)
 {
-MOTOR_SetSpeed(LEFT, .25-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-MOTOR_SetSpeed(RIGHT, .25+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+    MOTOR_SetSpeed(LEFT, base_speed+.01);
+    MOTOR_SetSpeed(RIGHT, base_speed);
+}
+
+
+else if (Valeurs.C_Left>Valeurs.C_Right)
+{
+MOTOR_SetSpeed(LEFT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+MOTOR_SetSpeed(RIGHT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
     
 }
 
 else if (Valeurs.C_Right>Valeurs.C_Left)
 {
-MOTOR_SetSpeed(LEFT, 0.25+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-MOTOR_SetSpeed(RIGHT, 0.25-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+MOTOR_SetSpeed(LEFT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+MOTOR_SetSpeed(RIGHT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
     
 }
 }
@@ -140,6 +147,9 @@ MOTOR_SetSpeed(RIGHT, 0.25-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
 
 
 bool IsLineDetected(){
+    
+    Capteurs valeurs_capteurs = Binary_Conversion();
+    
     return false;
 
 
