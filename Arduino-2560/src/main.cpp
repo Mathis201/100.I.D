@@ -27,10 +27,13 @@ enum RobotStates {
     FINISHED
 };
 
+constexpr int kColorReadingDelay = 300; // ms
+
 RobotStates currentRobotState;
 ActionColors currentColorAction;
 
-int lastTime = 0;
+unsigned long lastTime = 0;
+unsigned long lastColorReadingTime = 0;
 
 void beep(int count) {
     for (int i = 0; i < count; i++) {
@@ -58,12 +61,6 @@ void loop() {
     updateMotorInfo(millis());
     timerLed();
 
-    ActionColors couleurActuelleLue = lirecouleuractuel();
-    // Serial.println(couleurActuelleLue);
-    if (couleurActuelleLue != ActionColors::NO_COLOR) {
-        lightUpLed(couleurActuelleLue);
-    }
-
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {
         beep(2);
@@ -71,15 +68,27 @@ void loop() {
         beep(3);
     }
 
+    ActionColors couleurActuelleLue = ActionColors::NO_COLOR;
+    if (millis() - lastColorReadingTime > kColorReadingDelay &&
+        (currentRobotState == RobotStates::WAIT_FOR_START || currentRobotState == RobotStates::FOLLOW_LINE)) {
+        lastColorReadingTime = millis();
+        couleurActuelleLue = lirecouleuractuel();
+        if (couleurActuelleLue != ActionColors::NO_COLOR) {
+            lightUpLed(couleurActuelleLue);
+        }
+    }
+
     switch (currentRobotState) {
-    case WAIT_FOR_START:
+    case WAIT_FOR_START: {
         if (ROBUS_IsBumper(REAR) || remoteCommand == REMOTE_START_COMMAND) {
             currentRobotState = FOLLOW_LINE;
         }
         break;
+    }
 
-    case FOLLOW_LINE:
-        // TODO: replace this to trigger when color detected
+    case FOLLOW_LINE: {
+
+        // if (couleurActuelleLue != ActionColors::NO_COLOR) {
         if (true) {
             currentColorAction = ActionColors::ORANGE;
             // TODO: currentColorAction = detectedColor
@@ -110,8 +119,9 @@ void loop() {
         
 
         break;
+    }
 
-    case DO_COLOR_ACTION:
+    case DO_COLOR_ACTION: {
         bool isColorActionFinished;
         // update current color action and check if finished
         switch (currentColorAction) {
@@ -145,21 +155,28 @@ void loop() {
         }
 
         break;
+    }
 
-    case FINISH_COLOR:
+    case FINISH_COLOR: {
         // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
         beep(5);
         currentRobotState = WAIT_FOR_START;
         break;
+    }
 
-    case DROP_CUP:
-        break;
-
-    case FINISHED:
+    case DROP_CUP: {
         break;
     }
 
+    case FINISHED: {
+        break;
+    }
+    }
+
     delay(10);
-    // Serial.println(millis() - lastTime);
+    Serial.print("Loop time: ");
+    Serial.println(millis() - lastTime);
+    Serial.print("Current state: ");
+    Serial.println(currentRobotState);
     lastTime = millis();
 }
