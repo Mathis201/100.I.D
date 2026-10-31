@@ -67,41 +67,38 @@ void lightUpLed(ActionColors color) {
 
 void timerLed() {
     if (Time_Grid[static_cast<int>(ActionColors::BLUE)] <= millis()) {
-        // if (First_Time[static_cast<int>(ActionColors::BLUE)] != 1)
-        // {
+      
         digitalWrite(BLUE_LED_PIN, HIGH);
-        // First_Time[static_cast<int>(ActionColors::BLUE)] = 1;
-        // }
+        First_Time[static_cast<int>(ActionColors::BLUE)] = true;
+       
     }
 
     if (Time_Grid[static_cast<int>(ActionColors::YELLOW)] <= millis()) {
-        // if (First_Time[static_cast<int>(ActionColors::YELLOW)] != 1)
-        // {
+      
 
         digitalWrite(YELLOW_LED_PIN, HIGH);
-        // First_Time[static_cast<int>(ActionColors::YELLOW)] = 1;
-
-        // }
+        First_Time[static_cast<int>(ActionColors::YELLOW)] = true;
+        
     }
 
     if (Time_Grid[static_cast<int>(ActionColors::GREEN)] <= millis()) {
-        // if (First_Time[static_cast<int>(ActionColors::GREEN)] != 1) {
+     
         digitalWrite(GREEN_LED_PIN, HIGH);
-        // First_Time[static_cast<int>(ActionColors::GREEN)] = 1;
-        // }
+        First_Time[static_cast<int>(ActionColors::GREEN)] = true;
+       
     }
 
     if (Time_Grid[static_cast<int>(ActionColors::PINK_)] <= millis()) {
-        // if (First_Time[static_cast<int>(ActionColors::PINK_)] != 1) {
+        
         digitalWrite(PINK_LED_PIN, HIGH);
-        // First_Time[static_cast<int>(ActionColors::PINK_)] = 1;
-        // }
+        First_Time[static_cast<int>(ActionColors::PINK_)] = true;
+        
     }
 
     if (Time_Grid[static_cast<int>(ActionColors::ORANGE)] <= millis()) {
-        // if (First_Time[static_cast<int>(ActionColors::ORANGE)] != 1) {
+        
         digitalWrite(ORANGE_LED_PIN, HIGH);
-        // First_Time[static_cast<int>(ActionColors::ORANGE)] = 1;
-        // }
+        First_Time[static_cast<int>(ActionColors::ORANGE)] = true;
+        
     }
 }
