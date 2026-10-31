@@ -14,9 +14,6 @@ constexpr float distancePerCoordinate = 500; // mm
 
 constexpr float maxRecordedSpeed = 915; // mm / s
 
-constexpr float kMaxSpeed = 600; // mm / s
-constexpr float kAccel = 600;    // mm / s ^ 2
-
 constexpr float kProfileRefreshDelayMs = 20;
 constexpr float kVelocityRefreshDelayMs = 50;
 
@@ -35,8 +32,8 @@ float targetRightPosition = 0;
 float currentLeftVelocity = 0;
 float currentRightVelocity = 0;
 
-float lastVelocityTimeMs = 0;
-float lastProfileTimeMs = 0;
+unsigned long lastVelocityTimeMs = 0;
+unsigned long lastProfileTimeMs = 0;
 
 static void setMotorOutputs(float leftOutput, float rightOutput) {
     MOTOR_SetSpeed(LEFT, leftOutput);
@@ -48,12 +45,13 @@ static float calculateMotorOutput(float motorPosition, float motorTarget) {
     return calculated;
 }
 
-static void initMotorProfiles(float leftTarget, float rightTarget, float leftFinalVelocity, float rightFinalVelocity, bool straightLine = false) {
+static void initMotorProfiles(float leftTarget, float rightTarget, float leftFinalVelocity,
+                              float rightFinalVelocity, float maxSpeed, float accel, bool straightLine = false) {
     initProfile0(millis() / 1000.0,
                  currentLeftPosition + currentLeftVelocity * (kVelocityPredictionTime / 1000),
                  leftTarget,
-                 kMaxSpeed,
-                 kAccel,
+                 maxSpeed,
+                 accel,
                  currentLeftVelocity,
                  leftFinalVelocity,
                  straightLine);
@@ -61,8 +59,8 @@ static void initMotorProfiles(float leftTarget, float rightTarget, float leftFin
     initProfile1(millis() / 1000.0,
                  currentRightPosition + currentRightVelocity * (kVelocityPredictionTime / 1000),
                  rightTarget,
-                 kMaxSpeed,
-                 kAccel,
+                 maxSpeed,
+                 accel,
                  currentRightVelocity,
                  rightFinalVelocity,
                  straightLine);
@@ -135,17 +133,17 @@ void updateMotorProfiles() {
     }
 }
 
-void requestStraightDistance(float distanceMm, float targetEndVelocity) {
-    initMotorProfiles(currentLeftPosition + distanceMm, currentRightPosition + distanceMm, targetEndVelocity, targetEndVelocity);
+void requestStraightDistance(float distanceMm, float targetEndVelocity, float maxSpeed, float accel) {
+    initMotorProfiles(currentLeftPosition + distanceMm, currentRightPosition + distanceMm, targetEndVelocity, targetEndVelocity, maxSpeed, accel);
 }
 
-void requestTurnDegrees(float degrees) {
+void requestTurnDegrees(float degrees, float maxSpeed, float accel) {
     float distanceMm = ((degrees * PI / 180) * kTrackWidthMm) / 2;
-    initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0);
+    initMotorProfiles(currentLeftPosition - distanceMm, currentRightPosition + distanceMm, 0.0, 0.0, maxSpeed, accel);
 }
 
 void decelerateToStop() {
-    initMotorProfiles(0, 0, 0, 0, true);
+    initMotorProfiles(0, 0, 0, 0, kMaxSpeed, kAccel, true);
 }
 
 float getAngleSince(long initialLeftTicks, long initialRightTicks) {

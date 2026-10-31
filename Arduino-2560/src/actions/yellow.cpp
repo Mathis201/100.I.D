@@ -1,9 +1,8 @@
 #include "yellow.h"
+#include "capteurs/line_sensor.h"
+#include "motors/motor_management.h"
 #include <Arduino.h>
 #include <LibRobus.h>
-#include "motors/motor_management.h"
-#include "capteurs/line_sensor.h"
-
 
 enum YellowStates {
     WAIT_FOR_WALL,
@@ -18,13 +17,10 @@ enum YellowStates {
 };
 
 // Liste de constante pour le programme
-bool StartRotation = false;        // Condition pour la rotation
-bool StartForward = false;         // Condition pour avancer
-const int32_t Impulsion_90 = 1984; // Calcul de combien d'impulsion des roues pour faire 90 degrés
-const int SEUIL_IR = 270;          // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
-const float kp = 0.0001;
-const int32_t impulsion_forward_1 = 4010;   // imulsion pour avancer le long du mur
-const int32_t impulsion_forward_2 = 4010;   // impulsion pour avancer sur le cote du mur a augmenter(sam)
+bool StartRotation = false; // Condition pour la rotation
+bool StartForward = false;  // Condition pour avancer
+const int SEUIL_IR = 270;   // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
+
 YellowStates CurrentStates = WAIT_FOR_WALL; // etat initial
 
 uint16_t LireDistanceMur() {
@@ -66,16 +62,15 @@ void updateYellowAction() {
 
     case TURN_1: { // Premier virage de 90 degrés
 
-
         if (StartRotation == false) {
             requestTurnDegrees(-90);
-            
+
             StartRotation = true;
         }
 
         updateMotorProfiles();
 
-        if (areProfilesDone())  // Condition pour arreter de tourner
+        if (areProfilesDone()) // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -95,8 +90,6 @@ void updateYellowAction() {
         }
         updateMotorProfiles();
 
-        
-
         if (areProfilesDone()) {
 
             MOTOR_SetSpeed(LEFT, 0);
@@ -110,14 +103,13 @@ void updateYellowAction() {
 
     case TURN_2: { // Deuxième tournant pour contourner le mur
         if (StartRotation == false) {
-           requestTurnDegrees(90);
+            requestTurnDegrees(90);
 
             StartRotation = true;
         }
         updateMotorProfiles();
 
-
-        if (areProfilesDone())  // Condition pour arreter de tourner
+        if (areProfilesDone()) // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -136,7 +128,6 @@ void updateYellowAction() {
             StartForward = true;
         }
         updateMotorProfiles();
-  
 
         if (areProfilesDone()) {
 
@@ -156,9 +147,8 @@ void updateYellowAction() {
             StartRotation = true;
         }
         updateMotorProfiles();
-     
 
-        if (areProfilesDone())  // Condition pour arreter de tourner
+        if (areProfilesDone()) // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -171,22 +161,22 @@ void updateYellowAction() {
     }
 
     case FORWARD_3: {
-        if (StartForward == false){
+        if (StartForward == false) {
             requestStraightDistance(800);
 
             StartForward = true;
         }
 
         updateMotorProfiles();
-        
-        if (areProfilesDone()){
-                MOTOR_SetSpeed(LEFT,0);
-                MOTOR_SetSpeed(RIGHT,0);
+
+        if (areProfilesDone()) {
+            MOTOR_SetSpeed(LEFT, 0);
+            MOTOR_SetSpeed(RIGHT, 0);
 
             StartForward = false;
             CurrentStates = TURN_4;
         }
-       break; 
+        break;
     }
 
     case TURN_4: {
@@ -196,9 +186,8 @@ void updateYellowAction() {
             StartRotation = true;
         }
         updateMotorProfiles();
-    
 
-        if (areProfilesDone())  // Condition pour arreter de tourner
+        if (areProfilesDone()) // Condition pour arreter de tourner
         {
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
@@ -209,6 +198,7 @@ void updateYellowAction() {
 
         break;
     }
-    default: break;
+    default:
+        break;
     }
 }

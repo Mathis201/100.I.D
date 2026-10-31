@@ -162,9 +162,9 @@ void loop() {
     }
 
     delay(10);
-    Serial.print("Loop time: ");
-    Serial.println(millis() - lastTime);
-    Serial.print("Current state: ");
-    Serial.println(currentRobotState);
+    // Serial.print("Loop time: ");
+    // Serial.println(millis() - lastTime);
+    // Serial.print("Current state: ");
+    // Serial.println(currentRobotState);
     lastTime = millis();
 }
