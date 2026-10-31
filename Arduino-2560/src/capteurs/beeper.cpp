@@ -8,10 +8,10 @@ bool startedBeep = false;
 bool currentlyOn = false;
 int countLeft = 0;
 
-int lastSwitchTime = 0;
+unsigned long lastSwitchTime = 0;
 
 void requestBeep(int count) {
-    if (countLeft != 0) {
+    if (countLeft == 0) {
         lastSwitchTime = 0;
         startedBeep = false;
     }
