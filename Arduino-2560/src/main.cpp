@@ -1,9 +1,9 @@
 #include "actions/blue.h"
+#include "actions/drop_cup.h"
 #include "actions/green.h"
 #include "actions/orange.h"
 #include "actions/pink.h"
 #include "actions/yellow.h"
-#include "actions/drop_cup.h"
 #include "capteurs/beeper.h"
 #include "capteurs/capteur_distance_ir.h"
 #include "capteurs/capteurcouleur.h"
@@ -15,9 +15,6 @@
 #include <LibRobus.h>
 
 #include "constants.h"
-
-#define REMOTE_START_COMMAND 1
-#define REMOTE_WAKE_COMMAND 2
 
 enum RobotStates {
     WAIT_FOR_START,
@@ -52,8 +49,6 @@ void loop() {
     timerLed();
     updateBeeper();
 
-
-
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {
         requestBeep(2);
@@ -80,12 +75,11 @@ void loop() {
     }
 
     case FOLLOW_LINE: {
-
-        Adapt_Curve();
+        // Adapt_Curve();
 
         // if (couleurActuelleLue != ActionColors::NO_COLOR) {
-        if (false) {
-            currentColorAction = ActionColors::ORANGE;
+        if (true) {
+            currentColorAction = ActionColors::BLUE;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:
@@ -119,7 +113,7 @@ void loop() {
         // update current color action and check if finished
         switch (currentColorAction) {
         case ActionColors::BLUE:
-            updateBlueAction();
+            updateBlueAction(remoteCommand);
             isColorActionFinished = isBlueActionFinished();
             break;
         case ActionColors::YELLOW:
@@ -151,19 +145,26 @@ void loop() {
     }
 
     case FINISH_COLOR: {
-        // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
         requestBeep(5);
-        currentRobotState = DROP_CUP;
-        initDropCupAction();
+        // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
+        if (true) {
+            currentRobotState = DROP_CUP;
+            initDropCupAction();
+        }
+
         break;
     }
 
     case DROP_CUP: {
         updateDropCupAction();
+        if (isDropCupActionFinished()) {
+            currentRobotState = FINISHED;
+        }
         break;
     }
 
     case FINISHED: {
+        currentRobotState = WAIT_FOR_START;
         break;
     }
     }

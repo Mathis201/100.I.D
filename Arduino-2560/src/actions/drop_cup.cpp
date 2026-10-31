@@ -14,39 +14,37 @@ enum dropCupStates {
 
 dropCupStates dropCupState;
 
-void initDropCupAction(){
+void initDropCupAction() {
     dropCupState = LOWER_ARM;
 }
-void updateDropCupAction(){
-    switch (dropCupState)
-    {
+void updateDropCupAction() {
+    switch (dropCupState) {
     case LOWER_ARM:
         lowerArm();
-        if (!HasTimerStarted){
+        if (!HasTimerStarted) {
             TimeTarget = millis() + OnePeriod;
             HasTimerStarted = true;
         }
-        if (TimeTarget <= millis()){
+        if (TimeTarget <= millis()) {
             dropCupState = OPEN_CLAW;
             HasTimerStarted = false;
-        }  
+        }
         break;
     case OPEN_CLAW:
         openClaw();
-        if (!HasTimerStarted){
+        if (!HasTimerStarted) {
             TimeTarget = millis() + OnePeriod;
             HasTimerStarted = true;
         }
-        if (TimeTarget <= millis()){
-            dropCupState = OPEN_CLAW;
+        if (TimeTarget <= millis()) {
+            dropCupState = TEST_FINISHED;
             HasTimerStarted = false;
-        }  
+        }
         break;
     case TEST_FINISHED:
         break;
     }
 }
-bool isDropCupActionFinished(){
+bool isDropCupActionFinished() {
     return dropCupState == TEST_FINISHED;
 }
-

@@ -10,7 +10,6 @@ constexpr float kP = 0.035;
 
 constexpr float kWheelCircumference = 2.0 * PI * kWheelRadiusMm;
 constexpr float fTicksToMm = kWheelCircumference / kTicksPerRotation;
-constexpr float distancePerCoordinate = 500; // mm
 
 constexpr float maxRecordedSpeed = 915; // mm / s
 

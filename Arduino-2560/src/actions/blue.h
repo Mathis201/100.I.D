@@ -1,5 +1,5 @@
 #pragma once
 
 void initBlueAction();
-void updateBlueAction();
+void updateBlueAction(int currentRemoteCommand);
 bool isBlueActionFinished();
