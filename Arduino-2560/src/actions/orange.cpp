@@ -4,7 +4,7 @@
 #include "capteurs/capteur_distance_ir.h"
 #include <LibRobus.h>
 
-static float distanceMaxQuille = 50.0;
+static float distanceMaxVerre = 50.0;
 static long ticksDepartGauche;
 static long ticksDepartDroite;
 static float distance_cm;
@@ -12,9 +12,15 @@ static float angleTourne;
 const int onePeriod = 1000;
 unsigned long timeTarget = 0;
 bool hasTimerStarted = false;
+static float turnSpeed = 60.0;
+static const float ajustementVerreCm = 11.0;
+static const float modifiedSpeed = 150.0;
+
 
 enum orangeStates {
     TURN_IN_PLACE,
+    STOP_TURN,
+    LOWER_ARM,
     MOVE_TO_CUP,
     CLOSE_CLAW,
     RAISE_ARM,
@@ -26,40 +32,62 @@ enum orangeStates {
 orangeStates orangeState;
 
 void initOrangeAction() {
-    orangeState = CLOSE_CLAW;
+    orangeState = TURN_IN_PLACE;
+
+    distanceMaxVerre = 50.0;
+    hasTimerStarted = false;
+    timeTarget = 0;
 
     ticksDepartGauche = ENCODER_Read(LEFT);
     ticksDepartDroite = ENCODER_Read(RIGHT);
-    requestTurnDegrees(360.0);
+    requestTurnDegrees(360.0, turnSpeed);
 }
 
 void updateOrangeAction() {
     switch (orangeState){
     case TURN_IN_PLACE:
-        //TODO: Tourner sur place, pas trop rapidement
         distance_cm = detecter_distance(0); //capteur IR 0
-        if (distance_cm > 0.0 && distance_cm <= distanceMaxQuille)
+        updateMotorProfiles();
+        if (distance_cm > 0.0 && distance_cm <= distanceMaxVerre)
         {
-            stopMotors(); //Regarder si on met une décélération
-            orangeState = MOVE_TO_CUP;
-            requestStraightDistance(-(distance_cm + 2.0)*10.0);
-            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroite);
+            decelerateToStop(); //Regarder si on met une décélération
+            orangeState = STOP_TURN;
         }
         else if (areProfilesDone())
         {
-            requestTurnDegrees(360.0);  // À revoir, parce que le robot va refaire tous les tours après
-            distanceMaxQuille += 10.0;  // On pourrait mettre initPinkAction et la distanceMaxQuille
+            requestTurnDegrees(360.0, turnSpeed);
+            distanceMaxVerre += 10.0;
+        }
+        break;
+
+    case STOP_TURN:
+        updateMotorProfiles();
+        if (areProfilesDone())
+        {   
+            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroite);
+            orangeState = LOWER_ARM;
         }
         break;
     
+    case LOWER_ARM:
+        lowerArm();
+        if (!hasTimerStarted){
+            timeTarget = millis() + onePeriod;
+            hasTimerStarted = true;
+        }
+        if (timeTarget <= millis()){
+            hasTimerStarted = false;
+            requestStraightDistance(-(distance_cm) * 10.0, 0.0, modifiedSpeed);
+            orangeState = MOVE_TO_CUP;
+        }
+    break;
+
     case MOVE_TO_CUP:
-        // TODO: avancer vers la quille
-        //if(distance_parcourue == distance_cm)
+        updateMotorProfiles();
         if (areProfilesDone())
         {
             stopMotors(); //décélération?
             orangeState = CLOSE_CLAW;
-            requestStraightDistance((distance_cm) * 10.0);
         }
         break;
 
@@ -82,14 +110,29 @@ void updateOrangeAction() {
             hasTimerStarted = true;
         }
         if (timeTarget <= millis()){
-            orangeState = TEST_FINISHED; //A MODIFEIR
+            hasTimerStarted = false;
+            requestStraightDistance((distance_cm) * 10.0);
+            orangeState = RETURN_TO_LINE; //A MODIFEIR
         }
         break;
 
     case RETURN_TO_LINE:
+        updateMotorProfiles();
+        if (areProfilesDone())
+        {
+            stopMotors();
+            requestTurnDegrees(-angleTourne);
+            orangeState = RESTORE_ORIENTATION;
+        }
         break;
 
     case RESTORE_ORIENTATION:
+        updateMotorProfiles();
+        if (areProfilesDone())
+        {
+            stopMotors();
+            orangeState = TEST_FINISHED;
+        }
         break;
 
     case TEST_FINISHED:

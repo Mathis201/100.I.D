@@ -9,12 +9,13 @@ static const float valeursIR[] = {
     106.74,104.66, 100.4, 97.25
 };
 
+//TODO: Recalculer / modifier les valeurs percues par le capteur IR pour les cm
 
 float distance_interpolation(int mesure)
 {
     if (mesure > valeursIR[0] || mesure < valeursIR[14])
     {
-        return -1.0;
+        return 0.0;
     }
     for (int i = 0; i < 14; i++) {
         if (mesure <= valeursIR[i] && mesure >= valeursIR[i + 1]){

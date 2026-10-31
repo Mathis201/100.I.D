@@ -5,10 +5,6 @@
 const int indexArm = 0; //Servo qui monte et descend la pince
 const int indexClaw = 1; //Servo qui ouvre et ferme la pince
 
-void initServo(){ //active les servos, doit etre appelé à l'initialisation du robot
-    SERVO_Enable(indexArm);
-    SERVO_Enable(indexClaw);
-}
 
 void disableServo(){ //désactive les servos, doit être appelé en fin de programme 
     SERVO_Disable(indexArm);
@@ -29,4 +25,12 @@ void closeClaw(){ //ferme la pince
 
 void lowerArm(){ //baisse le bras 
     SERVO_SetAngle(indexArm, 90);
+}
+
+
+void initServo(){ //active les servos, doit etre appelé à l'initialisation du robot
+    SERVO_Enable(indexArm);
+    SERVO_Enable(indexClaw);
+    raiseArm();
+    openClaw();
 }
