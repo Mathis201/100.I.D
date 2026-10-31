@@ -82,7 +82,7 @@ void updateOrangeAction() {
             hasTimerStarted = true;
         }
         if (timeTarget <= millis()){
-            orangeState = RETURN_TO_LINE;
+            orangeState = TEST_FINISHED; //A MODIFEIR
         }
         break;
 

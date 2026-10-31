@@ -3,6 +3,7 @@
 #include "actions/orange.h"
 #include "actions/pink.h"
 #include "actions/yellow.h"
+#include "actions/drop_cup.h"
 #include "capteurs/beeper.h"
 #include "capteurs/capteur_distance_ir.h"
 #include "capteurs/capteurcouleur.h"
@@ -148,11 +149,13 @@ void loop() {
     case FINISH_COLOR: {
         // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
         requestBeep(5);
-        currentRobotState = WAIT_FOR_START;
+        currentRobotState = DROP_CUP;
+        initDropCupAction();
         break;
     }
 
     case DROP_CUP: {
+        updateDropCupAction();
         break;
     }
 
