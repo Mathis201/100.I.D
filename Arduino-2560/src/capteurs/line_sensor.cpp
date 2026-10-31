@@ -113,32 +113,89 @@ Capteurs Binary_Conversion(){
     return Valeurs;
 }
 
+unsigned long Last_Time = 0;
+float Past_Error = 0;
+
 void Adapt_Curve(){
 
-float KP = 0.2;
+float KD = .25;
+float KP = .2;
+
 float base_speed = .4;
- Capteurs Valeurs = Binary_Conversion();
+float ponderation = .4;
+
+float Live_Error = 0;
+float Deriv = 0;
+bool First = true;
+
+Capteurs Valeurs = Binary_Conversion();
+
+unsigned long Now = millis();
+
+
 
 if (Valeurs.C_Middle>.90)
 {
-    MOTOR_SetSpeed(LEFT, base_speed+.01);
-    MOTOR_SetSpeed(RIGHT, base_speed);
+    MOTOR_SetSpeed(RIGHT, .3);
+    MOTOR_SetSpeed(LEFT, .31);
 }
 
 
 else if (Valeurs.C_Left>Valeurs.C_Right)
 {
-MOTOR_SetSpeed(LEFT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-MOTOR_SetSpeed(RIGHT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-    
+Live_Error = (Valeurs.C_Left*ponderation+(1-Valeurs.C_Middle));
+if (Now-Last_Time != 0 || Now-Last_Time < 500 || First != true)
+{
+    Deriv = (Live_Error - Past_Error) / (Now-Last_Time);
 }
+
+MOTOR_SetSpeed(LEFT, base_speed-(Live_Error*KP+Deriv*KD));
+MOTOR_SetSpeed(RIGHT, base_speed+(Live_Error*KP+Deriv*KD));
+Past_Error = Live_Error;
+}
+
 
 else if (Valeurs.C_Right>Valeurs.C_Left)
 {
-MOTOR_SetSpeed(LEFT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-MOTOR_SetSpeed(RIGHT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-    
+Live_Error = (Valeurs.C_Right*ponderation+(1-Valeurs.C_Middle))*KP;
+if (Now-Last_Time != 0 || Now-Last_Time < 500 || First != true)
+{
+    Deriv = (Live_Error - Past_Error) / (Now-Last_Time);
 }
+MOTOR_SetSpeed(LEFT, base_speed+(Live_Error*KP+Deriv*KD));
+MOTOR_SetSpeed(RIGHT, base_speed-(Live_Error*KP+Deriv*KD));
+Past_Error = Live_Error;
+}
+
+
+else{
+    MOTOR_SetSpeed(RIGHT, .3);
+    MOTOR_SetSpeed(LEFT, .31);
+}
+
+
+Last_Time = Now;
+First = false;
+
+
+// if (Valeurs.C_Middle>.90)
+// {
+//     MOTOR_SetSpeed(LEFT, base_speed+.01);
+//     MOTOR_SetSpeed(RIGHT, base_speed);
+// }
+
+
+// else if (Valeurs.C_Left>Valeurs.C_Right)
+// {
+// MOTOR_SetSpeed(LEFT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+// MOTOR_SetSpeed(RIGHT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+    
+// }
+
+// else if (Valeurs.C_Right>Valeurs.C_Left)
+// {
+// MOTOR_SetSpeed(LEFT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+// MOTOR_SetSpeed(RIGHT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
 }
 
 
@@ -154,4 +211,4 @@ bool IsLineDetected(){
 
 
 
-}
+} 
