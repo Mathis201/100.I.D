@@ -130,8 +130,8 @@ float Past_Error = 0;
 
 void Adapt_Curve(){
 
-float KD = 3;
-float KP = .3;
+float KD = 0.1;
+float KP = .2;
 
 float base_speed = .3;
 float ponderation = .4;
