@@ -6,6 +6,7 @@
 
 enum YellowStates {
     WAIT_FOR_WALL,
+    STOP_BEFORE_TURN,
     TURN_1,
     FORWARD_1,
     TURN_2,
@@ -49,16 +50,21 @@ void updateYellowAction() {
         // delay (10000);
 
         if (valeurIR >= SEUIL_IR) { // Condition pour arreter devant le mur
-
-            MOTOR_SetSpeed(LEFT, 0);
-            MOTOR_SetSpeed(RIGHT, 0);
-
-            CurrentStates = TURN_1;
+            CurrentStates = STOP_BEFORE_TURN;
+            decelerateToStop();
         } else {
             // Continue à suivre la ligne
             Adapt_Curve();
         }
         break;
+    }
+    case STOP_BEFORE_TURN:{
+        updateMotorProfiles();      
+
+        if (areProfilesDone){
+            CurrentStates = TURN_1;    
+        }
+
     }
 
     case TURN_1: { // Premier virage de 90 degrés
