@@ -4,28 +4,33 @@
 #include "capteurs/capteur_distance_ir.h"
 #include <LibRobus.h>
 
-static float distanceMaxVerre = 50.0;
+
 static long ticksDepartGauche;
-static long ticksDepartDroite;
-static float distance_cm;
+static long ticksDepartDroit;
 static float angleTourne;
 const int onePeriod = 1000;
-unsigned long timeTarget = 0;
-bool hasTimerStarted = false;
-static float turnSpeed = 60.0;
-static const float ajustementVerreCm = 11.0;
+static unsigned long timeTarget = 0;
+static bool hasTimerStarted = false;
+
+static float turnSpeed = 100.0;
 static const float modifiedSpeed = 150.0;
 static const float valeurProcheVerre = 550;
 static float seuilDetection = 120.0;
+static float seuilTooClose = 600.0;
+static const float forwardDistanceMm = 1000.0;
+static const float backwardsDistanceMm = 300.0;
+
+
 static long ticksApprocheGauche;
 static long ticksApprocheDroit;
 static float distanceParcourueMm = 0.0;
 const float mmParTick = (2.0 * PI * 38.1) / 3200.0;
-
+static bool tooClose = false;
 
 enum orangeStates {
     TURN_IN_PLACE,
     STOP_TURN,
+    MOVE_BACKWARDS,
     LOWER_ARM,
     MOVE_TO_CUP,
     STOP_BEFORE_CUP,
@@ -41,22 +46,27 @@ orangeStates orangeState;
 void initOrangeAction() {
     orangeState = TURN_IN_PLACE;
 
-    distanceMaxVerre = 50.0;
     hasTimerStarted = false;
     timeTarget = 0;
+    tooClose = false;
+    seuilDetection = 120.0;
+    openClaw();
 
     ticksDepartGauche = ENCODER_Read(LEFT);
-    ticksDepartDroite = ENCODER_Read(RIGHT);
+    ticksDepartDroit = ENCODER_Read(RIGHT);
     requestTurnDegrees(360.0, turnSpeed);
 }
 
 void updateOrangeAction() {
     switch (orangeState){
     case TURN_IN_PLACE:
-        distance_cm = detecter_distance(1); //capteur IR 0
         updateMotorProfiles();
         if (detecterObjetIR(1, seuilDetection))// Lecture > 120
         {
+            if (detecterObjetIR(1,seuilTooClose))
+            {
+                tooClose = true;
+            }
             decelerateToStop(); //Regarder si on met une décélération
             orangeState = STOP_TURN;
         }
@@ -69,12 +79,27 @@ void updateOrangeAction() {
 
     case STOP_TURN:
         updateMotorProfiles();
-        if (areProfilesDone())
+        if (areProfilesDone() && tooClose)
+        {
+            requestStraightDistance(backwardsDistanceMm);
+            orangeState = MOVE_BACKWARDS;
+        }
+        else if (areProfilesDone())
         {   
-            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroite);
+            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroit);
             orangeState = LOWER_ARM;
         }
         break;
+    
+    case MOVE_BACKWARDS:
+        updateMotorProfiles();
+        if (areProfilesDone())
+        {
+            stopMotors();
+            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroit);
+            orangeState = LOWER_ARM;
+        }
+    break;
     
     case LOWER_ARM:
         lowerArm();
@@ -86,7 +111,7 @@ void updateOrangeAction() {
             hasTimerStarted = false;
             ticksApprocheGauche = ENCODER_Read(LEFT);
             ticksApprocheDroit = ENCODER_Read(RIGHT);
-            requestStraightDistance(1000.0, 0.0, modifiedSpeed);
+            requestStraightDistance(-forwardDistanceMm, 0.0, modifiedSpeed);
             orangeState = MOVE_TO_CUP;
         }
     break;
@@ -97,6 +122,17 @@ void updateOrangeAction() {
         {
             decelerateToStop();
             orangeState = STOP_BEFORE_CUP;
+        }
+        else if (areProfilesDone())
+        {
+            stopMotors();
+            long deltaGauche = ENCODER_Read(LEFT) - ticksApprocheGauche;
+            long deltaDroite = ENCODER_Read(RIGHT) - ticksApprocheDroit;
+
+            distanceParcourueMm = (deltaGauche + deltaDroite) / 2.0 * mmParTick;
+
+            hasTimerStarted = false;
+            orangeState = RAISE_ARM;
         }
         break;
 
@@ -134,7 +170,11 @@ void updateOrangeAction() {
         }
         if (timeTarget <= millis()){
             hasTimerStarted = false;
-            requestStraightDistance(- distanceParcourueMm);
+            float distanceRetourMm = -distanceParcourueMm;
+            if (tooClose){
+                distanceRetourMm -= backwardsDistanceMm;
+            }
+            requestStraightDistance(distanceRetourMm);
             orangeState = RETURN_TO_LINE; //A MODIFEIR
         }
         break;
@@ -166,3 +206,14 @@ void updateOrangeAction() {
 bool isOrangeActionFinished() {
     return orangeState == TEST_FINISHED;
 }
+
+
+
+/*
+if (ROBUS_IsBumper(LEFT))
+    {
+        currentColorAction = ActionColors:: ORANGE;
+        initOrangeAction();
+        currentRobotState = DO_COLOR_ACTION;
+    }
+*/
