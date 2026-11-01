@@ -15,6 +15,12 @@ bool hasTimerStarted = false;
 static float turnSpeed = 60.0;
 static const float ajustementVerreCm = 11.0;
 static const float modifiedSpeed = 150.0;
+static const float valeurProcheVerre = 550;
+static float seuilDetection = 120.0;
+static long ticksApprocheGauche;
+static long ticksApprocheDroit;
+static float distanceParcourueMm = 0.0;
+const float mmParTick = (2.0 * PI * 38.1) / 3200.0;
 
 
 enum orangeStates {
@@ -22,6 +28,7 @@ enum orangeStates {
     STOP_TURN,
     LOWER_ARM,
     MOVE_TO_CUP,
+    STOP_BEFORE_CUP,
     CLOSE_CLAW,
     RAISE_ARM,
     RETURN_TO_LINE,
@@ -46,9 +53,9 @@ void initOrangeAction() {
 void updateOrangeAction() {
     switch (orangeState){
     case TURN_IN_PLACE:
-        distance_cm = detecter_distance(0); //capteur IR 0
+        distance_cm = detecter_distance(1); //capteur IR 0
         updateMotorProfiles();
-        if (distance_cm > 0.0 && distance_cm <= distanceMaxVerre)
+        if (detecterObjetIR(1, seuilDetection))// Lecture > 120
         {
             decelerateToStop(); //Regarder si on met une décélération
             orangeState = STOP_TURN;
@@ -56,7 +63,7 @@ void updateOrangeAction() {
         else if (areProfilesDone())
         {
             requestTurnDegrees(360.0, turnSpeed);
-            distanceMaxVerre += 10.0;
+            seuilDetection -= 25.0;
         }
         break;
 
@@ -77,18 +84,34 @@ void updateOrangeAction() {
         }
         if (timeTarget <= millis()){
             hasTimerStarted = false;
-            requestStraightDistance(-(distance_cm) * 10.0, 0.0, modifiedSpeed);
+            ticksApprocheGauche = ENCODER_Read(LEFT);
+            ticksApprocheDroit = ENCODER_Read(RIGHT);
+            requestStraightDistance(1000.0, 0.0, modifiedSpeed);
             orangeState = MOVE_TO_CUP;
         }
     break;
 
     case MOVE_TO_CUP:
         updateMotorProfiles();
-        if (areProfilesDone())
+        if (detecterObjetIR(1,valeurProcheVerre))
         {
-            stopMotors(); //décélération?
-            orangeState = CLOSE_CLAW;
+            decelerateToStop();
+            orangeState = STOP_BEFORE_CUP;
         }
+        break;
+
+    case STOP_BEFORE_CUP:
+    updateMotorProfiles();
+    if (areProfilesDone())
+    {
+        stopMotors();
+
+        long deltaGauche = ENCODER_Read(LEFT) - ticksApprocheGauche;
+        long deltaDroite = ENCODER_Read(RIGHT) - ticksApprocheDroit;
+        distanceParcourueMm = (deltaGauche + deltaDroite) / 2.0 * mmParTick;
+        
+        orangeState = CLOSE_CLAW;
+    }
         break;
 
     case CLOSE_CLAW:
@@ -111,7 +134,7 @@ void updateOrangeAction() {
         }
         if (timeTarget <= millis()){
             hasTimerStarted = false;
-            requestStraightDistance((distance_cm) * 10.0);
+            requestStraightDistance(- distanceParcourueMm);
             orangeState = RETURN_TO_LINE; //A MODIFEIR
         }
         break;
