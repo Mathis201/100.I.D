@@ -49,6 +49,7 @@ void loop() {
     timerLed();
     updateBeeper();
     // getNormalizedLineReading();
+    // Binary_Conversion();
 
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {

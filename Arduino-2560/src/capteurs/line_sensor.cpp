@@ -101,18 +101,6 @@ int getNormalizedLineReading() {
     return 0;
 }
 
-
-
-
-
-
-struct Capteurs
-{
-    float C_Left;
-    float C_Middle;
-    float C_Right;
-};
-
 Capteurs Binary_Conversion(){
 
     Capteurs Valeurs;
@@ -131,9 +119,9 @@ Capteurs Binary_Conversion(){
 
     Valeurs.C_Left = constrain((V_Left-Min_Left)/(Max_Left-Min_Left), 0, 1);
     Valeurs.C_Middle = constrain((V_Middle-Min_Middle)/(Max_Middle-Min_Middle), 0, 1);
-    Valeurs.C_Right = constrain((V_Right-Min_Right)/(Max_Right-RIGHT), 0, 1);
-    
+    Valeurs.C_Right = constrain((V_Right-Min_Right)/(Max_Right-Min_Right), 0, 1);
 
+    
     return Valeurs;
 }
 
@@ -145,7 +133,7 @@ void Adapt_Curve(){
 float KD = 3;
 float KP = .3;
 
-float base_speed = .4;
+float base_speed = .3;
 float ponderation = .4;
 
 float Live_Error = 0;
@@ -233,19 +221,29 @@ bool IsLineDetected(int nbvoulu){
     Capteurs Valeurs = Binary_Conversion();
 
 
-    if (Valeurs.C_Left>=0.5){
+    if (Valeurs.C_Left>=0.4){
         nbcapteurs = nbcapteurs+1;
     }
-     if (Valeurs.C_Middle>=0.5){
+     if (Valeurs.C_Middle>=0.4){
         nbcapteurs = nbcapteurs+1;
     } 
-    if (Valeurs.C_Right>=0.5){
+    if (Valeurs.C_Right>=0.4){
         nbcapteurs = nbcapteurs+1;
     }
+    Serial.print("Gauche: ");
+    Serial.println(Valeurs.C_Left);
+    Serial.print("Milieu: ");
+    Serial.println(Valeurs.C_Middle);
+    Serial.print("Droite: ");
+    Serial.println(Valeurs.C_Right);
+
     if (nbcapteurs<nbvoulu){
        return false;
     }
-    if (nbcapteurs>=nbvoulu){
+    else {
        return true;
     }
+    
+
+    
 }
