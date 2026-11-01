@@ -48,6 +48,7 @@ void loop() {
     updateMotorInfo(millis());
     timerLed();
     updateBeeper();
+    // getNormalizedLineReading();
 
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {
@@ -75,10 +76,10 @@ void loop() {
     }
 
     case FOLLOW_LINE: {
-        // Adapt_Curve();
+        Adapt_Curve();
 
         // if (couleurActuelleLue != ActionColors::NO_COLOR) {
-        if (true) {
+        if (false) {
             currentColorAction = ActionColors::BLUE;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {

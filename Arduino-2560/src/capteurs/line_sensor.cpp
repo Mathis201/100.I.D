@@ -24,12 +24,24 @@ int getNormalizedLineReading() {
     float valeurMilieu = analogRead(LINE_SENSOR_MIDDLE_PIN);
     float valeurDroite = analogRead(LINE_SENSOR_RIGHT_PIN);
 
+
+
+    static unsigned long SommeGauche = 0;
+    static unsigned long SommeMilieu = 0;
+    static unsigned long SommeDroite = 0;
+    static int nombreFois = 0;
     static int MaxGauche = 0;
     static int MaxMilieu = 0;
     static int MaxDroite = 0;
     static int MinGauche = valeurGauche;
     static int MinMilieu = valeurMilieu;
     static int MinDroite = valeurDroite;
+
+    SommeGauche += valeurGauche;
+    SommeMilieu += valeurMilieu;
+    SommeDroite += valeurDroite;
+    nombreFois++;
+
 
     if (valeurGauche > MaxGauche){
         MaxGauche = valeurGauche;
@@ -60,7 +72,7 @@ int getNormalizedLineReading() {
         
     }
     if(ROBUS_IsBumper(LEFT)) {
-         Serial.print("Valeur max Gauche est : ");
+    Serial.print("Valeur max Gauche est : ");
     Serial.println(MaxGauche);
     Serial.print("Valeur max Milieu est : ");
     Serial.println(MaxMilieu);
@@ -72,6 +84,18 @@ int getNormalizedLineReading() {
     Serial.println(MinMilieu);
     Serial.print("Valeur min Droit est: ");
     Serial.println(MinDroite);
+    unsigned long MoyenneGauche = (SommeGauche)/nombreFois;
+    unsigned long MoyenneMilieu = (SommeMilieu)/nombreFois;
+    unsigned long MoyenneDroite = (SommeDroite)/nombreFois;
+    
+    Serial.print("Moyenne Gauche:");
+    Serial.println(MoyenneGauche);
+    Serial.print("Moyenne Milieu:");
+    Serial.println(MoyenneMilieu);
+    Serial.print("Moyenne Droite:");
+    Serial.println(MoyenneDroite);
+
+
     }
    
     return 0;
@@ -97,12 +121,12 @@ Capteurs Binary_Conversion(){
     float V_Middle = analogRead(LINE_SENSOR_MIDDLE_PIN);
     float V_Right = analogRead(LINE_SENSOR_RIGHT_PIN);
 
-    float Max_Left = 823;
-    float Max_Middle = 781;
-    float Max_Right = 804;
-    float Min_Left = 36;
+    float Max_Left = 641;
+    float Max_Middle = 559;
+    float Max_Right = 663;
+    float Min_Left = 39;
     float Min_Middle = 31;
-    float Min_Right = 32;
+    float Min_Right = 54;
     
 
     Valeurs.C_Left = constrain((V_Left-Min_Left)/(Max_Left-Min_Left), 0, 1);
@@ -118,8 +142,8 @@ float Past_Error = 0;
 
 void Adapt_Curve(){
 
-float KD = .25;
-float KP = .2;
+float KD = 3;
+float KP = .3;
 
 float base_speed = .4;
 float ponderation = .4;
@@ -134,14 +158,14 @@ unsigned long Now = millis();
 
 
 
-if (Valeurs.C_Middle>.90)
-{
-    MOTOR_SetSpeed(RIGHT, base_speed);
-    MOTOR_SetSpeed(LEFT, base_speed+0.01);
-}
+// if (Valeurs.C_Middle>.90)
+// {
+//     MOTOR_SetSpeed(RIGHT, base_speed);
+//     MOTOR_SetSpeed(LEFT, base_speed+0.01);
+// }
 
 
-else if (Valeurs.C_Left>Valeurs.C_Right)
+ if (Valeurs.C_Left>Valeurs.C_Right)
 {
 Live_Error = (Valeurs.C_Left*ponderation+(1-Valeurs.C_Middle));
 if (Now-Last_Time != 0 || Now-Last_Time < 500 || First != true)
@@ -157,7 +181,7 @@ Past_Error = Live_Error;
 
 else if (Valeurs.C_Right>Valeurs.C_Left)
 {
-Live_Error = (Valeurs.C_Right*ponderation+(1-Valeurs.C_Middle))*KP;
+Live_Error = (Valeurs.C_Right*ponderation+(1-Valeurs.C_Middle));
 if (Now-Last_Time != 0 || Now-Last_Time < 500 || First != true)
 {
     Deriv = (Live_Error - Past_Error) / (Now-Last_Time);
@@ -170,7 +194,7 @@ Past_Error = Live_Error;
 
 else{
     MOTOR_SetSpeed(RIGHT, base_speed);
-    MOTOR_SetSpeed(LEFT, base_speed+0.01);
+    MOTOR_SetSpeed(LEFT, base_speed);
 }
 
 
