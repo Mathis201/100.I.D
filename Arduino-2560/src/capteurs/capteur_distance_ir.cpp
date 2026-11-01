@@ -32,3 +32,8 @@ float detecter_distance(int pin_IR){
     return distance_interpolation(mesure);
 }
 
+
+bool detecterObjetIR(int pin_IR, int seuil)
+{
+    return ROBUS_ReadIR(pin_IR) > seuil;
+}
