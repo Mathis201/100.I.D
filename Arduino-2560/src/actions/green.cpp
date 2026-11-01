@@ -8,6 +8,10 @@ enum GreenStates {
     AVANCER,
     AVANCERSANSLIGNE,
     RETROUVERLIGNE,
+    Tourner_1,
+    Avancer_1,
+    Tourner_2,
+    Avancer_2,
     TEST_FINISHED
 };
 
@@ -33,17 +37,22 @@ void updateGreenAction() {
     case AVANCERSANSLIGNE:{
         updateMotorProfiles();
         if (areProfilesDone()) {
-            CurrentsStates = TEST_FINISHED;
+            if (IsLineDetected(1)){
+                CurrentsStates = TEST_FINISHED;
+
+            }
+            else {
+                CurrentsStates = Tourner_1;
+            }          
+            
         }
 
         break;
     }
 
-    case RETROUVERLIGNE:{
-        // if (IsLineDetected(3)){
-        //     requestStraightDistance(50);
-        //     updateMotorProfiles;
-        // }
+    case Tourner_1:{
+        requestTurnDegrees(90);
+        
 
         // if (IsLineDetected(1)){
         //     CurrentsStates = TEST_FINISHED;
