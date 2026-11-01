@@ -42,6 +42,7 @@ void updateGreenAction() {
 
             }
             else {
+                 requestTurnDegrees(90);
                 CurrentsStates = Tourner_1;
             }          
             
@@ -51,70 +52,69 @@ void updateGreenAction() {
     }
 
     case Tourner_1:{
-        requestTurnDegrees(90);
         updateMotorProfiles();
-        if (areProfilesDone()) {
+        
             if (IsLineDetected(1)){
                 CurrentsStates = TEST_FINISHED;
 
             }
-            else {
+            if (areProfilesDone()) {
+                requestStraightDistance(200);
                 CurrentsStates = Avancer_1;
             }          
             
-        }
+        
 
         break;
 
     }
      case Avancer_1:{
-        requestStraightDistance(200);
         updateMotorProfiles();
-        if (areProfilesDone()) {
+       
             if (IsLineDetected(1)){
                 CurrentsStates = TEST_FINISHED;
 
             }
-            else {
+            if (areProfilesDone()) {
+                requestTurnDegrees(180);
                 CurrentsStates = Tourner_2;
             }          
             
-        }
+        
 
         break;
 
     }
 
      case Tourner_2:{
-        requestTurnDegrees(180);
         updateMotorProfiles();
-        if (areProfilesDone()) {
+       
             if (IsLineDetected(1)){
                 CurrentsStates = TEST_FINISHED;
 
             }
-            else {
+            if (areProfilesDone()) {
+                requestStraightDistance(400);
                 CurrentsStates = Avancer_2;
             }         
             
-        }
 
         break;
 
     }
       case Avancer_2:{
-        requestStraightDistance(40);
         updateMotorProfiles();
-        if (areProfilesDone()) {
+    
             if (IsLineDetected(1)){
                 CurrentsStates = TEST_FINISHED;
 
             }
-            else {
-                CurrentsStates = Tourner_1;
+            if (areProfilesDone()) {
+                requestTurnDegrees(90);
+                CurrentsStates = TEST_FINISHED;
             }         
             
-        }
+
 
         break;
 
