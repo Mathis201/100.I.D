@@ -56,6 +56,7 @@ void updateYellowAction() {
             CurrentStates = TURN_1;
         } else {
             // Continue à suivre la ligne
+            Adapt_Curve();
         }
         break;
     }
@@ -169,7 +170,7 @@ void updateYellowAction() {
 
         updateMotorProfiles();
 
-        if (areProfilesDone()) {
+        if (IsLineDetected(3) || areProfilesDone()) { // Trouver la ligne apres avoir contourner le mur 
             MOTOR_SetSpeed(LEFT, 0);
             MOTOR_SetSpeed(RIGHT, 0);
 
@@ -179,7 +180,7 @@ void updateYellowAction() {
         break;
     }
 
-    case TURN_4: {
+    case TURN_4: { // Derniere rotation sur la ligne 
         if (StartRotation == false) {
             requestTurnDegrees(-90);
 
