@@ -2,7 +2,7 @@
 
 void initLineSensor();
 int getNormalizedLineReading();
-bool IsLineDetected();
+bool IsLineDetected(int nbvoulu);
 
 struct Capteurs;
 Capteurs Binary_Conversion();

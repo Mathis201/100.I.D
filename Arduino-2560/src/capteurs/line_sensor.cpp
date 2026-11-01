@@ -203,12 +203,25 @@ First = false;
 
 
 
-bool IsLineDetected(){
-    
-    Capteurs valeurs_capteurs = Binary_Conversion();
-    
-    return false;
+bool IsLineDetected(int nbvoulu){
+
+    int nbcapteurs = 0;
+    Capteurs Valeurs = Binary_Conversion();
 
 
-
-} 
+    if (Valeurs.C_Left>=0.5){
+        nbcapteurs = nbcapteurs+1;
+    }
+     if (Valeurs.C_Middle>=0.5){
+        nbcapteurs = nbcapteurs+1;
+    } 
+    if (Valeurs.C_Right>=0.5){
+        nbcapteurs = nbcapteurs+1;
+    }
+    if (nbcapteurs<nbvoulu){
+       return false;
+    }
+    if (nbcapteurs>=nbvoulu){
+       return true;
+    }
+}

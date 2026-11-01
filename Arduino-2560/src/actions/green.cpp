@@ -1,6 +1,8 @@
 #include "green.h"
 #include "capteurs/line_sensor.h"
 #include "motors/motor_management.h"
+#include "Arduino.h"
+
 
 enum GreenStates {
     AVANCER,
@@ -16,41 +18,51 @@ void initGreenAction() {
 }
 
 void updateGreenAction() {
-    switch (CurrentsStates) {
-    case AVANCER:
+    switch (CurrentsStates)
+    {
+    case AVANCER:{
         Adapt_Curve();
-        if (IsLineDetected()) {
-            requestStraightDistance(750);
-            CurrentsStates = AVANCERSANSLIGNE;
+        if (IsLineDetected(3)) {
+            requestStraightDistance(800);
+            CurrentsStates = AVANCERSANSLIGNE;   
         }
-
+    
         break;
-
-    case AVANCERSANSLIGNE:
+    }
+    
+    case AVANCERSANSLIGNE:{
         updateMotorProfiles();
         if (areProfilesDone()) {
             CurrentsStates = TEST_FINISHED;
         }
 
         break;
+    }
 
-    case RETROUVERLIGNE:
-        if (IsLineDetected()) {
-            requestStraightDistance(50);
-            updateMotorProfiles;
-        }
+    case RETROUVERLIGNE:{
+        // if (IsLineDetected(3)){
+        //     requestStraightDistance(50);
+        //     updateMotorProfiles;
+        // }
 
-        if (IsLineDetected()) {
-            CurrentsStates = TEST_FINISHED;
-        }
+        // if (IsLineDetected(1)){
+        //     CurrentsStates = TEST_FINISHED;
+        // }
 
-        break;
+        // break;
 
+    }
     default:
         break;
     }
 }
 
 bool isGreenActionFinished() {
-    CurrentsStates = TEST_FINISHED;
+     if (CurrentsStates==TEST_FINISHED){
+        return true;
+     }
+     else {
+        return false;
+     }
+  
 }

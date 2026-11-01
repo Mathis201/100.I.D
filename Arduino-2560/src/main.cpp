@@ -49,6 +49,7 @@ void loop() {
     timerLed();
     updateBeeper();
 
+
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {
         requestBeep(2);
@@ -75,11 +76,11 @@ void loop() {
     }
 
     case FOLLOW_LINE: {
-        // Adapt_Curve();
+        //Adapt_Curve();
 
         // if (couleurActuelleLue != ActionColors::NO_COLOR) {
         if (true) {
-            currentColorAction = ActionColors::BLUE;
+            currentColorAction = ActionColors::GREEN;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:
