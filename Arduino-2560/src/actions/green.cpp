@@ -52,15 +52,74 @@ void updateGreenAction() {
 
     case Tourner_1:{
         requestTurnDegrees(90);
-        
+        updateMotorProfiles();
+        if (areProfilesDone()) {
+            if (IsLineDetected(1)){
+                CurrentsStates = TEST_FINISHED;
 
-        // if (IsLineDetected(1)){
-        //     CurrentsStates = TEST_FINISHED;
-        // }
+            }
+            else {
+                CurrentsStates = Avancer_1;
+            }          
+            
+        }
 
-        // break;
+        break;
 
     }
+     case Avancer_1:{
+        requestStraightDistance(200);
+        updateMotorProfiles();
+        if (areProfilesDone()) {
+            if (IsLineDetected(1)){
+                CurrentsStates = TEST_FINISHED;
+
+            }
+            else {
+                CurrentsStates = Tourner_2;
+            }          
+            
+        }
+
+        break;
+
+    }
+
+     case Tourner_2:{
+        requestTurnDegrees(180);
+        updateMotorProfiles();
+        if (areProfilesDone()) {
+            if (IsLineDetected(1)){
+                CurrentsStates = TEST_FINISHED;
+
+            }
+            else {
+                CurrentsStates = Avancer_2;
+            }         
+            
+        }
+
+        break;
+
+    }
+      case Avancer_2:{
+        requestStraightDistance(40);
+        updateMotorProfiles();
+        if (areProfilesDone()) {
+            if (IsLineDetected(1)){
+                CurrentsStates = TEST_FINISHED;
+
+            }
+            else {
+                CurrentsStates = Tourner_1;
+            }         
+            
+        }
+
+        break;
+
+    }
+
     default:
         break;
     }
