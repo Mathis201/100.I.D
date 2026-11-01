@@ -6,6 +6,7 @@
 
 enum YellowStates {
     WAIT_FOR_WALL,
+    STOP_BEFORE_TURN,
     TURN_1,
     FORWARD_1,
     TURN_2,
@@ -19,7 +20,7 @@ enum YellowStates {
 // Liste de constante pour le programme
 bool StartRotation = false; // Condition pour la rotation
 bool StartForward = false;  // Condition pour avancer
-const int SEUIL_IR = 270;   // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
+const int SEUIL_IR = 170;   // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
 
 YellowStates CurrentStates = WAIT_FOR_WALL; // etat initial
 
@@ -49,16 +50,21 @@ void updateYellowAction() {
         // delay (10000);
 
         if (valeurIR >= SEUIL_IR) { // Condition pour arreter devant le mur
-
-            MOTOR_SetSpeed(LEFT, 0);
-            MOTOR_SetSpeed(RIGHT, 0);
-
-            CurrentStates = TURN_1;
+            CurrentStates = STOP_BEFORE_TURN;
+            decelerateToStop();
         } else {
             // Continue à suivre la ligne
             Adapt_Curve();
         }
         break;
+    }
+    case STOP_BEFORE_TURN:{
+        updateMotorProfiles();      
+
+        if (areProfilesDone){
+            CurrentStates = TURN_1;    
+        }
+
     }
 
     case TURN_1: { // Premier virage de 90 degrés
@@ -85,7 +91,7 @@ void updateYellowAction() {
 
     case FORWARD_1: { // Avancement du robot
         if (StartForward == false) {
-            requestStraightDistance(500);
+            requestStraightDistance(400);
 
             StartForward = true;
         }
@@ -124,7 +130,7 @@ void updateYellowAction() {
 
     case FORWARD_2: {
         if (StartForward == false) {
-            requestStraightDistance(600);
+            requestStraightDistance(300);
 
             StartForward = true;
         }
@@ -163,7 +169,7 @@ void updateYellowAction() {
 
     case FORWARD_3: {
         if (StartForward == false) {
-            requestStraightDistance(800);
+            requestStraightDistance(500);
 
             StartForward = true;
         }
