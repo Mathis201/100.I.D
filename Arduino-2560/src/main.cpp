@@ -25,13 +25,15 @@ enum RobotStates {
     FINISHED
 };
 
-constexpr int kColorReadingDelay = 300; // ms
+constexpr int kColorReadingDelay = 150; // ms
 
 RobotStates currentRobotState;
 ActionColors currentColorAction;
 
 unsigned long lastTime = 0;
 unsigned long lastColorReadingTime = 0;
+
+bool colorsSeen[5] = {false};
 
 void setup() {
     BoardInit();
@@ -45,11 +47,11 @@ void setup() {
 }
 
 void loop() {
-    Serial.print("Devant:");
-    Serial.print(ROBUS_ReadIR(0));
-    Serial.print(".   Derriere:");
-    Serial.println(ROBUS_ReadIR(1));
-    
+    // Serial.print("Devant:");
+    // Serial.print(ROBUS_ReadIR(0));
+    // Serial.print(".   Derriere:");
+    // Serial.println(ROBUS_ReadIR(1));
+
     updateMotorInfo(millis());
     timerLed();
     updateBeeper();
@@ -75,7 +77,10 @@ void loop() {
 
     switch (currentRobotState) {
     case WAIT_FOR_START: {
-        if (ROBUS_IsBumper(LEFT) || remoteCommand == REMOTE_START_COMMAND) {
+        if (ROBUS_IsBumper(REAR) || remoteCommand == REMOTE_START_COMMAND) {
+            for (int i = 0; i < 5; i++) {
+                colorsSeen[i] = false;
+            }
             currentRobotState = FOLLOW_LINE;
         }
         break;
@@ -84,10 +89,10 @@ void loop() {
     case FOLLOW_LINE: {
         Adapt_Curve();
 
-        // if (couleurActuelleLue != ActionColors::NO_COLOR) {
-        if (true) {
-            currentColorAction = ActionColors::PINK_;
-            // TODO: currentColorAction = detectedColor
+        if (couleurActuelleLue != ActionColors::NO_COLOR && !colorsSeen[couleurActuelleLue]) {
+            // if (true) {
+            currentColorAction = couleurActuelleLue;
+            colorsSeen[couleurActuelleLue] = true;
             switch (currentColorAction) {
             case ActionColors::BLUE:
                 initBlueAction();
@@ -152,9 +157,19 @@ void loop() {
     }
 
     case FINISH_COLOR: {
-        requestBeep(5);
-        // TODO: add logic to determine if at end (switch to drop cup) or if keep on following line
-        if (true) {
+        requestBeep(1);
+
+        bool colorLeftIncomplete = false;
+        for (int i = 0; i < 5; i++) {
+            if (!colorsSeen[i]) {
+                colorLeftIncomplete = true;
+                break;
+            }
+        }
+
+        if (colorLeftIncomplete) {
+            currentRobotState = FOLLOW_LINE;
+        } else {
             currentRobotState = DROP_CUP;
             initDropCupAction();
         }

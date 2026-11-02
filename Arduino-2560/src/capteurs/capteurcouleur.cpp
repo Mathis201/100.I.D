@@ -2,7 +2,7 @@
 #include "constants.h"
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
-int tolerence = 75;
+int tolerence = 100;
 
 struct Couleur {
     int red;

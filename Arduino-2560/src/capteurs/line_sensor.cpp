@@ -24,8 +24,6 @@ int getNormalizedLineReading() {
     float valeurMilieu = analogRead(LINE_SENSOR_MIDDLE_PIN);
     float valeurDroite = analogRead(LINE_SENSOR_RIGHT_PIN);
 
-
-
     static unsigned long SommeGauche = 0;
     static unsigned long SommeMilieu = 0;
     static unsigned long SommeDroite = 0;
@@ -42,66 +40,55 @@ int getNormalizedLineReading() {
     SommeDroite += valeurDroite;
     nombreFois++;
 
-
-    if (valeurGauche > MaxGauche){
+    if (valeurGauche > MaxGauche) {
         MaxGauche = valeurGauche;
-           
     }
 
     if (valeurMilieu > MaxMilieu) {
         MaxMilieu = valeurMilieu;
-     
     }
     if (valeurDroite > MaxDroite) {
         MaxDroite = valeurDroite;
-         
-        }
-    if (valeurGauche < MinGauche){
+    }
+    if (valeurGauche < MinGauche) {
         MinGauche = valeurGauche;
-        
-
     }
-     if (valeurMilieu < MinMilieu){
+    if (valeurMilieu < MinMilieu) {
         MinMilieu = valeurMilieu;
-        
     }
 
-     if (valeurDroite < MinDroite){
+    if (valeurDroite < MinDroite) {
         MinDroite = valeurDroite;
-        
-        
     }
-    if(ROBUS_IsBumper(LEFT)) {
-    Serial.print("Valeur max Gauche est : ");
-    Serial.println(MaxGauche);
-    Serial.print("Valeur max Milieu est : ");
-    Serial.println(MaxMilieu);
-    Serial.print("Valeur max Droite est : ");
-    Serial.println(MaxDroite);
-    Serial.print("Valeur min Gauche est: ");
-    Serial.println(MinGauche);
-    Serial.print("Valeur min Milieu est: ");
-    Serial.println(MinMilieu);
-    Serial.print("Valeur min Droit est: ");
-    Serial.println(MinDroite);
-    unsigned long MoyenneGauche = (SommeGauche)/nombreFois;
-    unsigned long MoyenneMilieu = (SommeMilieu)/nombreFois;
-    unsigned long MoyenneDroite = (SommeDroite)/nombreFois;
-    
-    Serial.print("Moyenne Gauche:");
-    Serial.println(MoyenneGauche);
-    Serial.print("Moyenne Milieu:");
-    Serial.println(MoyenneMilieu);
-    Serial.print("Moyenne Droite:");
-    Serial.println(MoyenneDroite);
+    if (ROBUS_IsBumper(LEFT)) {
+        Serial.print("Valeur max Gauche est : ");
+        Serial.println(MaxGauche);
+        Serial.print("Valeur max Milieu est : ");
+        Serial.println(MaxMilieu);
+        Serial.print("Valeur max Droite est : ");
+        Serial.println(MaxDroite);
+        Serial.print("Valeur min Gauche est: ");
+        Serial.println(MinGauche);
+        Serial.print("Valeur min Milieu est: ");
+        Serial.println(MinMilieu);
+        Serial.print("Valeur min Droit est: ");
+        Serial.println(MinDroite);
+        unsigned long MoyenneGauche = (SommeGauche) / nombreFois;
+        unsigned long MoyenneMilieu = (SommeMilieu) / nombreFois;
+        unsigned long MoyenneDroite = (SommeDroite) / nombreFois;
 
-
+        Serial.print("Moyenne Gauche:");
+        Serial.println(MoyenneGauche);
+        Serial.print("Moyenne Milieu:");
+        Serial.println(MoyenneMilieu);
+        Serial.print("Moyenne Droite:");
+        Serial.println(MoyenneDroite);
     }
-   
+
     return 0;
 }
 
-Capteurs Binary_Conversion(){
+Capteurs Binary_Conversion() {
 
     Capteurs Valeurs;
 
@@ -115,120 +102,100 @@ Capteurs Binary_Conversion(){
     float Min_Left = 39;
     float Min_Middle = 31;
     float Min_Right = 54;
-    
 
-    Valeurs.C_Left = constrain((V_Left-Min_Left)/(Max_Left-Min_Left), 0, 1);
-    Valeurs.C_Middle = constrain((V_Middle-Min_Middle)/(Max_Middle-Min_Middle), 0, 1);
-    Valeurs.C_Right = constrain((V_Right-Min_Right)/(Max_Right-Min_Right), 0, 1);
+    Valeurs.C_Left = constrain((V_Left - Min_Left) / (Max_Left - Min_Left), 0, 1);
+    Valeurs.C_Middle = constrain((V_Middle - Min_Middle) / (Max_Middle - Min_Middle), 0, 1);
+    Valeurs.C_Right = constrain((V_Right - Min_Right) / (Max_Right - Min_Right), 0, 1);
 
-    
     return Valeurs;
 }
 
 unsigned long Last_Time = 0;
 float Past_Error = 0;
 
-void Adapt_Curve(){
+void Adapt_Curve() {
 
-float KD = 0.1;
-float KP = .2;
+    float KD = 0.1;
+    float KP = .2;
 
-float base_speed = .3;
-float ponderation = .4;
+    float base_speed = .25;
+    float ponderation = .4;
 
-float Live_Error = 0;
-float Deriv = 0;
-bool First = true;
+    float Live_Error = 0;
+    float Deriv = 0;
+    bool First = true;
 
-Capteurs Valeurs = Binary_Conversion();
+    Capteurs Valeurs = Binary_Conversion();
 
-unsigned long Now = millis();
+    unsigned long Now = millis();
 
+    // if (Valeurs.C_Middle>.90)
+    // {
+    //     MOTOR_SetSpeed(RIGHT, base_speed);
+    //     MOTOR_SetSpeed(LEFT, base_speed+0.01);
+    // }
 
+    if (Valeurs.C_Left > Valeurs.C_Right) {
+        Live_Error = (Valeurs.C_Left * ponderation + (1 - Valeurs.C_Middle));
+        if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
+            Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
+        }
 
-// if (Valeurs.C_Middle>.90)
-// {
-//     MOTOR_SetSpeed(RIGHT, base_speed);
-//     MOTOR_SetSpeed(LEFT, base_speed+0.01);
-// }
+        MOTOR_SetSpeed(LEFT, base_speed - (Live_Error * KP + Deriv * KD));
+        MOTOR_SetSpeed(RIGHT, base_speed + (Live_Error * KP + Deriv * KD));
+        Past_Error = Live_Error;
+    }
 
+    else if (Valeurs.C_Right > Valeurs.C_Left) {
+        Live_Error = (Valeurs.C_Right * ponderation + (1 - Valeurs.C_Middle));
+        if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
+            Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
+        }
+        MOTOR_SetSpeed(LEFT, base_speed + (Live_Error * KP + Deriv * KD));
+        MOTOR_SetSpeed(RIGHT, base_speed - (Live_Error * KP + Deriv * KD));
+        Past_Error = Live_Error;
+    }
 
- if (Valeurs.C_Left>Valeurs.C_Right)
-{
-Live_Error = (Valeurs.C_Left*ponderation+(1-Valeurs.C_Middle));
-if (Now-Last_Time != 0 || Now-Last_Time < 500 || First != true)
-{
-    Deriv = (Live_Error - Past_Error) / (Now-Last_Time);
+    else {
+        MOTOR_SetSpeed(RIGHT, base_speed);
+        MOTOR_SetSpeed(LEFT, base_speed);
+    }
+
+    Last_Time = Now;
+    First = false;
+
+    // if (Valeurs.C_Middle>.90)
+    // {
+    //     MOTOR_SetSpeed(LEFT, base_speed+.01);
+    //     MOTOR_SetSpeed(RIGHT, base_speed);
+    // }
+
+    // else if (Valeurs.C_Left>Valeurs.C_Right)
+    // {
+    // MOTOR_SetSpeed(LEFT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+    // MOTOR_SetSpeed(RIGHT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+
+    // }
+
+    // else if (Valeurs.C_Right>Valeurs.C_Left)
+    // {
+    // MOTOR_SetSpeed(LEFT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
+    // MOTOR_SetSpeed(RIGHT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
 }
 
-MOTOR_SetSpeed(LEFT, base_speed-(Live_Error*KP+Deriv*KD));
-MOTOR_SetSpeed(RIGHT, base_speed+(Live_Error*KP+Deriv*KD));
-Past_Error = Live_Error;
-}
-
-
-else if (Valeurs.C_Right>Valeurs.C_Left)
-{
-Live_Error = (Valeurs.C_Right*ponderation+(1-Valeurs.C_Middle));
-if (Now-Last_Time != 0 || Now-Last_Time < 500 || First != true)
-{
-    Deriv = (Live_Error - Past_Error) / (Now-Last_Time);
-}
-MOTOR_SetSpeed(LEFT, base_speed+(Live_Error*KP+Deriv*KD));
-MOTOR_SetSpeed(RIGHT, base_speed-(Live_Error*KP+Deriv*KD));
-Past_Error = Live_Error;
-}
-
-
-else{
-    MOTOR_SetSpeed(RIGHT, base_speed);
-    MOTOR_SetSpeed(LEFT, base_speed);
-}
-
-
-Last_Time = Now;
-First = false;
-
-
-// if (Valeurs.C_Middle>.90)
-// {
-//     MOTOR_SetSpeed(LEFT, base_speed+.01);
-//     MOTOR_SetSpeed(RIGHT, base_speed);
-// }
-
-
-// else if (Valeurs.C_Left>Valeurs.C_Right)
-// {
-// MOTOR_SetSpeed(LEFT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-// MOTOR_SetSpeed(RIGHT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-    
-// }
-
-// else if (Valeurs.C_Right>Valeurs.C_Left)
-// {
-// MOTOR_SetSpeed(LEFT, base_speed+(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-// MOTOR_SetSpeed(RIGHT, base_speed-(Valeurs.C_Left+(1-Valeurs.C_Middle))*KP);
-}
-
-
-
-
-
-
-bool IsLineDetected(int nbvoulu){
+bool IsLineDetected(int nbvoulu) {
 
     int nbcapteurs = 0;
     Capteurs Valeurs = Binary_Conversion();
 
-
-    if (Valeurs.C_Left>=0.4){
-        nbcapteurs = nbcapteurs+1;
+    if (Valeurs.C_Left >= 0.4) {
+        nbcapteurs = nbcapteurs + 1;
     }
-     if (Valeurs.C_Middle>=0.4){
-        nbcapteurs = nbcapteurs+1;
-    } 
-    if (Valeurs.C_Right>=0.4){
-        nbcapteurs = nbcapteurs+1;
+    if (Valeurs.C_Middle >= 0.4) {
+        nbcapteurs = nbcapteurs + 1;
+    }
+    if (Valeurs.C_Right >= 0.4) {
+        nbcapteurs = nbcapteurs + 1;
     }
     Serial.print("Gauche: ");
     Serial.println(Valeurs.C_Left);
@@ -237,13 +204,9 @@ bool IsLineDetected(int nbvoulu){
     Serial.print("Droite: ");
     Serial.println(Valeurs.C_Right);
 
-    if (nbcapteurs<nbvoulu){
-       return false;
+    if (nbcapteurs < nbvoulu) {
+        return false;
+    } else {
+        return true;
     }
-    else {
-       return true;
-    }
-    
-
-    
 }

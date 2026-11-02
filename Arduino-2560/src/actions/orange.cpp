@@ -1,9 +1,8 @@
 #include "orange.h"
-#include "motors/servo_management.h"
-#include "motors/motor_management.h"
 #include "capteurs/capteur_distance_ir.h"
+#include "motors/motor_management.h"
+#include "motors/servo_management.h"
 #include <LibRobus.h>
-
 
 static long ticksDepartGauche;
 static long ticksDepartDroit;
@@ -19,8 +18,7 @@ static float seuilDetection = 200.0;
 static float seuilTooClose = 400.0;
 static const float forwardDistanceMm = 600.0;
 static const float backwardsDistanceMm = 150.0;
-static float angleMagique; 
-
+static float angleMagique;
 
 static long ticksApprocheGauche;
 static long ticksApprocheDroit;
@@ -63,32 +61,26 @@ void initOrangeAction() {
 }
 
 void updateOrangeAction() {
-    switch (orangeState){
+    switch (orangeState) {
     case TURN_IN_PLACE:
         updateMotorProfiles();
-        if (detecterObjetIR(1,seuilDetection))
-        {
+        if (detecterObjetIR(1, seuilDetection)) {
             compteur1 += 1;
-        }
-        else
-        {
+        } else {
             compteur1 = 0;
         }
-        if (compteur1 >= 5)// Lecture > 120
+        if (compteur1 >= 5) // Lecture > 120
         {
-            Serial.print("DETECTION DERRIERE:");
-            Serial.println(ROBUS_ReadIR(1));
-            
-            if (detecterObjetIR(1,seuilTooClose))
-            {
+            // Serial.print("DETECTION DERRIERE:");
+            // Serial.println(ROBUS_ReadIR(1));
+
+            if (detecterObjetIR(1, seuilTooClose)) {
                 angleMagique = 0;
                 tooClose = true;
             }
-            decelerateToStop(); //Regarder si on met une décélération
+            decelerateToStop(); // Regarder si on met une décélération
             orangeState = STOP_TURN;
-        }
-        else if (areProfilesDone())
-        {
+        } else if (areProfilesDone()) {
             requestTurnDegrees(360.0, turnSpeed);
             seuilDetection -= 25.0;
         }
@@ -96,60 +88,52 @@ void updateOrangeAction() {
 
     case STOP_TURN:
         updateMotorProfiles();
-        if (areProfilesDone() && tooClose)
-        {
+        if (areProfilesDone() && tooClose) {
             requestStraightDistance(backwardsDistanceMm);
             orangeState = MOVE_BACKWARDS;
-        }
-        else if (areProfilesDone())
-        {   
+        } else if (areProfilesDone()) {
             orangeState = LOWER_ARM;
         }
         break;
-    
+
     case MOVE_BACKWARDS:
         updateMotorProfiles();
-        if (areProfilesDone())
-        {
+        if (areProfilesDone()) {
             stopMotors();
             orangeState = LOWER_ARM;
         }
-    break;
-    
+        break;
+
     case LOWER_ARM:
         lowerArm();
-        if (!hasTimerStarted){
+        if (!hasTimerStarted) {
             timeTarget = millis() + onePeriod;
             hasTimerStarted = true;
         }
-        if (timeTarget <= millis()){
+        if (timeTarget <= millis()) {
             hasTimerStarted = false;
             requestTurnDegrees(-angleMagique);
             orangeState = ADJUST_TO_CUP;
         }
-    break;
+        break;
 
     case ADJUST_TO_CUP:
         updateMotorProfiles();
-        if (areProfilesDone())
-        {
-        angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroit);
-        ticksApprocheGauche = ENCODER_Read(LEFT);
-        ticksApprocheDroit = ENCODER_Read(RIGHT);
-        requestStraightDistance(-forwardDistanceMm, 0.0, modifiedSpeed);
-        orangeState = MOVE_TO_CUP;
+        if (areProfilesDone()) {
+            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroit);
+            ticksApprocheGauche = ENCODER_Read(LEFT);
+            ticksApprocheDroit = ENCODER_Read(RIGHT);
+            requestStraightDistance(-forwardDistanceMm, 0.0, modifiedSpeed);
+            orangeState = MOVE_TO_CUP;
         }
-    break;
+        break;
 
     case MOVE_TO_CUP:
         updateMotorProfiles();
-        if (detecterObjetIR(1,valeurProcheVerre))
-        {
+        if (detecterObjetIR(1, valeurProcheVerre)) {
             decelerateToStop();
             orangeState = STOP_BEFORE_CUP;
-        }
-        else if (areProfilesDone())
-        {
+        } else if (areProfilesDone()) {
             stopMotors();
             long deltaGauche = ENCODER_Read(LEFT) - ticksApprocheGauche;
             long deltaDroite = ENCODER_Read(RIGHT) - ticksApprocheDroit;
@@ -162,52 +146,50 @@ void updateOrangeAction() {
         break;
 
     case STOP_BEFORE_CUP:
-    updateMotorProfiles();
-    if (areProfilesDone())
-    {
-        stopMotors();
+        updateMotorProfiles();
+        if (areProfilesDone()) {
+            stopMotors();
 
-        long deltaGauche = ENCODER_Read(LEFT) - ticksApprocheGauche;
-        long deltaDroite = ENCODER_Read(RIGHT) - ticksApprocheDroit;
-        distanceParcourueMm = (deltaGauche + deltaDroite) / 2.0 * mmParTick;
-        
-        orangeState = CLOSE_CLAW;
-    }
+            long deltaGauche = ENCODER_Read(LEFT) - ticksApprocheGauche;
+            long deltaDroite = ENCODER_Read(RIGHT) - ticksApprocheDroit;
+            distanceParcourueMm = (deltaGauche + deltaDroite) / 2.0 * mmParTick;
+
+            orangeState = CLOSE_CLAW;
+        }
         break;
 
     case CLOSE_CLAW:
         closeClaw();
-        if (!hasTimerStarted){
+        if (!hasTimerStarted) {
             timeTarget = millis() + onePeriod;
             hasTimerStarted = true;
         }
-        if (timeTarget <= millis()){
+        if (timeTarget <= millis()) {
             orangeState = RAISE_ARM;
             hasTimerStarted = false;
-        }  
+        }
         break;
 
     case RAISE_ARM:
         raiseArm();
-        if (!hasTimerStarted){
+        if (!hasTimerStarted) {
             timeTarget = millis() + onePeriod;
             hasTimerStarted = true;
         }
-        if (timeTarget <= millis()){
+        if (timeTarget <= millis()) {
             hasTimerStarted = false;
             float distanceRetourMm = -distanceParcourueMm;
-            if (tooClose){
+            if (tooClose) {
                 distanceRetourMm -= backwardsDistanceMm;
             }
             requestStraightDistance(distanceRetourMm);
-            orangeState = RETURN_TO_LINE; //A MODIFEIR
+            orangeState = RETURN_TO_LINE; // A MODIFEIR
         }
         break;
 
     case RETURN_TO_LINE:
         updateMotorProfiles();
-        if (areProfilesDone())
-        {
+        if (areProfilesDone()) {
             stopMotors();
             requestTurnDegrees(-(angleTourne));
             orangeState = RESTORE_ORIENTATION;
@@ -216,8 +198,7 @@ void updateOrangeAction() {
 
     case RESTORE_ORIENTATION:
         updateMotorProfiles();
-        if (areProfilesDone())
-        {
+        if (areProfilesDone()) {
             stopMotors();
             orangeState = TEST_FINISHED;
         }
@@ -231,8 +212,6 @@ void updateOrangeAction() {
 bool isOrangeActionFinished() {
     return orangeState == TEST_FINISHED;
 }
-
-
 
 /*
 if (ROBUS_IsBumper(LEFT))
