@@ -1,4 +1,5 @@
 #include "drop_cup.h"
+#include "motors/motor_management.h"
 #include "motors/servo_management.h"
 #include <LibRobus.h>
 
@@ -9,6 +10,7 @@ bool HasTimerStarted = false;
 enum dropCupStates {
     LOWER_ARM,
     OPEN_CLAW,
+    BACK_UP,
     TEST_FINISHED
 };
 
@@ -19,7 +21,7 @@ void initDropCupAction() {
 }
 void updateDropCupAction() {
     switch (dropCupState) {
-    case LOWER_ARM:
+    case LOWER_ARM: {
         lowerArm();
         if (!HasTimerStarted) {
             TimeTarget = millis() + OnePeriod;
@@ -30,19 +32,34 @@ void updateDropCupAction() {
             HasTimerStarted = false;
         }
         break;
-    case OPEN_CLAW:
+    }
+
+    case OPEN_CLAW: {
         openClaw();
         if (!HasTimerStarted) {
             TimeTarget = millis() + OnePeriod;
             HasTimerStarted = true;
         }
         if (TimeTarget <= millis()) {
-            dropCupState = TEST_FINISHED;
+            dropCupState = BACK_UP;
+            requestStraightDistance(100);
             HasTimerStarted = false;
         }
+
         break;
-    case TEST_FINISHED:
+    }
+
+    case BACK_UP: {
+        updateMotorProfiles();
+        if (areProfilesDone()) {
+            dropCupState = TEST_FINISHED;
+        }
         break;
+    }
+
+    case TEST_FINISHED: {
+        break;
+    }
     }
 }
 bool isDropCupActionFinished() {

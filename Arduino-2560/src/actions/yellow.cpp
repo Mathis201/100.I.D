@@ -7,6 +7,7 @@
 enum YellowStates {
     WAIT_FOR_WALL,
     STOP_BEFORE_TURN,
+    BACK_UP_BEFORE_WALL,
     TURN_1,
     FORWARD_1,
     TURN_2,
@@ -21,7 +22,7 @@ enum YellowStates {
 // Liste de constante pour le programme
 bool StartRotation = false; // Condition pour la rotation
 bool StartForward = false;  // Condition pour avancer
-const int SEUIL_IR = 240;   // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
+const int SEUIL_IR = 300;   // Valeur numerique donner par arduino qu'on dit au robot d'Arreter devant le mur
 bool Line_detected = false;
 YellowStates CurrentStates = WAIT_FOR_WALL; // etat initial
 
@@ -46,24 +47,34 @@ void updateYellowAction() {
         // Lire la distance du capteur:
 
         uint16_t valeurIR = LireDistanceMur();
- 
 
         if (valeurIR >= SEUIL_IR) { // Condition pour arreter devant le mur
             CurrentStates = STOP_BEFORE_TURN;
-            decelerateToStop();// décélerer pour ne pas avoir un arret brusque
+            decelerateToStop(); // décélerer pour ne pas avoir un arret brusque
         } else {
             // Continue à suivre la ligne
             Adapt_Curve();
         }
         break;
     }
-    case STOP_BEFORE_TURN:{ // être arreter avant de faire les etapes pour contourner le mur 
-        updateMotorProfiles();      
+    case STOP_BEFORE_TURN: { // être arreter avant de faire les etapes pour contourner le mur
+        updateMotorProfiles();
 
-        if (areProfilesDone()){
-            CurrentStates = TURN_1;    
+        if (areProfilesDone()) {
+            requestStraightDistance(-50);
+            CurrentStates = BACK_UP_BEFORE_WALL;
         }
 
+        break;
+    }
+
+    case BACK_UP_BEFORE_WALL: {
+        updateMotorProfiles();
+        if (areProfilesDone()) {
+            CurrentStates = TURN_1;
+        }
+
+        break;
     }
 
     case TURN_1: { // Premier virage de 90 degrés
@@ -162,46 +173,41 @@ void updateYellowAction() {
 
     case FORWARD_3: {
         if (StartForward == false) {
-            requestStraightDistance(1000,0,250);
+            requestStraightDistance(1000, 0, 250);
 
             StartForward = true;
         }
 
         updateMotorProfiles();
 
-        if (IsLineDetected(1) && Line_detected == false) {// Trouver la ligne apres avoir contourner le mur
-              requestStraightDistance(82,0,250);
-              Line_detected = true;
-            
-        }  
-    
-        if (areProfilesDone()){
+        if (IsLineDetected(1) && Line_detected == false) { // Trouver la ligne apres avoir contourner le mur
+            requestStraightDistance(82, 0, 250);
+            Line_detected = true;
+        }
+
+        if (areProfilesDone()) {
             StartForward = false;
             CurrentStates = Reach_line;
             Line_detected = false;
-
         }
         break;
     }
-    case Reach_line:{
-        if (StartRotation == false){
-            requestTurnDegrees(-120,100);
+    case Reach_line: {
+        if (StartRotation == false) {
+            requestTurnDegrees(-120, 100);
             StartRotation = true;
         }
         updateMotorProfiles();
 
-        if(areProfilesDone() || IsLineDetected(1)){
+        if (areProfilesDone() || IsLineDetected(1)) {
             CurrentStates = FINISHED;
             StartRotation = false;
             stopMotors();
         }
 
         break;
-
-
     }
     default:
         break;
     }
 }
-
