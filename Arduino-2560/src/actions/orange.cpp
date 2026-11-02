@@ -15,11 +15,11 @@ static bool hasTimerStarted = false;
 static float turnSpeed = 70.0;
 static const float modifiedSpeed = 150.0;
 static const float valeurProcheVerre = 550;
-static float seuilDetection = 150.0;
+static float seuilDetection = 200.0;
 static float seuilTooClose = 400.0;
-static const float forwardDistanceMm = 1000.0;
+static const float forwardDistanceMm = 600.0;
 static const float backwardsDistanceMm = 150.0;
-static float angleMagique = 5.5;
+static float angleMagique; 
 
 
 static long ticksApprocheGauche;
@@ -53,8 +53,8 @@ void initOrangeAction() {
     hasTimerStarted = false;
     timeTarget = 0;
     tooClose = false;
-    seuilDetection = 150.0;
     compteur1 = 0;
+    angleMagique = 7;
     openClaw();
 
     ticksDepartGauche = ENCODER_Read(LEFT);

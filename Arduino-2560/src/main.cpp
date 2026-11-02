@@ -86,7 +86,7 @@ void loop() {
 
         // if (couleurActuelleLue != ActionColors::NO_COLOR) {
         if (true) {
-            currentColorAction = ActionColors::ORANGE;
+            currentColorAction = ActionColors::PINK_;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:
@@ -172,6 +172,8 @@ void loop() {
 
     case FINISHED: {
         currentRobotState = WAIT_FOR_START;
+        raiseArm();
+        openClaw();
         break;
     }
     }

@@ -60,14 +60,14 @@ ActionColors lirecouleuractuel() {
     tcs.getRawData(&red, &green, &blue, &clear);
     Couleur actuel{red, green, blue, clear};
 
-    Serial.print("R: ");
-    Serial.print(red);
-    Serial.print(" G: ");
-    Serial.print(green);
-    Serial.print(" B: ");
-    Serial.print(blue);
-    Serial.print(" Clear: ");
-    Serial.println(clear);
+    // Serial.print("R: ");
+    // Serial.print(red);
+    // Serial.print(" G: ");
+    // Serial.print(green);
+    // Serial.print(" B: ");
+    // Serial.print(blue);
+    // Serial.print(" Clear: ");
+    // Serial.println(clear);
 
     for (int i = 0; i < 5; i++) {
         if (comparecouleur(actuel, couleurscapteur[i])) {

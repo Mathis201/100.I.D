@@ -9,11 +9,11 @@ static float angleTourne;
 static float turnSpeed = 60;
 static const float modifiedSpeed = 150.0;
 static const float valeurProcheQuille = 550;
-static float seuilDetection = 150.0;
-static const float forwardDistanceMm = 1000.0;
+static float seuilDetection = 215.0;
+static const float forwardDistanceMm = 600.0;
 static int capteurChoisi = 0;
 static float sensApproche = -1.0;
-static const float angleMagique = 4.5;
+static const float angleMagique = 6.5;
 
 static long ticksApprocheGauche;
 static long ticksApprocheDroit;
@@ -39,7 +39,6 @@ PinkStates pinkstate;
 
 void initPinkAction() {
     pinkstate = TURN_IN_PLACE;
-    seuilDetection = 120.0;
 
     ticksDepartGauche = ENCODER_Read(LEFT);
     ticksDepartDroite = ENCODER_Read(RIGHT);
@@ -74,8 +73,8 @@ void updatePinkAction() {
             compteur1 = 0;
         }
 
-        bool avantDetecte = compteur0 >= 3;
-        bool arriereDetecte = compteur1 >= 3;
+        bool avantDetecte = compteur0 >= 5;
+        bool arriereDetecte = compteur1 >= 5;
 
         if (avantDetecte || arriereDetecte)
         {
