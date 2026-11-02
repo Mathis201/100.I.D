@@ -12,7 +12,7 @@ enum YellowStates {
     TURN_2,
     FORWARD_2,
     TURN_3,
-    STOP_BEFORE_LINE,
+    Reach_line,
     FORWARD_3,
     TURN_4,
     FINISHED
@@ -46,9 +46,7 @@ void updateYellowAction() {
         // Lire la distance du capteur:
 
         uint16_t valeurIR = LireDistanceMur();
-        // Serial.println("Valeur IR : ");
-        // Serial.print(valeurIR);// test pour distance du mur
-        // delay (10000);
+ 
 
         if (valeurIR >= SEUIL_IR) { // Condition pour arreter devant le mur
             CurrentStates = STOP_BEFORE_TURN;
@@ -80,8 +78,8 @@ void updateYellowAction() {
 
         if (areProfilesDone()) // Condition pour arreter de tourner
         {
-            MOTOR_SetSpeed(LEFT, 0);
-            MOTOR_SetSpeed(RIGHT, 0);
+            // MOTOR_SetSpeed(LEFT, 0);
+            // MOTOR_SetSpeed(RIGHT, 0);
 
             StartRotation = false;
             CurrentStates = FORWARD_1;
@@ -99,9 +97,6 @@ void updateYellowAction() {
         updateMotorProfiles();
 
         if (areProfilesDone()) {
-
-            // MOTOR_SetSpeed(LEFT, 0);
-            // MOTOR_SetSpeed(RIGHT, 0);
 
             StartForward = false;
             CurrentStates = TURN_2;
@@ -131,16 +126,13 @@ void updateYellowAction() {
 
     case FORWARD_2: {
         if (StartForward == false) {
-            requestStraightDistance(400);
+            requestStraightDistance(500);
 
             StartForward = true;
         }
         updateMotorProfiles();
 
         if (areProfilesDone()) {
-
-            // MOTOR_SetSpeed(LEFT, 0);
-            // MOTOR_SetSpeed(RIGHT, 0);
 
             StartForward = false;
             CurrentStates = TURN_3;
@@ -167,25 +159,10 @@ void updateYellowAction() {
 
         break;
     }
-    // case STOP_BEFORE_LINE:{ 
-    //     if (StartForward == false) {
-    //         decelerateToStop();
-    //         StartForward = true;
-    //     }
-    //     updateMotorProfiles();      
 
-    //     if (areProfilesDone()){
-    //         CurrentStates = TURN_4;
-    //         StartForward = false;
-               
-    //     }
-
-    //     break;
-
-    
     case FORWARD_3: {
         if (StartForward == false) {
-            requestStraightDistance(1000,0,150);
+            requestStraightDistance(1000,0,250);
 
             StartForward = true;
         }
@@ -193,37 +170,35 @@ void updateYellowAction() {
         updateMotorProfiles();
 
         if (IsLineDetected(1) && Line_detected == false) {// Trouver la ligne apres avoir contourner le mur
-              requestStraightDistance(82,0,150);
-              Line_detected = true; 
+              requestStraightDistance(82,0,250);
+              Line_detected = true;
+            
         }  
     
         if (areProfilesDone()){
             StartForward = false;
-            CurrentStates = TURN_4;
+            CurrentStates = Reach_line;
             Line_detected = false;
 
         }
         break;
     }
-
-    case TURN_4: { // Derniere rotation sur la ligne 
-        if (StartRotation == false) {
-            requestTurnDegrees(-90);
-
+    case Reach_line:{
+        if (StartRotation == false){
+            requestTurnDegrees(-120,100);
             StartRotation = true;
         }
         updateMotorProfiles();
 
-        if (areProfilesDone()) // Condition pour arreter de tourner
-        {
-            MOTOR_SetSpeed(LEFT, 0);
-            MOTOR_SetSpeed(RIGHT, 0);
-
-            StartRotation = false;
+        if(areProfilesDone() || IsLineDetected(1)){
             CurrentStates = FINISHED;
+            StartRotation = false;
+            stopMotors();
         }
 
         break;
+
+
     }
     default:
         break;
