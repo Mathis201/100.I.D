@@ -5,6 +5,7 @@ struct Capteurs
     float C_Left;
     float C_Middle;
     float C_Right;
+
 };
 
 void initLineSensor();
