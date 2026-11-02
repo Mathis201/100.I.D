@@ -12,13 +12,14 @@ const int onePeriod = 1000;
 static unsigned long timeTarget = 0;
 static bool hasTimerStarted = false;
 
-static float turnSpeed = 100.0;
+static float turnSpeed = 70.0;
 static const float modifiedSpeed = 150.0;
 static const float valeurProcheVerre = 550;
-static float seuilDetection = 120.0;
-static float seuilTooClose = 600.0;
+static float seuilDetection = 150.0;
+static float seuilTooClose = 400.0;
 static const float forwardDistanceMm = 1000.0;
-static const float backwardsDistanceMm = 300.0;
+static const float backwardsDistanceMm = 150.0;
+static float angleMagique = 5.5;
 
 
 static long ticksApprocheGauche;
@@ -27,9 +28,12 @@ static float distanceParcourueMm = 0.0;
 const float mmParTick = (2.0 * PI * 38.1) / 3200.0;
 static bool tooClose = false;
 
+static int compteur1 = 0;
+
 enum orangeStates {
     TURN_IN_PLACE,
     STOP_TURN,
+    ADJUST_TO_CUP,
     MOVE_BACKWARDS,
     LOWER_ARM,
     MOVE_TO_CUP,
@@ -49,7 +53,8 @@ void initOrangeAction() {
     hasTimerStarted = false;
     timeTarget = 0;
     tooClose = false;
-    seuilDetection = 120.0;
+    seuilDetection = 150.0;
+    compteur1 = 0;
     openClaw();
 
     ticksDepartGauche = ENCODER_Read(LEFT);
@@ -61,10 +66,22 @@ void updateOrangeAction() {
     switch (orangeState){
     case TURN_IN_PLACE:
         updateMotorProfiles();
-        if (detecterObjetIR(1, seuilDetection))// Lecture > 120
+        if (detecterObjetIR(1,seuilDetection))
         {
+            compteur1 += 1;
+        }
+        else
+        {
+            compteur1 = 0;
+        }
+        if (compteur1 >= 5)// Lecture > 120
+        {
+            Serial.print("DETECTION DERRIERE:");
+            Serial.println(ROBUS_ReadIR(1));
+            
             if (detecterObjetIR(1,seuilTooClose))
             {
+                angleMagique = 0;
                 tooClose = true;
             }
             decelerateToStop(); //Regarder si on met une décélération
@@ -86,7 +103,6 @@ void updateOrangeAction() {
         }
         else if (areProfilesDone())
         {   
-            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroit);
             orangeState = LOWER_ARM;
         }
         break;
@@ -96,7 +112,6 @@ void updateOrangeAction() {
         if (areProfilesDone())
         {
             stopMotors();
-            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroit);
             orangeState = LOWER_ARM;
         }
     break;
@@ -109,10 +124,20 @@ void updateOrangeAction() {
         }
         if (timeTarget <= millis()){
             hasTimerStarted = false;
-            ticksApprocheGauche = ENCODER_Read(LEFT);
-            ticksApprocheDroit = ENCODER_Read(RIGHT);
-            requestStraightDistance(-forwardDistanceMm, 0.0, modifiedSpeed);
-            orangeState = MOVE_TO_CUP;
+            requestTurnDegrees(-angleMagique);
+            orangeState = ADJUST_TO_CUP;
+        }
+    break;
+
+    case ADJUST_TO_CUP:
+        updateMotorProfiles();
+        if (areProfilesDone())
+        {
+        angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroit);
+        ticksApprocheGauche = ENCODER_Read(LEFT);
+        ticksApprocheDroit = ENCODER_Read(RIGHT);
+        requestStraightDistance(-forwardDistanceMm, 0.0, modifiedSpeed);
+        orangeState = MOVE_TO_CUP;
         }
     break;
 
@@ -184,7 +209,7 @@ void updateOrangeAction() {
         if (areProfilesDone())
         {
             stopMotors();
-            requestTurnDegrees(-angleTourne);
+            requestTurnDegrees(-(angleTourne));
             orangeState = RESTORE_ORIENTATION;
         }
         break;

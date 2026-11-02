@@ -45,6 +45,11 @@ void setup() {
 }
 
 void loop() {
+    Serial.print("Devant:");
+    Serial.print(ROBUS_ReadIR(0));
+    Serial.print(".   Derriere:");
+    Serial.println(ROBUS_ReadIR(1));
+    
     updateMotorInfo(millis());
     timerLed();
     updateBeeper();
@@ -70,7 +75,7 @@ void loop() {
 
     switch (currentRobotState) {
     case WAIT_FOR_START: {
-        if (ROBUS_IsBumper(REAR) || remoteCommand == REMOTE_START_COMMAND) {
+        if (ROBUS_IsBumper(LEFT) || remoteCommand == REMOTE_START_COMMAND) {
             currentRobotState = FOLLOW_LINE;
         }
         break;
@@ -81,7 +86,7 @@ void loop() {
 
         // if (couleurActuelleLue != ActionColors::NO_COLOR) {
         if (true) {
-            currentColorAction = ActionColors::GREEN;
+            currentColorAction = ActionColors::ORANGE;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:
