@@ -7,6 +7,8 @@
 
 enum GreenStates {
     AVANCER,
+    Decel,
+    Reculer,
     AVANCERSANSLIGNE,
     RETROUVERLIGNE,
     Tourner_1,
@@ -22,17 +24,41 @@ GreenStates CurrentsStates;
 bool wasLineDetected; 
 
 void initGreenAction() {
-    CurrentsStates = AVANCER;
+    CurrentsStates = Decel;
     wasLineDetected = false;
+    decelerateToStop();
 }
 
 void updateGreenAction() {
     switch (CurrentsStates)
     {
+
+    case Decel:{
+        updateMotorProfiles();
+        if (areProfilesDone()){
+        requestStraightDistance(-200);
+        CurrentsStates = Reculer;   
+        }
+    
+        break;
+    }
+    
+   
+    
+    case Reculer:{
+        updateMotorProfiles();
+        if (areProfilesDone()){
+        CurrentsStates = AVANCER;   
+        }
+    
+        break;
+    }
+    
+
     case AVANCER:{
         Adapt_Curve();
         if (IsLineDetected(3)) {
-            requestStraightDistance(950);
+            requestStraightDistance(950,0,300);
             CurrentsStates = AVANCERSANSLIGNE;   
         }
     
