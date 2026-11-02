@@ -80,8 +80,8 @@ void loop() {
         Adapt_Curve();
 
         // if (couleurActuelleLue != ActionColors::NO_COLOR) {
-        if (false) {
-            currentColorAction = ActionColors::YELLOW;
+        if (true) {
+            currentColorAction = ActionColors::GREEN;
             // TODO: currentColorAction = detectedColor
             switch (currentColorAction) {
             case ActionColors::BLUE:

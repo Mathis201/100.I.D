@@ -4,6 +4,7 @@
 #include "Arduino.h"
 
 
+
 enum GreenStates {
     AVANCER,
     AVANCERSANSLIGNE,
@@ -12,13 +13,17 @@ enum GreenStates {
     Avancer_1,
     Tourner_2,
     Avancer_2,
+    Avancer_3,
+    Lignetrouver,
     TEST_FINISHED
 };
 
 GreenStates CurrentsStates;
+bool wasLineDetected; 
 
 void initGreenAction() {
     CurrentsStates = AVANCER;
+    wasLineDetected = false;
 }
 
 void updateGreenAction() {
@@ -27,7 +32,7 @@ void updateGreenAction() {
     case AVANCER:{
         Adapt_Curve();
         if (IsLineDetected(3)) {
-            requestStraightDistance(800);
+            requestStraightDistance(950);
             CurrentsStates = AVANCERSANSLIGNE;   
         }
     
@@ -42,7 +47,7 @@ void updateGreenAction() {
 
             }
             else {
-                 requestTurnDegrees(90);
+                 requestTurnDegrees(90,250);
                 CurrentsStates = Tourner_1;
             }          
             
@@ -54,12 +59,9 @@ void updateGreenAction() {
     case Tourner_1:{
         updateMotorProfiles();
         
-            if (IsLineDetected(1)){
-                CurrentsStates = TEST_FINISHED;
 
-            }
             if (areProfilesDone()) {
-                requestStraightDistance(200);
+                requestStraightDistance(300,0,250);
                 CurrentsStates = Avancer_1;
             }          
             
@@ -71,13 +73,21 @@ void updateGreenAction() {
      case Avancer_1:{
         updateMotorProfiles();
        
-            if (IsLineDetected(1)){
-                CurrentsStates = TEST_FINISHED;
+            if (IsLineDetected(1) && wasLineDetected == false) {// Trouver la ligne apres avoir contourner le mur
+                requestStraightDistance(82,0,250);
+                wasLineDetected = true;
+            
+            }  
 
-            }
             if (areProfilesDone()) {
-                requestTurnDegrees(180);
+                if (wasLineDetected){
+                requestTurnDegrees(-90, 250);
+                CurrentsStates = Lignetrouver;
+                }
+                else {
+                requestTurnDegrees(180); 
                 CurrentsStates = Tourner_2;
+                }
             }          
             
         
@@ -89,12 +99,8 @@ void updateGreenAction() {
      case Tourner_2:{
         updateMotorProfiles();
        
-            if (IsLineDetected(1)){
-                CurrentsStates = TEST_FINISHED;
-
-            }
             if (areProfilesDone()) {
-                requestStraightDistance(400);
+                requestStraightDistance(600,0,250);
                 CurrentsStates = Avancer_2;
             }         
             
@@ -105,12 +111,39 @@ void updateGreenAction() {
       case Avancer_2:{
         updateMotorProfiles();
     
+            if (IsLineDetected(1) && wasLineDetected == false) {// Trouver la ligne apres avoir contourner le mur
+                requestStraightDistance(82,0,250);
+                wasLineDetected = true;
+            
+            }  
+
+            if (areProfilesDone()) {
+                if (wasLineDetected){
+                requestTurnDegrees(90, 250);
+                CurrentsStates = Lignetrouver;
+                }
+                else {
+                CurrentsStates = Lignetrouver;
+                }
+            }          
+                 
+            
+
+
+        break;
+
+    }
+
+    
+        case Lignetrouver:{
+        updateMotorProfiles();
+
             if (IsLineDetected(1)){
                 CurrentsStates = TEST_FINISHED;
-
-            }
+            
+        }  
+    
             if (areProfilesDone()) {
-                requestTurnDegrees(90);
                 CurrentsStates = TEST_FINISHED;
             }         
             
@@ -127,7 +160,9 @@ void updateGreenAction() {
 
 bool isGreenActionFinished() {
      if (CurrentsStates==TEST_FINISHED){
+       stopMotors();
         return true;
+        
      }
      else {
         return false;
