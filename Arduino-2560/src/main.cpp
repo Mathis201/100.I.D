@@ -70,6 +70,7 @@ void loop() {
         (currentRobotState == RobotStates::WAIT_FOR_START || currentRobotState == RobotStates::FOLLOW_LINE)) {
         lastColorReadingTime = millis();
         couleurActuelleLue = lirecouleuractuel();
+        // Serial.println(couleurActuelleLue);
         if (couleurActuelleLue != ActionColors::NO_COLOR) {
             lightUpLed(couleurActuelleLue);
         }
