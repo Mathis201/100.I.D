@@ -84,6 +84,12 @@ void loop() {
             }
             currentRobotState = FOLLOW_LINE;
         }
+        //if (ROBUS_IsBumper(LEFT))
+        //{
+        //    currentColorAction = ActionColors::PINK_;
+        //    initPinkAction();
+        //    currentRobotState = DO_COLOR_ACTION;
+        //}
         break;
     }
 
@@ -151,8 +157,8 @@ void loop() {
 
         // if finished, switch state
         if (isColorActionFinished) {
-            //currentRobotState = FINISH_COLOR;
             currentRobotState = FINISH_COLOR;
+            //currentRobotState = FINISHED;
         }
 
         break;

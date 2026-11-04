@@ -9,11 +9,12 @@ static float angleTourne;
 static float turnSpeed = 60;
 static const float modifiedSpeed = 150.0;
 static const float valeurProcheQuille = 550;
-static float seuilDetection = 300.0;
+static float seuilDetection0 = 300.0;
+static float seuilDetection1 = 300.0;
 static const float forwardDistanceMm = 600.0;
 static int capteurChoisi = 0;
 static float sensApproche = -1.0;
-static const float angleMagique = 6.5;
+static const float angleMagique = 3;
 
 static long ticksApprocheGauche;
 static long ticksApprocheDroit;
@@ -56,7 +57,7 @@ void updatePinkAction() {
         int lectureAvant = ROBUS_ReadIR(0);
         int lectureArriere = ROBUS_ReadIR(1);
         
-        if (lectureAvant >= seuilDetection)
+        if (lectureAvant >= seuilDetection0)
         {
             compteur0 += 1;
         }
@@ -64,7 +65,7 @@ void updatePinkAction() {
         {
             compteur0 = 0;
         }
-        if (lectureArriere >= seuilDetection)
+        if (lectureArriere >= seuilDetection1)
         {
             compteur1 += 1;
         }
@@ -93,7 +94,8 @@ void updatePinkAction() {
         else if (areProfilesDone())
         {
             requestTurnDegrees(360.0, turnSpeed);
-            seuilDetection -= 25.0;
+            seuilDetection0 -= 25.0;
+            seuilDetection1 -= 25.0;
         }
     }
         break;
@@ -120,7 +122,7 @@ void updatePinkAction() {
         updateMotorProfiles();
         if (detecterObjetIR(capteurChoisi, valeurProcheQuille))
         {
-            requestStraightDistance(sensApproche * 100);
+            requestStraightDistance((sensApproche + 4) * 10);
             pinkstate = SPEED_TO_QUILLE;
         }
         else if (areProfilesDone())

@@ -69,7 +69,7 @@ void updateOrangeAction() {
         } else {
             compteur1 = 0;
         }
-        if (compteur1 >= 8) // Lecture > 120
+        if (compteur1 >= 6) // Lecture > 120
         {
             //Serial.print("DETECTION DERRIERE:");
             //Serial.println(ROBUS_ReadIR(1));
