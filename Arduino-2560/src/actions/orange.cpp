@@ -14,7 +14,7 @@ static bool hasTimerStarted = false;
 static float turnSpeed = 70.0;
 static const float modifiedSpeed = 150.0;
 static const float valeurProcheVerre = 550;
-static float seuilDetection = 200.0;
+static float seuilDetection = 325.0;
 static float seuilTooClose = 400.0;
 static const float forwardDistanceMm = 600.0;
 static const float backwardsDistanceMm = 150.0;
@@ -52,7 +52,7 @@ void initOrangeAction() {
     timeTarget = 0;
     tooClose = false;
     compteur1 = 0;
-    angleMagique = 7;
+    angleMagique = 8;
     openClaw();
 
     ticksDepartGauche = ENCODER_Read(LEFT);
@@ -69,13 +69,13 @@ void updateOrangeAction() {
         } else {
             compteur1 = 0;
         }
-        if (compteur1 >= 5) // Lecture > 120
+        if (compteur1 >= 8) // Lecture > 120
         {
-            // Serial.print("DETECTION DERRIERE:");
-            // Serial.println(ROBUS_ReadIR(1));
+            //Serial.print("DETECTION DERRIERE:");
+            //Serial.println(ROBUS_ReadIR(1));
 
             if (detecterObjetIR(1, seuilTooClose)) {
-                angleMagique = 0;
+                angleMagique = 7;
                 tooClose = true;
             }
             decelerateToStop(); // Regarder si on met une décélération
