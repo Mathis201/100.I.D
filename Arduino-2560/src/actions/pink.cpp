@@ -9,19 +9,16 @@ static float angleTourne;
 static float turnSpeed = 60;
 static const float modifiedSpeed = 150.0;
 static const float valeurProcheQuille = 550;
-static float seuilDetection0 = 300.0;
 static float seuilDetection1 = 300.0;
 static const float forwardDistanceMm = 600.0;
-static int capteurChoisi = 0;
-static float sensApproche = -1.0;
 static const float angleMagique = 3;
+static int compteurTours = 0;
 
 static long ticksApprocheGauche;
 static long ticksApprocheDroit;
 static float distanceParcourueMm = 0.0;
 const float mmParTick = (2.0 * PI * 38.1) / 3200.0;
 
-static int compteur0 = 0;
 static int compteur1 = 0;
 
 enum PinkStates {
@@ -45,7 +42,6 @@ void initPinkAction() {
     ticksDepartDroite = ENCODER_Read(RIGHT);
     requestTurnDegrees(360.0, turnSpeed);
 
-    //compteur0 = 0;
     compteur1 = 0;
 
 }
@@ -54,17 +50,9 @@ void updatePinkAction() {
     switch (pinkstate) {
     case TURN_IN_PLACE:{
         updateMotorProfiles();
-        //int lectureAvant = ROBUS_ReadIR(0);
+
         int lectureArriere = ROBUS_ReadIR(1);
         
-        //if (lectureAvant >= seuilDetection0)
-        //{
-        //    compteur0 += 1;
-        //}
-        //else
-        //{
-        //    compteur0 = 0;
-        //}
         if (lectureArriere >= seuilDetection1)
         {
         compteur1 += 1;
@@ -74,29 +62,22 @@ void updatePinkAction() {
             compteur1 = 0;
         }
 
-        //bool avantDetecte = compteur0 >= 5;
         bool arriereDetecte = compteur1 >= 5;
 
         if (arriereDetecte)
         {
-            //capteurChoisi = avantDetecte ? 0:1;
-            sensApproche = -1.0;
-            //(capteurChoisi == 0) ? 1.0:-1.0;
             decelerateToStop();
-
-
-            //Serial.print("DETECTION DEVANT:");
-            //Serial.print(ROBUS_ReadIR(0));
-            //Serial.print("DETECTION DERRIERE:");
-            //Serial.println(ROBUS_ReadIR(1));
-
             pinkstate = STOP_TURN;
         }
         else if (areProfilesDone())
         {
+            if (compteurTours >= 1)
+            {
+                pinkstate = TEST_FINISHED;
+            }
             requestTurnDegrees(360.0, turnSpeed);
-            //seuilDetection0 -= 25.0;
             seuilDetection1 -= 25.0;
+            compteurTours += 1;
         }
     }
         break;
@@ -121,7 +102,7 @@ void updatePinkAction() {
         break;
     case MOVE_TO_QUILLE: // sinon ça pourrait être case QUILLE_DETECTED, puis l'approche de la quille va suivre
         updateMotorProfiles();
-        if (detecterObjetIR(capteurChoisi, valeurProcheQuille))
+        if (detecterObjetIR(1, valeurProcheQuille))
         {
             requestStraightDistance(-100);
             pinkstate = SPEED_TO_QUILLE;

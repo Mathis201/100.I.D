@@ -47,11 +47,6 @@ void setup() {
 }
 
 void loop() {
-    Serial.print("Devant:");
-    Serial.print(ROBUS_ReadIR(0));
-    Serial.print(".   Derriere:");
-    Serial.println(ROBUS_ReadIR(1));
-
     updateMotorInfo(millis());
     timerLed();
     updateBeeper();
@@ -83,12 +78,6 @@ void loop() {
                 colorsSeen[i] = false;
             }
             currentRobotState = FOLLOW_LINE;
-        }
-        if (ROBUS_IsBumper(LEFT))
-        {
-            currentColorAction = ActionColors::PINK_;
-            initPinkAction();
-            currentRobotState = DO_COLOR_ACTION;
         }
         break;
     }
@@ -157,8 +146,7 @@ void loop() {
 
         // if finished, switch state
         if (isColorActionFinished) {
-            //currentRobotState = FINISH_COLOR;
-            currentRobotState = FINISHED;
+            currentRobotState = FINISH_COLOR;
         }
 
         break;
