@@ -45,7 +45,7 @@ void initPinkAction() {
     ticksDepartDroite = ENCODER_Read(RIGHT);
     requestTurnDegrees(360.0, turnSpeed);
 
-    compteur0 = 0;
+    //compteur0 = 0;
     compteur1 = 0;
 
 }
@@ -54,33 +54,34 @@ void updatePinkAction() {
     switch (pinkstate) {
     case TURN_IN_PLACE:{
         updateMotorProfiles();
-        int lectureAvant = ROBUS_ReadIR(0);
+        //int lectureAvant = ROBUS_ReadIR(0);
         int lectureArriere = ROBUS_ReadIR(1);
         
-        if (lectureAvant >= seuilDetection0)
-        {
-            compteur0 += 1;
-        }
-        else
-        {
-            compteur0 = 0;
-        }
+        //if (lectureAvant >= seuilDetection0)
+        //{
+        //    compteur0 += 1;
+        //}
+        //else
+        //{
+        //    compteur0 = 0;
+        //}
         if (lectureArriere >= seuilDetection1)
         {
-            compteur1 += 1;
+        compteur1 += 1;
         }
         else
         {
             compteur1 = 0;
         }
 
-        bool avantDetecte = compteur0 >= 5;
+        //bool avantDetecte = compteur0 >= 5;
         bool arriereDetecte = compteur1 >= 5;
 
-        if (avantDetecte || arriereDetecte)
+        if (arriereDetecte)
         {
-            capteurChoisi = avantDetecte ? 0:1;
-            sensApproche = (capteurChoisi == 0) ? 1.0:-1.0;
+            //capteurChoisi = avantDetecte ? 0:1;
+            sensApproche = -1.0;
+            //(capteurChoisi == 0) ? 1.0:-1.0;
             decelerateToStop();
 
 
@@ -94,7 +95,7 @@ void updatePinkAction() {
         else if (areProfilesDone())
         {
             requestTurnDegrees(360.0, turnSpeed);
-            seuilDetection0 -= 25.0;
+            //seuilDetection0 -= 25.0;
             seuilDetection1 -= 25.0;
         }
     }
@@ -114,7 +115,7 @@ void updatePinkAction() {
         {
         ticksApprocheGauche = ENCODER_Read(LEFT);
         ticksApprocheDroit = ENCODER_Read(RIGHT);
-        requestStraightDistance(sensApproche * forwardDistanceMm, 0.0, modifiedSpeed);
+        requestStraightDistance(-forwardDistanceMm, 0.0, modifiedSpeed);
         pinkstate = MOVE_TO_QUILLE;
         }
         break;
@@ -122,7 +123,7 @@ void updatePinkAction() {
         updateMotorProfiles();
         if (detecterObjetIR(capteurChoisi, valeurProcheQuille))
         {
-            requestStraightDistance((sensApproche + 4) * 10);
+            requestStraightDistance(-100);
             pinkstate = SPEED_TO_QUILLE;
         }
         else if (areProfilesDone())
