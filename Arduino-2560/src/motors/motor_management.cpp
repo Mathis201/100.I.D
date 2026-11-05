@@ -151,6 +151,10 @@ float getAngleSince(long initialLeftTicks, long initialRightTicks) {
 
     float angle = (rightMm - leftMm) / kTrackWidthMm * 180 / PI; // angle en degrés
 
+    return angle;
+}
+
+float normalizeAngle(float angle) {
     while (angle > 180.0) {
         angle -= 360.0;
     }

@@ -118,7 +118,7 @@ void updateOrangeAction() {
     case ADJUST_TO_CUP:
         updateMotorProfiles();
         if (areProfilesDone()) {
-            angleTourne = getAngleSince(ticksDepartGauche, ticksDepartDroit);
+            angleTourne = normalizeAngle(getAngleSince(ticksDepartGauche, ticksDepartDroit));
             ticksApprocheGauche = ENCODER_Read(LEFT);
             ticksApprocheDroit = ENCODER_Read(RIGHT);
             requestStraightDistance(-forwardDistanceMm, 0.0, modifiedSpeed);

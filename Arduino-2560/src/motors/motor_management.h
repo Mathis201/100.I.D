@@ -14,3 +14,4 @@ void requestTurnDegrees(float degrees, float maxSpeed = kMaxSpeed, float accel =
 void decelerateToStop();
 
 float getAngleSince(long initialLeftTicks, long initialRightTicks);
+float normalizeAngle(float angle);

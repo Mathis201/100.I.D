@@ -137,7 +137,7 @@ void updateYellowAction() {
 
     case FORWARD_2: {
         if (StartForward == false) {
-            requestStraightDistance(500);
+            requestStraightDistance(550);
 
             StartForward = true;
         }

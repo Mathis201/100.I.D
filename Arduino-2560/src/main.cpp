@@ -53,7 +53,7 @@ void loop() {
     // getNormalizedLineReading();
     // Binary_Conversion();
 
-    //Serial.println(ROBUS_ReadIR(1));
+    // Serial.println(ROBUS_ReadIR(1));
 
     int remoteCommand = getRemoteReadCommand();
     if (remoteCommand == REMOTE_START_COMMAND) {
@@ -87,10 +87,10 @@ void loop() {
     case FOLLOW_LINE: {
         Adapt_Curve();
 
-        //if (couleurActuelleLue != ActionColors::NO_COLOR && !colorsSeen[couleurActuelleLue]) {
-            if (true) {
-            //currentColorAction = couleurActuelleLue;
-            currentColorAction = ActionColors::PINK_;
+        if (couleurActuelleLue != ActionColors::NO_COLOR && !colorsSeen[couleurActuelleLue]) {
+            // if (true) {
+            currentColorAction = couleurActuelleLue;
+            // currentColorAction = ActionColors::PINK_;
             colorsSeen[couleurActuelleLue] = true;
             switch (currentColorAction) {
             case ActionColors::BLUE:
@@ -156,8 +156,6 @@ void loop() {
     }
 
     case FINISH_COLOR: {
-        requestBeep(1);
-
         bool colorLeftIncomplete = false;
         for (int i = 0; i < 5; i++) {
             if (!colorsSeen[i]) {
@@ -167,14 +165,14 @@ void loop() {
         }
 
         if (colorLeftIncomplete) {
-            currentRobotState = DROP_CUP;
+            currentRobotState = FOLLOW_LINE;
+            // currentRobotState = FINISHED;
         } else {
             currentRobotState = DROP_CUP;
             initDropCupAction();
         }
 
         break;
-    
     }
 
     case DROP_CUP: {
