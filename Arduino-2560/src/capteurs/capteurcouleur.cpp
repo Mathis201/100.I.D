@@ -16,11 +16,11 @@ Couleur couleurscapteur[5];
 void initcapteurcouleur() {
     tcs.begin();
 
-    couleurscapteur[ActionColors::BLUE] = Couleur{300, 490, 450, 1280};
-    couleurscapteur[ActionColors::PINK_] = Couleur{810, 570, 470, 1850};
-    couleurscapteur[ActionColors::YELLOW] = Couleur{710, 740, 390, 1850};
-    couleurscapteur[ActionColors::GREEN] = Couleur{480, 680, 490, 1680};
-    couleurscapteur[ActionColors::ORANGE] = Couleur{680, 520, 310, 1550};
+    couleurscapteur[ActionColors::BLUE] = Couleur{250, 415, 390, 1100};
+    couleurscapteur[ActionColors::PINK_] = Couleur{650, 490, 380, 1550};
+    couleurscapteur[ActionColors::YELLOW] = Couleur{600, 650, 345, 1600};
+    couleurscapteur[ActionColors::GREEN] = Couleur{410, 570, 425, 1450};
+    couleurscapteur[ActionColors::ORANGE] = Couleur{550, 480, 280, 1350};
 }
 
 bool comparecouleur(Couleur couleurentree, Couleur couleurreference) {

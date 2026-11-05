@@ -11,7 +11,7 @@ static const float modifiedSpeed = 150.0;
 static const float valeurProcheQuille = 550;
 static float seuilDetection1 = 300.0;
 static const float forwardDistanceMm = 600.0;
-static const float angleMagique = 3;
+static const float angleMagique = 6;
 static int compteurTours = 0;
 
 static long ticksApprocheGauche;
@@ -66,6 +66,7 @@ void updatePinkAction() {
 
         if (arriereDetecte)
         {
+            Serial.println("DÉTECTÉÉÉÉÉÉÉÉÉ");
             decelerateToStop();
             pinkstate = STOP_TURN;
         }
@@ -76,7 +77,7 @@ void updatePinkAction() {
                 pinkstate = TEST_FINISHED;
             }
             requestTurnDegrees(360.0, turnSpeed);
-            seuilDetection1 -= 25.0;
+            seuilDetection1 -= 50.0;
             compteurTours += 1;
         }
     }
