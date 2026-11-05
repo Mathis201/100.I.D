@@ -197,12 +197,12 @@ bool IsLineDetected(int nbvoulu) {
     if (Valeurs.C_Right >= 0.4) {
         nbcapteurs = nbcapteurs + 1;
     }
-    Serial.print("Gauche: ");
-    Serial.println(Valeurs.C_Left);
-    Serial.print("Milieu: ");
-    Serial.println(Valeurs.C_Middle);
-    Serial.print("Droite: ");
-    Serial.println(Valeurs.C_Right);
+    //Serial.print("Gauche: ");
+    //Serial.println(Valeurs.C_Left);
+    //Serial.print("Milieu: ");
+    //Serial.println(Valeurs.C_Middle);
+    //Serial.print("Droite: ");
+    //Serial.println(Valeurs.C_Right);
 
     if (nbcapteurs < nbvoulu) {
         return false;

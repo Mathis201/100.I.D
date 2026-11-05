@@ -18,7 +18,6 @@ void initBlueAction() {
 }
 
 void updateBlueAction(int currentRemoteCommand) {
-    Serial.println(currentState);
     switch (currentState) {
     case DECELERATE: {
         if (areProfilesDone()) {

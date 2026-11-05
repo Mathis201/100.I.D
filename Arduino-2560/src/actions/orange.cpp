@@ -14,7 +14,7 @@ static bool hasTimerStarted = false;
 static float turnSpeed = 70.0;
 static const float modifiedSpeed = 150.0;
 static const float valeurProcheVerre = 550;
-static float seuilDetection = 325.0;
+static float seuilDetection = 300.0;
 static float seuilTooClose = 400.0;
 static const float forwardDistanceMm = 600.0;
 static const float backwardsDistanceMm = 150.0;
@@ -71,9 +71,6 @@ void updateOrangeAction() {
         }
         if (compteur1 >= 6) // Lecture > 120
         {
-            //Serial.print("DETECTION DERRIERE:");
-            //Serial.println(ROBUS_ReadIR(1));
-
             if (detecterObjetIR(1, seuilTooClose)) {
                 angleMagique = 7;
                 tooClose = true;
@@ -90,6 +87,7 @@ void updateOrangeAction() {
         updateMotorProfiles();
         if (areProfilesDone() && tooClose) {
             requestStraightDistance(backwardsDistanceMm);
+            angleMagique = 0;
             orangeState = MOVE_BACKWARDS;
         } else if (areProfilesDone()) {
             orangeState = LOWER_ARM;
