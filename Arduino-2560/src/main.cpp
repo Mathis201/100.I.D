@@ -25,7 +25,7 @@ enum RobotStates {
     FINISHED
 };
 
-constexpr int kColorReadingDelay = 150; // ms
+constexpr int kColorReadingDelay = 100; // ms
 
 RobotStates currentRobotState;
 ActionColors currentColorAction;
