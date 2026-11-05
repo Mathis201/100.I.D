@@ -2,7 +2,7 @@
 #include "constants.h"
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
-int tolerence = 80;
+int tolerence = 75;
 
 struct Couleur {
     int red;
@@ -20,7 +20,7 @@ void initcapteurcouleur() {
     couleurscapteur[ActionColors::PINK_] = Couleur{810, 570, 470, 1850};
     couleurscapteur[ActionColors::YELLOW] = Couleur{710, 740, 390, 1850};
     couleurscapteur[ActionColors::GREEN] = Couleur{480, 680, 490, 1680};
-    couleurscapteur[ActionColors::ORANGE] = Couleur{650, 520, 310, 1550};
+    couleurscapteur[ActionColors::ORANGE] = Couleur{680, 520, 310, 1550};
 }
 
 bool comparecouleur(Couleur couleurentree, Couleur couleurreference) {
