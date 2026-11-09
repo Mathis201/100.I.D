@@ -9,11 +9,13 @@
 
 #define LED_STATE_CHARACTERISTIC_UUID "4ca76883-83e7-4c4e-a3da-b433e5e8fd2a"
 
+#define ONBOARD_DEL 2
+
 constexpr int serialPrintDelay = 250;
+int lastTime = 0;
 
 bool deviceConnected = false;
 int ledOn = 0;
-int lastTime = 0;
 
 // Setup callbacks onConnect and onDisconnect
 class ServerCallbacks : public BLEServerCallbacks {
@@ -34,7 +36,7 @@ static BLECharacteristic *pLedStateCharacteristic;
 void setup() {
     // put your setup code here, to run once:
     Serial.begin(9600);
-    Serial1.begin(9600);
+    Serial2.begin(9600);
 
     BLEDevice::init(SERVER_NAME);
     BLEServer *pServer = BLEDevice::createServer();
@@ -57,12 +59,17 @@ void setup() {
     pServer->getAdvertising()->setMinInterval(ADVERTISING_INTERVAL);
     pServer->getAdvertising()->setMaxInterval(ADVERTISING_INTERVAL);
     pServer->getAdvertising()->start();
+
+    pinMode(ONBOARD_DEL, OUTPUT);
 }
 
 void loop() {
     // put your main code here, to run repeatedly:
     if ((millis() - lastTime) > serialPrintDelay) {
-        Serial1.println(pLedStateCharacteristic->getValue().c_str());
+        int newVal = *pLedStateCharacteristic->getData();
+        Serial.println(newVal);
+        Serial2.println(newVal);
+        digitalWrite(ONBOARD_DEL, newVal);
         lastTime = millis();
     }
 }
