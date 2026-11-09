@@ -47,6 +47,8 @@ int Y_NOW = 0;
 int X_PAST = 0;
 int Y_PAST = 0;
 
+Orientation = 
+
 int Action;
 
 bool Go_To_Position_XY(int Target_X, int Target_Y){
@@ -57,22 +59,22 @@ case Follow_line_straight:
     Follow_line();
     break;
 case Horizontal_Detected:
-    /* code */
+    
     break;
 case Vertical_Detected:
-    /* code */
+    
     break;
 case TurnLeft:
-    /* code */
+    
     break;
 case TurnRight:
-    /* code */
+    
     break;
 case Put_Pawn:
-    /* code */
+    
     break;
-case Orientation:
-    /* code */
+case Orientation234:
+    
     break;
 
 default:
@@ -155,10 +157,8 @@ void X_Up_or_Down(int Target_X){
 
 
 
-unsigned long Last_Time = 0;
-float Past_Error = 0;
-
-int Follow_line() {
+ 
+int Follow_line(int ton) {
 
     float KD = 0.1;
     float KP = .2;
@@ -174,50 +174,99 @@ int Follow_line() {
 
     unsigned long Now = millis();
 
-    if (Valeurs.C_Left < 0.15 && Valeurs.C_Right < 0.15)
+    if (Valeurs.C_Left < 0.1 && Valeurs.C_Right < 0.1)
     {
         return Horizontal_Detected;
     }
     
-    else if (Valeurs.C_Left > 0.85 && Valeurs.C_Right > 0.85)
+    else if (Valeurs.C_Left > 0.9 && Valeurs.C_Right > 0.9)
     {
         return Vertical_Detected;
     }
+    else if (ton == static_cast<int>(white))
+    {
     
-    else if (Valeurs.C_Left > Valeurs.C_Right) {
-        Live_Error = (Valeurs.C_Left * ponderation + (1 - Valeurs.C_Middle));
-        if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
-            Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
-        }
-
-        MOTOR_SetSpeed(LEFT, base_speed - (Live_Error * KP + Deriv * KD));
-        MOTOR_SetSpeed(RIGHT, base_speed + (Live_Error * KP + Deriv * KD));
-        Past_Error = Live_Error;
+        White_line_motor();
+    
     }
 
-    else if (Valeurs.C_Right > Valeurs.C_Left) {
-        Live_Error = (Valeurs.C_Right * ponderation + (1 - Valeurs.C_Middle));
-        if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
-            Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
-        }
-        MOTOR_SetSpeed(LEFT, base_speed + (Live_Error * KP + Deriv * KD));
-        MOTOR_SetSpeed(RIGHT, base_speed - (Live_Error * KP + Deriv * KD));
-        Past_Error = Live_Error;
-    }
+    else if (ton == static_cast<int>(black))
+    {
 
-    else {
-        MOTOR_SetSpeed(RIGHT, base_speed);
-        MOTOR_SetSpeed(LEFT, base_speed);
-    }
+        Black_line_motor();
 
-    Last_Time = Now;
-    First = false;
+    }
+    
 
     return Follow_line_straight;
 }
 
 
+unsigned long Last_Time = 0;
+float Past_Error = 0;
 
+
+void White_line_motor(){
+
+if (Valeurs.C_Left < Valeurs.C_Right) {
+                Live_Error = (Valeurs.C_Left * ponderation + (1 - Valeurs.C_Middle));
+                if (Now - Last_Time != 0 || Now - Last_Time < 250 || First != true) {
+                    Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
+                }
+
+                MOTOR_SetSpeed(LEFT, base_speed - (Live_Error * KP + Deriv * KD));
+                MOTOR_SetSpeed(RIGHT, base_speed + (Live_Error * KP + Deriv * KD));
+                Past_Error = Live_Error;
+            }
+
+            else if (Valeurs.C_Right < Valeurs.C_Left) {
+                Live_Error = (Valeurs.C_Right * ponderation + (1 - Valeurs.C_Middle));
+                if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
+                    Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
+                }
+                MOTOR_SetSpeed(LEFT, base_speed + (Live_Error * KP + Deriv * KD));
+                MOTOR_SetSpeed(RIGHT, base_speed - (Live_Error * KP + Deriv * KD));
+                Past_Error = Live_Error;
+            }
+
+            else {
+                MOTOR_SetSpeed(RIGHT, base_speed);
+                MOTOR_SetSpeed(LEFT, base_speed);
+            }
+Last_Time = Now;
+First = false;
+}
+
+void Black_line_motor(){
+
+if (Valeurs.C_Left > Valeurs.C_Right) {
+                Live_Error = (Valeurs.C_Left * ponderation + (1 - Valeurs.C_Middle));
+                if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
+                    Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
+                }
+
+                MOTOR_SetSpeed(LEFT, base_speed - (Live_Error * KP + Deriv * KD));
+                MOTOR_SetSpeed(RIGHT, base_speed + (Live_Error * KP + Deriv * KD));
+                Past_Error = Live_Error;
+            }
+
+            else if (Valeurs.C_Right > Valeurs.C_Left) {
+                Live_Error = (Valeurs.C_Right * ponderation + (1 - Valeurs.C_Middle));
+                if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
+                    Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
+                }
+                MOTOR_SetSpeed(LEFT, base_speed + (Live_Error * KP + Deriv * KD));
+                MOTOR_SetSpeed(RIGHT, base_speed - (Live_Error * KP + Deriv * KD));
+                Past_Error = Live_Error;
+            }
+
+            else {
+                MOTOR_SetSpeed(RIGHT, base_speed);
+                MOTOR_SetSpeed(LEFT, base_speed);
+            }
+Last_Time = Now;
+First = false;
+}
 
 
 
