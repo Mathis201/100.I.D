@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 # Install script for directory: C:/Uni/S1/Projet/Qtapp/RobusUI
+=======
+# Install script for directory: C:/Uni/S1/Projet/Code/Robus19A/100.I.D/Qtapp/RobusUI
+>>>>>>> Stashed changes
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
