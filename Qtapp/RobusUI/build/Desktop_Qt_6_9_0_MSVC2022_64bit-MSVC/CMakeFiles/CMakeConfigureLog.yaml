@@ -178,6 +178,16 @@ events:
         \x1b[31mFAILED: \x1b[0mcmTC_2db44.exe 
         C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Qt\\Tools\\CMake_64\\bin\\cmake.exe -E vs_link_exe --intdir=CMakeFiles\\cmTC_2db44.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_2db44.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_2db44.exe /implib:cmTC_2db44.lib /pdb:cmTC_2db44.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
         LINK Pass 1: command "C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_2db44.dir\\CheckFunctionExists.cxx.obj /out:cmTC_2db44.exe /implib:cmTC_2db44.lib /pdb:cmTC_2db44.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_2db44.dir/intermediate.manifest CMakeFiles\\cmTC_2db44.dir/manifest.res" failed (exit code 1104) with the following output:
+=======
+        Change Dir: 'C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-apc6j2'
+        
+        Run Build Command(s): C:/PROGRA~1/MICROS~4/2022/COMMUN~1/Common7/IDE/COMMON~1/MICROS~1/CMake/Ninja/ninja.exe -v cmTC_6e7f7
+        [1/2] C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\HostX64\\x64\\cl.exe  /nologo /TP   -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_6e7f7.dir\\CheckFunctionExists.cxx.obj /FdCMakeFiles\\cmTC_6e7f7.dir\\ /FS -c C:\\Uni\\S1\\Projet\\Qtapp\\RobusUI\\build\\Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC\\CMakeFiles\\CMakeScratch\\TryCompile-apc6j2\\CheckFunctionExists.cxx
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Qt\\Tools\\CMake_64\\bin\\cmake.exe -E vs_link_exe --intdir=CMakeFiles\\cmTC_6e7f7.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_6e7f7.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_6e7f7.exe /implib:cmTC_6e7f7.lib /pdb:cmTC_6e7f7.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        \x1b[31mFAILED: \x1b[0mcmTC_6e7f7.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Qt\\Tools\\CMake_64\\bin\\cmake.exe -E vs_link_exe --intdir=CMakeFiles\\cmTC_6e7f7.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_6e7f7.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_6e7f7.exe /implib:cmTC_6e7f7.lib /pdb:cmTC_6e7f7.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_6e7f7.dir\\CheckFunctionExists.cxx.obj /out:cmTC_6e7f7.exe /implib:cmTC_6e7f7.lib /pdb:cmTC_6e7f7.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_6e7f7.dir/intermediate.manifest CMakeFiles\\cmTC_6e7f7.dir/manifest.res" failed (exit code 1104) with the following output:
+>>>>>>> Stashed changes
         LINK : fatal error LNK1104: cannot open file 'pthreads.lib'\x0d
         ninja: build stopped: subcommand failed.
         
@@ -196,8 +206,13 @@ events:
     checks:
       - "Looking for pthread_create in pthread"
     directories:
+<<<<<<< Updated upstream
       source: "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-dqn7f7"
       binary: "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-dqn7f7"
+=======
+      source: "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-3k5w6l"
+      binary: "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-3k5w6l"
+>>>>>>> Stashed changes
     cmakeVariables:
       CMAKE_CXX_FLAGS: "-DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -207,6 +222,7 @@ events:
       variable: "CMAKE_HAVE_PTHREAD_CREATE"
       cached: true
       stdout: |
+<<<<<<< Updated upstream
         Change Dir: 'C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-dqn7f7'
         
         Run Build Command(s): C:/PROGRA~1/MICROS~4/2022/COMMUN~1/Common7/IDE/COMMON~1/MICROS~1/CMake/Ninja/ninja.exe -v cmTC_b131e
@@ -215,6 +231,16 @@ events:
         \x1b[31mFAILED: \x1b[0mcmTC_b131e.exe 
         C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Qt\\Tools\\CMake_64\\bin\\cmake.exe -E vs_link_exe --intdir=CMakeFiles\\cmTC_b131e.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_b131e.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_b131e.exe /implib:cmTC_b131e.lib /pdb:cmTC_b131e.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
         LINK Pass 1: command "C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_b131e.dir\\CheckFunctionExists.cxx.obj /out:cmTC_b131e.exe /implib:cmTC_b131e.lib /pdb:cmTC_b131e.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_b131e.dir/intermediate.manifest CMakeFiles\\cmTC_b131e.dir/manifest.res" failed (exit code 1104) with the following output:
+=======
+        Change Dir: 'C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-3k5w6l'
+        
+        Run Build Command(s): C:/PROGRA~1/MICROS~4/2022/COMMUN~1/Common7/IDE/COMMON~1/MICROS~1/CMake/Ninja/ninja.exe -v cmTC_c9592
+        [1/2] C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\HostX64\\x64\\cl.exe  /nologo /TP   -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_c9592.dir\\CheckFunctionExists.cxx.obj /FdCMakeFiles\\cmTC_c9592.dir\\ /FS -c C:\\Uni\\S1\\Projet\\Qtapp\\RobusUI\\build\\Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC\\CMakeFiles\\CMakeScratch\\TryCompile-3k5w6l\\CheckFunctionExists.cxx
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Qt\\Tools\\CMake_64\\bin\\cmake.exe -E vs_link_exe --intdir=CMakeFiles\\cmTC_c9592.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_c9592.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_c9592.exe /implib:cmTC_c9592.lib /pdb:cmTC_c9592.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        \x1b[31mFAILED: \x1b[0mcmTC_c9592.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Qt\\Tools\\CMake_64\\bin\\cmake.exe -E vs_link_exe --intdir=CMakeFiles\\cmTC_c9592.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_c9592.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_c9592.exe /implib:cmTC_c9592.lib /pdb:cmTC_c9592.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_c9592.dir\\CheckFunctionExists.cxx.obj /out:cmTC_c9592.exe /implib:cmTC_c9592.lib /pdb:cmTC_c9592.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_c9592.dir/intermediate.manifest CMakeFiles\\cmTC_c9592.dir/manifest.res" failed (exit code 1104) with the following output:
+>>>>>>> Stashed changes
         LINK : fatal error LNK1104: cannot open file 'pthread.lib'\x0d
         ninja: build stopped: subcommand failed.
         
@@ -234,8 +260,13 @@ events:
     checks:
       - "Performing Test HAVE_STDATOMIC"
     directories:
+<<<<<<< Updated upstream
       source: "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-x9r2we"
       binary: "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-x9r2we"
+=======
+      source: "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-31e5xl"
+      binary: "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-31e5xl"
+>>>>>>> Stashed changes
     cmakeVariables:
       CMAKE_CXX_FLAGS: "-DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -245,11 +276,19 @@ events:
       variable: "HAVE_STDATOMIC"
       cached: true
       stdout: |
+<<<<<<< Updated upstream
         Change Dir: 'C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-x9r2we'
         
         Run Build Command(s): C:/PROGRA~1/MICROS~4/2022/COMMUN~1/Common7/IDE/COMMON~1/MICROS~1/CMake/Ninja/ninja.exe -v cmTC_8df94
         [1/2] C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\HostX64\\x64\\cl.exe  /nologo /TP -DHAVE_STDATOMIC  -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_8df94.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_8df94.dir\\ /FS -c C:\\Uni\\S1\\Projet\\Qtapp\\RobusUI\\build\\Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC\\CMakeFiles\\CMakeScratch\\TryCompile-x9r2we\\src.cxx
         [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Qt\\Tools\\CMake_64\\bin\\cmake.exe -E vs_link_exe --intdir=CMakeFiles\\cmTC_8df94.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_8df94.dir\\src.cxx.obj  /out:cmTC_8df94.exe /implib:cmTC_8df94.lib /pdb:cmTC_8df94.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+=======
+        Change Dir: 'C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/CMakeScratch/TryCompile-31e5xl'
+        
+        Run Build Command(s): C:/PROGRA~1/MICROS~4/2022/COMMUN~1/Common7/IDE/COMMON~1/MICROS~1/CMake/Ninja/ninja.exe -v cmTC_75028
+        [1/2] C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\HostX64\\x64\\cl.exe  /nologo /TP -DHAVE_STDATOMIC  -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_75028.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_75028.dir\\ /FS -c C:\\Uni\\S1\\Projet\\Qtapp\\RobusUI\\build\\Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC\\CMakeFiles\\CMakeScratch\\TryCompile-31e5xl\\src.cxx
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Qt\\Tools\\CMake_64\\bin\\cmake.exe -E vs_link_exe --intdir=CMakeFiles\\cmTC_75028.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~4\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1441~1.341\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_75028.dir\\src.cxx.obj  /out:cmTC_75028.exe /implib:cmTC_75028.lib /pdb:cmTC_75028.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+>>>>>>> Stashed changes
         
       exitCode: 0
 ...

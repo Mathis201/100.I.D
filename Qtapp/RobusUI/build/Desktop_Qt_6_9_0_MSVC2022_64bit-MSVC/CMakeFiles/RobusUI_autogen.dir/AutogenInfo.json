@@ -429,20 +429,32 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/GNUInstallDirs.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/GNUInstallDirs.cmake"
 	],
+<<<<<<< Updated upstream
 	"CMAKE_SOURCE_DIR" : "C:/Uni/S1/Projet/Qtapp/RobusUI",
+=======
+	"CMAKE_SOURCE_DIR" : "C:/Uni/S1/Projet/Code/Robus19A/100.I.D/Qtapp/RobusUI",
+>>>>>>> Stashed changes
 	"CROSS_CONFIG" : false,
 	"DEP_FILE" : "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/RobusUI_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "RobusUI_autogen/timestamp",
 	"HEADERS" : 
 	[
 		[
+<<<<<<< Updated upstream
 			"C:/Uni/S1/Projet/Qtapp/RobusUI/DeviceHandler.h",
+=======
+			"C:/Uni/S1/Projet/Code/Robus19A/100.I.D/Qtapp/RobusUI/DeviceHandler.h",
+>>>>>>> Stashed changes
 			"MU",
 			"EWIEGA46WW/moc_DeviceHandler.cpp",
 			null
 		],
 		[
+<<<<<<< Updated upstream
 			"C:/Uni/S1/Projet/Qtapp/RobusUI/mainwindow.h",
+=======
+			"C:/Uni/S1/Projet/Code/Robus19A/100.I.D/Qtapp/RobusUI/mainwindow.h",
+>>>>>>> Stashed changes
 			"MU",
 			"EWIEGA46WW/moc_mainwindow.cpp",
 			null
@@ -507,9 +519,27 @@
 	"SETTINGS_FILE" : "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Desktop_Qt_6_9_0_MSVC2022_64bit-MSVC/CMakeFiles/RobusUI_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
+<<<<<<< Updated upstream
 		[ "C:/Uni/S1/Projet/Qtapp/RobusUI/DeviceHandler.cpp", "MU", null ],
 		[ "C:/Uni/S1/Projet/Qtapp/RobusUI/main.cpp", "MU", null ],
 		[ "C:/Uni/S1/Projet/Qtapp/RobusUI/mainwindow.cpp", "MU", null ]
+=======
+		[
+			"C:/Uni/S1/Projet/Code/Robus19A/100.I.D/Qtapp/RobusUI/DeviceHandler.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Uni/S1/Projet/Code/Robus19A/100.I.D/Qtapp/RobusUI/main.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Uni/S1/Projet/Code/Robus19A/100.I.D/Qtapp/RobusUI/mainwindow.cpp",
+			"MU",
+			null
+		]
+>>>>>>> Stashed changes
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],
