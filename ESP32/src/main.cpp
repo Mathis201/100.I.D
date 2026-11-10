@@ -1,75 +1,64 @@
+#include "ble_setup.h"
+#include "game_info_service.h"
 #include <Arduino.h>
 #include <BLE2902.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 
-#define SERVER_NAME "100ID_ESP32"
-#define SERVICE_UUID "37d5098d-a1bd-471e-8794-aae7bf8ed532"
-#define ADVERTISING_INTERVAL 100 // ms
+constexpr static int onboardDel = 2;
 
-#define LED_STATE_CHARACTERISTIC_UUID "4ca76883-83e7-4c4e-a3da-b433e5e8fd2a"
+constexpr static int serialPrintDelay = 250;
+static int lastTime = 0;
 
-#define ONBOARD_DEL 2
-
-constexpr int serialPrintDelay = 250;
-int lastTime = 0;
-
-bool deviceConnected = false;
-int ledOn = 0;
+static bool deviceConnected = false;
 
 // Setup callbacks onConnect and onDisconnect
 class ServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer *pServer) {
         deviceConnected = true;
+        digitalWrite(onboardDel, true);
         Serial.println("Device connected");
     };
     void onDisconnect(BLEServer *pServer) {
         deviceConnected = false;
+        digitalWrite(onboardDel, false);
+        pServer->getAdvertising()->stop();
+        pServer->getAdvertising()->start();
         Serial.println("Device disconnected");
     }
 };
 
 static ServerCallbacks serverCallbacks{};
-static BLEDescriptor ledStateDescriptor{BLEUUID((uint16_t)0x2903)};
-static BLECharacteristic *pLedStateCharacteristic;
+static BLEServer *pServer;
+
+static BLECharacteristic *pPlayerInfo_GridCharacteristic;
+static BLECharacteristic *pPlayerInfo_LastShotCoordsCharacteristic;
+static BLECharacteristic *pPlayerInfo_LastShotResultCharacteristic;
+
+static BLECharacteristic *pRobotInfo_LastShotCoordsCharacteristic;
+static BLECharacteristic *pRobotInfo_LastShotResultCharacteristic;
 
 void setup() {
     // put your setup code here, to run once:
     Serial.begin(9600);
     Serial2.begin(9600);
 
-    BLEDevice::init(SERVER_NAME);
+    BLEDevice::init(ServerSettings::serverName);
     BLEServer *pServer = BLEDevice::createServer();
+
+    setupGameInfoService(pServer);
+
+    pServer->getAdvertising()->setMinInterval(ServerSettings::advertisingInterval);
+    pServer->getAdvertising()->setMaxInterval(ServerSettings::advertisingInterval);
+    pServer->getAdvertising()->start();
     pServer->setCallbacks(&serverCallbacks);
 
-    BLEService *pService = pServer->createService(SERVICE_UUID);
-    pLedStateCharacteristic = pService->createCharacteristic(LED_STATE_CHARACTERISTIC_UUID,
-                                                             BLECharacteristic::PROPERTY_READ |
-                                                                 BLECharacteristic::PROPERTY_WRITE |
-                                                                 BLECharacteristic::PROPERTY_INDICATE);
-
-    ledStateDescriptor.setValue("LED State");
-    pLedStateCharacteristic->addDescriptor(&ledStateDescriptor);
-    pLedStateCharacteristic->addDescriptor(new BLE2902());
-    pLedStateCharacteristic->setValue(ledOn);
-
-    pService->start();
-
-    pServer->getAdvertising()->addServiceUUID(SERVICE_UUID);
-    pServer->getAdvertising()->setMinInterval(ADVERTISING_INTERVAL);
-    pServer->getAdvertising()->setMaxInterval(ADVERTISING_INTERVAL);
-    pServer->getAdvertising()->start();
-
-    pinMode(ONBOARD_DEL, OUTPUT);
+    pinMode(onboardDel, OUTPUT);
 }
 
 void loop() {
     // put your main code here, to run repeatedly:
     if ((millis() - lastTime) > serialPrintDelay) {
-        int newVal = *pLedStateCharacteristic->getData();
-        Serial.println(newVal);
-        Serial2.println(newVal);
-        digitalWrite(ONBOARD_DEL, newVal);
         lastTime = millis();
     }
 }
