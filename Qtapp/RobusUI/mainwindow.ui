@@ -58,7 +58,7 @@
      <rect>
       <x>200</x>
       <y>80</y>
-      <width>101</width>
+      <width>81</width>
       <height>31</height>
      </rect>
     </property>
@@ -71,7 +71,7 @@
      <rect>
       <x>20</x>
       <y>80</y>
-      <width>201</width>
+      <width>181</width>
       <height>31</height>
      </rect>
     </property>
@@ -82,20 +82,20 @@
    <widget class="QPushButton" name="Rotation">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>290</x>
       <y>90</y>
       <width>80</width>
       <height>18</height>
      </rect>
     </property>
     <property name="text">
-     <string>Rotation</string>
+     <string>Rotation (H)</string>
     </property>
    </widget>
    <widget class="QPushButton" name="Suivant">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>380</x>
       <y>90</y>
       <width>80</width>
       <height>18</height>
@@ -110,7 +110,7 @@
      <rect>
       <x>200</x>
       <y>120</y>
-      <width>101</width>
+      <width>221</width>
       <height>16</height>
      </rect>
     </property>
