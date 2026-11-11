@@ -1,3 +1,4 @@
+#include "game_info_service.h"
 #include "ble_setup.h"
 #include <BLE2902.h>
 #include <BLEServer.h>
@@ -5,11 +6,11 @@
 static BLECharacteristic *pAlgorithmStrengthCharacteristic;
 static BLECharacteristic *pGameOverCharacteristic;
 
-static uint8_t algorithmStrength;
+static uint8_t algorithmStrength = 2;
 static bool gameOver = false;
 
 void setupGameInfoService(BLEServer *pServer) {
-    BLEService *pService = pServer->createService(GameInfoService::UUID, 30);
+    BLEService *pService = pServer->createService(GameInfoService::UUID);
 
     pAlgorithmStrengthCharacteristic = pService->createCharacteristic(GameInfoService::AlgorithmStrengthCharacteristic::UUID,
                                                                       BLECharacteristic::PROPERTY_READ |

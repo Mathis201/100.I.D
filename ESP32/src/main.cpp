@@ -1,7 +1,8 @@
 #include "ble_setup.h"
-#include "game_info_service.h"
+#include "services/game_info_service.h"
+#include "services/player_info_service.h"
+#include "services/robot_info_service.h"
 #include <Arduino.h>
-#include <BLE2902.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 
@@ -31,13 +32,6 @@ class ServerCallbacks : public BLEServerCallbacks {
 static ServerCallbacks serverCallbacks{};
 static BLEServer *pServer;
 
-static BLECharacteristic *pPlayerInfo_GridCharacteristic;
-static BLECharacteristic *pPlayerInfo_LastShotCoordsCharacteristic;
-static BLECharacteristic *pPlayerInfo_LastShotResultCharacteristic;
-
-static BLECharacteristic *pRobotInfo_LastShotCoordsCharacteristic;
-static BLECharacteristic *pRobotInfo_LastShotResultCharacteristic;
-
 void setup() {
     // put your setup code here, to run once:
     Serial.begin(9600);
@@ -47,6 +41,8 @@ void setup() {
     BLEServer *pServer = BLEDevice::createServer();
 
     setupGameInfoService(pServer);
+    setupPlayerInfoService(pServer);
+    setupRobotInfoService(pServer);
 
     pServer->getAdvertising()->setMinInterval(ServerSettings::advertisingInterval);
     pServer->getAdvertising()->setMaxInterval(ServerSettings::advertisingInterval);
