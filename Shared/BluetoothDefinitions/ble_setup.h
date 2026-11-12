@@ -5,7 +5,7 @@
 
 namespace ServerSettings {
     const std::string serverName = "100ID_ESP32";
-    constexpr int advertisingInterval = 100;
+    constexpr int advertisingInterval = 100; // ms
 };
 
 namespace GameInfoService {
@@ -15,9 +15,13 @@ namespace GameInfoService {
         const std::string UUID = "6b85c9b7-2736-4adc-b87d-bfa97e767329";
     };
 
-    namespace GameOverCharacteristic {
+    namespace IsGameOverCharacteristic {
         const std::string UUID = "5fc69066-dde4-4cef-b026-82c06f86a1f6";
     };
+
+    namespace IsPlayerTurnCharacteristic {
+        const std::string UUID = "35c5b4bd-2ed1-4b61-a257-1912c2358a49";
+    }
 
 };
 
@@ -30,10 +34,6 @@ namespace PlayerInfoService {
 
     namespace LastShotCoordsCharacteristic {
         const std::string UUID = "12d64fe0-eab5-4d29-988d-504ac91448c8";
-    };
-
-    namespace LastShotResultCharacteristic {
-        const std::string UUID = "35c5b4bd-2ed1-4b61-a257-1912c2358a49";
     };
 };
 
