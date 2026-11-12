@@ -11,6 +11,7 @@ Inclure les librairies de functions que vous voulez utiliser
 */
 #include <LibRobus.h>
 #include <../lib/Grille/Position/PID_follow_line.h>
+#include <../lib/Grille/Position/Position_Grille.h>
 
 
 #define OUTPUT_LED_PIN 53
@@ -35,31 +36,7 @@ void loop() {
     {
         while (true)
         {
-            Follow_line(ton::white);
-            if (ROBUS_IsBumper(RIGHT))
-            {   
-                MOTOR_SetSpeed(RIGHT, 0);
-                MOTOR_SetSpeed(LEFT, 0);
-                break;
-            }
-            
+           Go_To_Position_XY(5, 3);
         }
-        
-        
-    }
-    if (ROBUS_IsBumper(LEFT))
-    {
-
-        while (true)
-            {
-                Follow_line(ton::black);
-                if (ROBUS_IsBumper(RIGHT))
-                {   
-                    MOTOR_SetSpeed(RIGHT, 0);
-                    MOTOR_SetSpeed(LEFT, 0);
-                    break;
-                }
-                
-            }
     }
 }

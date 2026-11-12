@@ -9,7 +9,7 @@ enum Actions{Horizontal_Detected, Vertical_Detected, Follow_line_straight, TurnR
 
 enum Orientation{X_Axis_Pos, Y_Axis_Neg, X_Axis_Neg, Y_Axis_Pos};
 
-void Left_or_Right(int Target_X, int Target_Y);
+void Left_or_Right(int Target_Y);
 
 int Wich_Line_Follow();
 
