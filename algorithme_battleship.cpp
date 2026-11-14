@@ -3,7 +3,7 @@
 
 const int DX[4] = {0, 0, -1, 1}; // sert a calculer les coordonnees d'un deplacement (haut, bas, gauche, droite)
 const int DY[4] = {-1, 1, 0, 0};
-const int codes_bateaux[NB_BATEAUX + 1] = {0, 20, 21, 30, 40, 50}; // sert d'ID pour les bateaux
+const int codes_bateaux[NB_BATEAUX + 1] = {0, 20, 21, 30, 40, 50}; // associe chaque ID de bateau a son code dans la grille de vue
 void initialiser_ordi(EtatOrdi &etat) {
     etat.nb_de_coup = 0;
     etat.dernier_resultat = RATE;
@@ -100,7 +100,7 @@ Coord effectuer_prochain_coup(
 
     // Reprendre le plus ancien bateau en attente
     while (!etat.bateau_actif && etat.nb_en_attente > 0) {
-        Move prochain = etat.next_boat_to_do[0];
+        BateauEnAttente prochain = etat.next_boat_to_do[0];
         for (int i = 0; i < etat.nb_en_attente - 1; i++)
             etat.next_boat_to_do[i] = etat.next_boat_to_do[i + 1];
         etat.nb_en_attente--;
@@ -160,7 +160,7 @@ void mettre_a_jour_stats_ordi(
         if (etat.bateau_actif && code == etat.actif_code)
             etat.bateau_actif = false;
 
-        // Un bateau coule ne doit plus rester dans la file.
+        // Un bateau coule ne doit plus rester dans la file
         for (int i = 0; i < etat.nb_en_attente; ) {
             Coord position = etat.next_boat_to_do[i].coord;
             int code_attente = grille_vue_ordi[position.y][position.x];
@@ -179,9 +179,9 @@ void mettre_a_jour_stats_ordi(
     if (!etat.bateau_actif) {
         etat.bateau_actif = true;
         etat.actif_code = code;
-        etat.actif_longueur = (code == 20 || code == 21) ? 2 : code / 10;
+        etat.actif_longueur = code / 10;
     } else if (code != etat.actif_code) {
-        // Ne jamais ajouter deux fois le meme.
+        // Ne jamais ajouter deux fois le meme
         bool deja_en_attente = false;
         for (int i = 0; i < etat.nb_en_attente; i++) {
             Coord position = etat.next_boat_to_do[i].coord;
