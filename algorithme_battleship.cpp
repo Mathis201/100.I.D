@@ -4,13 +4,14 @@
 const int DX[4] = {0, 0, -1, 1}; // sert a calculer les coordonnees d'un deplacement (haut, bas, gauche, droite)
 const int DY[4] = {-1, 1, 0, 0};
 const int codes_bateaux[NB_BATEAUX + 1] = {0, 20, 21, 30, 40, 50}; // sert d'ID pour les bateaux
-void initialiser_ordinateur(EtatOrdi &etat) {
+void initialiser_ordi(EtatOrdi &etat) {
     etat.nb_de_coup = 0;
     etat.dernier_resultat = RATE;
     etat.dernier_touche = {0, 0};
     etat.bateau_actif = false;
     etat.actif_code = 0;
     etat.actif_longueur = 0;
+    etat.nb_en_attente = 0;
 }
 
 bool coord_valide(Coord coup) {
@@ -96,6 +97,25 @@ Coord effectuer_prochain_coup(
             return coup;
         etat.bateau_actif = false;
     }
+
+    // Reprendre le plus ancien bateau en attente
+    while (!etat.bateau_actif && etat.nb_en_attente > 0) {
+        Move prochain = etat.next_boat_to_do[0];
+        for (int i = 0; i < etat.nb_en_attente - 1; i++)
+            etat.next_boat_to_do[i] = etat.next_boat_to_do[i + 1];
+        etat.nb_en_attente--;
+
+        int code = grille_vue[prochain.coord.y][prochain.coord.x];
+        if (code <= 0) continue; // Verif si bateau deja coule 
+        etat.bateau_actif = true;
+        etat.actif_code = code;
+        etat.actif_longueur = prochain.longueur;
+
+        Coord coup;
+        if (choisir_orientation(coup, grille_vue, etat.actif_code))
+            return coup;
+        etat.bateau_actif = false;
+    }
     return coup_aleatoire(grille_vue);
 }
 
@@ -139,6 +159,20 @@ void mettre_a_jour_stats_ordi(
     if (resultat == COULE) {
         if (etat.bateau_actif && code == etat.actif_code)
             etat.bateau_actif = false;
+
+        // Un bateau coule ne doit plus rester dans la file.
+        for (int i = 0; i < etat.nb_en_attente; ) {
+            Coord position = etat.next_boat_to_do[i].coord;
+            int code_attente = grille_vue_ordi[position.y][position.x];
+            if (code_attente < 0) code_attente = -code_attente;
+            if (code_attente == code) {
+                for (int j = i; j < etat.nb_en_attente - 1; j++)
+                    etat.next_boat_to_do[j] = etat.next_boat_to_do[j + 1];
+                etat.nb_en_attente--;
+            } else {
+                i++;
+            }
+        }
         return;
     }
 
@@ -146,5 +180,19 @@ void mettre_a_jour_stats_ordi(
         etat.bateau_actif = true;
         etat.actif_code = code;
         etat.actif_longueur = (code == 20 || code == 21) ? 2 : code / 10;
+    } else if (code != etat.actif_code) {
+        // Ne jamais ajouter deux fois le meme.
+        bool deja_en_attente = false;
+        for (int i = 0; i < etat.nb_en_attente; i++) {
+            Coord position = etat.next_boat_to_do[i].coord;
+            if (grille_vue_ordi[position.y][position.x] == code) {
+                deja_en_attente = true;
+                break;
+            }
+        }
+        if (!deja_en_attente && etat.nb_en_attente < NB_BATEAUX) {
+            etat.next_boat_to_do[etat.nb_en_attente] = {coup, (code == 20 || code == 21) ? 2 : code / 10};
+            etat.nb_en_attente++;
+        }
     }
 }

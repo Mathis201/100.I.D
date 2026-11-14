@@ -31,7 +31,7 @@ void initialiser_partie() {
     }
     bateaux_ordi_coules = 0;
     bateaux_humain_coules = 0;
-    initialiser_ordinateur(etat_ordinateur);
+    initialiser_ordi(etat_ordinateur);
 }
 
 void afficher_grille(const int grille[taille_grille][taille_grille]) {
@@ -79,7 +79,7 @@ int main() {
     srand(time(0));
     initialiser_partie();
 
-    // Le placement utilise les ID 1 a 5 correspondant au longueurs 2,2,3,4,5.
+    // Le placement utilise les ID 1 a 5 correspondant aux longueurs 2,2,3,4,5.
     placer_bateau(grille_bateaux_ordi, &longueur_bateau[1], NB_BATEAUX);
     placer_bateau(grille_bateaux_humain, &longueur_bateau[1], NB_BATEAUX);
 
