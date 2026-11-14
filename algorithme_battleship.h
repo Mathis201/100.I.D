@@ -12,6 +12,11 @@ struct Coord {
     int y;
 };
 
+struct Move {
+    Coord coord;
+    int longueur;
+};
+
 struct EtatOrdi {
     int nb_de_coup;
     Resultat dernier_resultat;
@@ -19,9 +24,11 @@ struct EtatOrdi {
     bool bateau_actif;
     int actif_code;
     int actif_longueur;
+    Move next_boat_to_do[NB_BATEAUX];
+    int nb_en_attente;
 };
 
-void initialiser_ordinateur(EtatOrdi &etat);
+void initialiser_ordi(EtatOrdi &etat);
 bool coord_valide(Coord coup);
 bool case_inconnue(int x, int y,
                    const int grille_vue[taille_grille][taille_grille]);
