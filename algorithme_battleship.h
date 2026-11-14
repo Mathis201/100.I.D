@@ -12,7 +12,7 @@ struct Coord {
     int y;
 };
 
-struct Move {
+struct BateauEnAttente {
     Coord coord;
     int longueur;
 };
@@ -24,7 +24,7 @@ struct EtatOrdi {
     bool bateau_actif;
     int actif_code;
     int actif_longueur;
-    Move next_boat_to_do[NB_BATEAUX];
+    BateauEnAttente next_boat_to_do[NB_BATEAUX];
     int nb_en_attente;
 };
 

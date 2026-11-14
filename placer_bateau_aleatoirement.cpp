@@ -1,4 +1,3 @@
-// placer_bateau_aleatoirement.cpp
 #include <cstdlib>
 #include "placer_bateau_aleatoirement.h"
 
