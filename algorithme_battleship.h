@@ -7,24 +7,28 @@ const int NB_BATEAUX = 5;
 
 enum Resultat { RATE, TOUCHE, COULE };
 
+// choix du mode de l'algo
+enum ModeOrdi { ALEATOIRE, NORMAL, TRICHE };
+
 struct Coord {
     int x;
     int y;
 };
 
-struct BateauEnAttente {
+struct Move {
     Coord coord;
     int longueur;
 };
 
 struct EtatOrdi {
+    ModeOrdi mode;
     int nb_de_coup;
     Resultat dernier_resultat;
     Coord dernier_touche;
     bool bateau_actif;
     int actif_code;
     int actif_longueur;
-    BateauEnAttente next_boat_to_do[NB_BATEAUX];
+    Move next_boat_to_do[NB_BATEAUX];
     int nb_en_attente;
 };
 
@@ -37,11 +41,13 @@ bool choisir_orientation(Coord &coup,
                          const int grille_vue[taille_grille][taille_grille],
                          int actif_code);
 
-// Choisit le tir, sans acceder a la grille reelle avec la position des bateaux
+// choisit le tir en fonction du mode de jeu, seulement le mode triche utilise la grille reelle
 Coord effectuer_prochain_coup(
-    const int grille_vue[taille_grille][taille_grille], EtatOrdi &etat);
+    const int grille_vue[taille_grille][taille_grille],
+    const int grille_bateaux_adversaire[taille_grille][taille_grille],
+    EtatOrdi &etat);
 
-// Evalue et retourne le resulat d'un tir avec la grille reelle
+// evalue et retourne le resulat d'un tir avec la grille reelle
 Resultat evaluer_coup(
     Coord coup,
     const int grille_cible[taille_grille][taille_grille],

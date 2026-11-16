@@ -28,7 +28,8 @@ int main() {
 
     int bateaux_coules = 0;
     while (bateaux_coules < NB_BATEAUX) {
-        Coord coup = effectuer_prochain_coup(grille_vue_ordi, etat_ordinateur);
+        Coord coup = effectuer_prochain_coup(
+            grille_vue_ordi, grille_bateaux_humain, etat_ordinateur);
         if (!coord_valide(coup) || grille_vue_ordi[coup.y][coup.x] != 0) {
             cout << "Partie interrompue : aucun tir valide disponible.\n";
             break;

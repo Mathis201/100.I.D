@@ -3,8 +3,9 @@
 
 const int DX[4] = {0, 0, -1, 1}; // sert a calculer les coordonnees d'un deplacement (haut, bas, gauche, droite)
 const int DY[4] = {-1, 1, 0, 0};
-const int codes_bateaux[NB_BATEAUX + 1] = {0, 20, 21, 30, 40, 50}; // associe chaque ID de bateau a son code dans la grille de vue
+const int codes_bateaux[NB_BATEAUX + 1] = {0, 20, 21, 30, 40, 50}; // sert d'ID pour les bateaux
 void initialiser_ordi(EtatOrdi &etat) {
+    etat.mode = NORMAL;
     etat.nb_de_coup = 0;
     etat.dernier_resultat = RATE;
     etat.dernier_touche = {0, 0};
@@ -89,7 +90,7 @@ bool choisir_orientation(Coord &coup,
     return true;
 }
 
-Coord effectuer_prochain_coup(
+Coord coup_normal(
     const int grille_vue[taille_grille][taille_grille], EtatOrdi &etat) {
     if (etat.bateau_actif) {
         Coord coup;
@@ -98,15 +99,15 @@ Coord effectuer_prochain_coup(
         etat.bateau_actif = false;
     }
 
-    // Reprendre le plus ancien bateau en attente
+    // reprend le plus ancien bateau en attente
     while (!etat.bateau_actif && etat.nb_en_attente > 0) {
-        BateauEnAttente prochain = etat.next_boat_to_do[0];
+        Move prochain = etat.next_boat_to_do[0];
         for (int i = 0; i < etat.nb_en_attente - 1; i++)
             etat.next_boat_to_do[i] = etat.next_boat_to_do[i + 1];
         etat.nb_en_attente--;
 
         int code = grille_vue[prochain.coord.y][prochain.coord.x];
-        if (code <= 0) continue; // Verif si bateau deja coule 
+        if (code <= 0) continue; // verif si bateau deja coule
         etat.bateau_actif = true;
         etat.actif_code = code;
         etat.actif_longueur = prochain.longueur;
@@ -117,6 +118,25 @@ Coord effectuer_prochain_coup(
         etat.bateau_actif = false;
     }
     return coup_aleatoire(grille_vue);
+}
+
+Coord effectuer_prochain_coup(
+    const int grille_vue[taille_grille][taille_grille],
+    const int grille_bateaux_adversaire[taille_grille][taille_grille], // pour le mode triche seulement
+    EtatOrdi &etat) {
+    (void)grille_bateaux_adversaire; // temporaire en attendant implementation du mode triche
+    switch (etat.mode) {
+        case NORMAL:
+            return coup_normal(grille_vue, etat);
+
+        case ALEATOIRE:
+            return coup_aleatoire(grille_vue);
+
+        case TRICHE:
+            // A faire dans une fonction coup_triche. Va utiliser grille_bateaux_adversaire. Retourne une coord invalide pour l'instant 
+            return {-1, -1};
+    }
+    return {-1, -1};
 }
 
 Resultat evaluer_coup(
@@ -160,7 +180,7 @@ void mettre_a_jour_stats_ordi(
         if (etat.bateau_actif && code == etat.actif_code)
             etat.bateau_actif = false;
 
-        // Un bateau coule ne doit plus rester dans la file
+        // enlever un bateau coule de la liste
         for (int i = 0; i < etat.nb_en_attente; ) {
             Coord position = etat.next_boat_to_do[i].coord;
             int code_attente = grille_vue_ordi[position.y][position.x];
@@ -179,7 +199,7 @@ void mettre_a_jour_stats_ordi(
     if (!etat.bateau_actif) {
         etat.bateau_actif = true;
         etat.actif_code = code;
-        etat.actif_longueur = code / 10;
+        etat.actif_longueur = (code == 20 || code == 21) ? 2 : code / 10;
     } else if (code != etat.actif_code) {
         // Ne jamais ajouter deux fois le meme
         bool deja_en_attente = false;
