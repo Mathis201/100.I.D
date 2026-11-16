@@ -21,7 +21,7 @@ public:
     bool rotation = false; //false pour horizontal et true pour vertical
     array<array<int,8>,8> grid= {0}; //grille 8x8
     int boatNum = 0; //index du bateau a placer
-    int boatLength[5] = {2,2,3,4,5};
+    int boatLength[5] = {2,3,4,4,5};
 
 
 private slots:

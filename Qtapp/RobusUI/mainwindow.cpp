@@ -75,7 +75,7 @@ void MainWindow::checkBoat(){
 
         // PLace le bateau
         for (int i = 0; i < length; i++) {
-            grid[row + dRow * i][col + dCol * i] = boatNum;
+            grid[row + dRow * i][col + dCol * i] = length;
             ui->label_3->setText("Position sur le plateau, bateau #" + QString::number(length));
         }
 
@@ -90,6 +90,7 @@ void MainWindow::checkBoat(){
 void MainWindow::on_Suivant_clicked()
 {
     checkBoat();
+    ui->a1->setText("🟥");
 }
 
 void MainWindow::printGrid()
