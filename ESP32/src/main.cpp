@@ -12,9 +12,6 @@
 
 constexpr static int onboardDel = 2;
 
-constexpr static int serialPrintDelay = 250;
-static int lastTime = 0;
-
 static bool deviceConnected = false;
 
 // Setup callbacks onConnect and onDisconnect
@@ -56,7 +53,6 @@ void setup() {
 
     // put your setup code here, to run once:
     Serial.begin(9600);
-    Serial2.begin(9600);
 
     BLEDevice::init(ServerSettings::serverName);
     BLEServer *pServer = BLEDevice::createServer();
@@ -75,15 +71,8 @@ void setup() {
 
 void loop() {
     // put your main code here, to run repeatedly:
-    if ((millis() - lastTime) > serialPrintDelay) {
-        lastTime = millis();
-    }
-
     for (auto characteristic : characteristics) {
-        // if (characteristic->readAndUpdateData()) {
-        //         Serial.print(static_cast<int>(characteristic->getMessageID()));
-        //         Serial.print(" ");
-        //         Serial.println(characteristic->getData().c_str());
-        // }
+        if (characteristic->readAndUpdateData()) {
+        }
     }
 }
