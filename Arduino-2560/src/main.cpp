@@ -10,6 +10,9 @@ Date: Derniere date de modification
 Inclure les librairies de functions que vous voulez utiliser
 */
 #include <LibRobus.h>
+#include <../lib/Grille/Position/PID_follow_line.h>
+#include <../lib/Grille/Position/Position_Grille.h>
+
 
 #define OUTPUT_LED_PIN 53
 
@@ -21,21 +24,19 @@ Fonctions d'initialisation (setup)
 */
 void setup() {
     BoardInit();
-    Serial1.begin(BAUD_RATE_SERIAL0);
+    initLineSensor();    
 
-    // initialisation
-    pinMode(OUTPUT_LED_PIN, OUTPUT);
-    digitalWrite(OUTPUT_LED_PIN, 0);
 }
-
-/*
-Fonctions de boucle infinie
- -> Se fait appeler perpetuellement suite au "setup"
-*/
+// Fonctions de boucle infinie
+// //  -> Se fait appeler perpetuellement suite au "setup"
+// */
 void loop() {
-    if (Serial1.available() > 0) {
-        int newVal = Serial1.parseInt();
-        Serial.println(newVal);
-        digitalWrite(OUTPUT_LED_PIN, newVal);
+
+    if (ROBUS_IsBumper(REAR))
+    {
+        while (true)
+        {
+           Go_To_Position_XY(5, 3);
+        }
     }
 }

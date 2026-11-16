@@ -1,7 +1,9 @@
 #include "ble_setup.h"
+#include "serial_messaging/serial_manager.h"
 #include "services/game_info_service.h"
 #include "services/player_info_service.h"
 #include "services/robot_info_service.h"
+
 #include <Arduino.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -56,5 +58,10 @@ void loop() {
     // put your main code here, to run repeatedly:
     if ((millis() - lastTime) > serialPrintDelay) {
         lastTime = millis();
+    }
+
+    if (Serial.available() > 0) {
+        String read = Serial.readStringUntil('\n');
+        Serial.println(read);
     }
 }
