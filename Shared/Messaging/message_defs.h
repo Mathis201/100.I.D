@@ -1,0 +1,12 @@
+#pragma once
+
+enum class MessageID {
+    ALGORITHM_STRENGTH,
+    IS_GAME_OVER,
+    IS_PLAYER_TURN,
+    ROBOT_LAST_SHOT_COORDS,
+    ROBOT_LAST_SHOT_RESULT,
+    PLAYER_GRID,
+    PLAYER_LAST_SHOT_COORDS,
+    _COUNT
+};

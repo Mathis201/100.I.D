@@ -1,10 +1,12 @@
+#include "BluetoothCommunication/BLECharacteristicManager.h"
 #include "ble_setup.h"
-#include "serial_messaging/serial_manager.h"
+#include "data_management/serial_manager.h"
 #include "services/game_info_service.h"
 #include "services/player_info_service.h"
 #include "services/robot_info_service.h"
 
 #include <Arduino.h>
+#include <BLE2902.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 
@@ -33,8 +35,25 @@ class ServerCallbacks : public BLEServerCallbacks {
 
 static ServerCallbacks serverCallbacks{};
 static BLEServer *pServer;
+static BaseCharacteristicManager *characteristics[static_cast<int>(MessageID::_COUNT)];
+
+static BLECharacteristicManager<AlgorithmStrength> algorithmStrengthCharacteristic{MessageID::ALGORITHM_STRENGTH};
+static BLECharacteristicManager<bool> isGameOverCharacteristic{MessageID::IS_GAME_OVER};
+static BLECharacteristicManager<bool> isPlayerTurnCharacteristic{MessageID::IS_PLAYER_TURN};
+static BLECharacteristicManager<std::string> playerLastShotCoordsCharacteristic{MessageID::PLAYER_LAST_SHOT_COORDS};
+static BLECharacteristicManager<std::string> playerGridCharacteristic{MessageID::PLAYER_GRID};
+static BLECharacteristicManager<std::string> robotLastShotCoordsCharacteristic{MessageID::ROBOT_LAST_SHOT_COORDS};
+static BLECharacteristicManager<ShotResult> robotLastShotResultCharacteristic{MessageID::ROBOT_LAST_SHOT_RESULT};
 
 void setup() {
+    characteristics[static_cast<int>(MessageID::ALGORITHM_STRENGTH)] = &algorithmStrengthCharacteristic;
+    characteristics[static_cast<int>(MessageID::IS_GAME_OVER)] = &isGameOverCharacteristic;
+    characteristics[static_cast<int>(MessageID::IS_PLAYER_TURN)] = &isPlayerTurnCharacteristic;
+    characteristics[static_cast<int>(MessageID::PLAYER_LAST_SHOT_COORDS)] = &playerLastShotCoordsCharacteristic;
+    characteristics[static_cast<int>(MessageID::PLAYER_GRID)] = &playerGridCharacteristic;
+    characteristics[static_cast<int>(MessageID::ROBOT_LAST_SHOT_COORDS)] = &robotLastShotCoordsCharacteristic;
+    characteristics[static_cast<int>(MessageID::ROBOT_LAST_SHOT_RESULT)] = &robotLastShotResultCharacteristic;
+
     // put your setup code here, to run once:
     Serial.begin(9600);
     Serial2.begin(9600);
@@ -42,9 +61,9 @@ void setup() {
     BLEDevice::init(ServerSettings::serverName);
     BLEServer *pServer = BLEDevice::createServer();
 
-    setupGameInfoService(pServer);
-    setupPlayerInfoService(pServer);
-    setupRobotInfoService(pServer);
+    setupGameInfoService(pServer, algorithmStrengthCharacteristic, isGameOverCharacteristic, isPlayerTurnCharacteristic);
+    setupPlayerInfoService(pServer, playerGridCharacteristic, playerLastShotCoordsCharacteristic);
+    setupRobotInfoService(pServer, robotLastShotCoordsCharacteristic, robotLastShotResultCharacteristic);
 
     pServer->getAdvertising()->setMinInterval(ServerSettings::advertisingInterval);
     pServer->getAdvertising()->setMaxInterval(ServerSettings::advertisingInterval);
@@ -60,8 +79,11 @@ void loop() {
         lastTime = millis();
     }
 
-    if (Serial.available() > 0) {
-        String read = Serial.readStringUntil('\n');
-        Serial.println(read);
+    for (auto characteristic : characteristics) {
+        // if (characteristic->readAndUpdateData()) {
+        //         Serial.print(static_cast<int>(characteristic->getMessageID()));
+        //         Serial.print(" ");
+        //         Serial.println(characteristic->getData().c_str());
+        // }
     }
 }
