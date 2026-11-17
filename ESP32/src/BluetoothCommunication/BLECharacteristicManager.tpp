@@ -1,9 +1,9 @@
 #include "BLECharacteristic.h"
 #include "BLECharacteristicManager.h"
-#include "string_message_helper.h"
+#include "string_characteristic_helper.h"
 
 template <typename SendableType>
-BLECharacteristicManager<SendableType>::BLECharacteristicManager(MessageID messageID) {
+BLECharacteristicManager<SendableType>::BLECharacteristicManager(CharacteristicID messageID) {
     this->messageID = messageID;
 }
 
@@ -52,7 +52,7 @@ void inline BLECharacteristicManager<std::string>::setData(std::string stringRep
 }
 
 template <typename SendableType>
-MessageID BLECharacteristicManager<SendableType>::getMessageID() {
+CharacteristicID BLECharacteristicManager<SendableType>::getMessageID() {
     return this->messageID;
 }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "message_defs.h"
+#include "characteristic_ids.h"
 #include <BLECharacteristic.h>
 
 class BaseCharacteristicManager {
@@ -7,13 +7,13 @@ public:
     virtual bool readAndUpdateData() = 0;
     virtual std::string getData() = 0;
     virtual void setData(std::string stringRepresentation) = 0;
-    virtual MessageID getMessageID() = 0;
+    virtual CharacteristicID getMessageID() = 0;
 };
 
 template <typename SendableType>
 class BLECharacteristicManager : public BaseCharacteristicManager {
 public:
-    BLECharacteristicManager(MessageID messageID);
+    BLECharacteristicManager(CharacteristicID messageID);
 
     // reads the data from the bluetooth characteristic, returns true if there was a change
     bool readAndUpdateData() override;
@@ -24,7 +24,7 @@ public:
     // sets the new data value, writing to the bluetooth characteristic
     void setData(std::string stringRepresentation) override;
 
-    MessageID getMessageID();
+    CharacteristicID getMessageID();
 
     BLECharacteristic *getRawCharacteristic();
     void setCharacteristic(BLECharacteristic *characteristic);
@@ -32,7 +32,7 @@ public:
 private:
     SendableType data;
     BLECharacteristic *pCharacteristic;
-    MessageID messageID;
+    CharacteristicID messageID;
 };
 
 #include "BLECharacteristicManager.tpp"
