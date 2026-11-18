@@ -13,6 +13,8 @@ qt_add_executable(RobusUI
     mainwindow.ui
     devicehandler.h
     devicehandler.cpp
+    BoardWidget.h
+    BoardWidget.cpp
 
 
 )

@@ -1,6 +1,6 @@
 #include "DeviceHandler.h"
 #include <QDebug>
-#include "../../Shared/BluetoothDefinitions/ble_setup.h"
+#include "../../Shared/Messaging/ble_setup.h"
 
 static QBluetoothUuid toUuid(const std::string &s)
 {

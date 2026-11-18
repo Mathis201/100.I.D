@@ -22,6 +22,7 @@ public:
     int grid[8][8] = {0}; //grille 8x8
     int boatNum = 0; //index du bateau a placer
     int boatLength[5] = {2,3,4,4,5};
+    int m_nextBoatId = 1;
 
 
 private slots:
@@ -32,7 +33,7 @@ private slots:
 
     void printGrid();
 
-    std::string convertGrid(int grid[8][8]);
+    QString convertGrid(int grid[8][8]);
 
 private:
     Ui::MainWindow *ui;

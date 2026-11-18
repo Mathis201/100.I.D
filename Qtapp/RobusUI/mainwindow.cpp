@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "DeviceHandler.h"
 #include <QRegularExpression>
+#include "../../Shared/Messaging/ble_setup.h"
+#include "BoardWidget.h"
+
 using namespace std;
 
     MainWindow::MainWindow(QWidget *parent)
@@ -65,11 +69,17 @@ void MainWindow::checkBoat(){
             }
         }
 
+        const int boatId = m_nextBoatId++;
+
         // Place le bateau
         for (int i = 0; i < length; i++) {
-            grid[row + dRow * i][col + dCol * i] = length;
-            ui->label_3->setText("Position sur le plateau, bateau #" + QString::number(length));
+            int r = row + dRow * i;
+            int c = col + dCol * i;
+
+            grid[r][c] = length;                          // your game state (unchanged)
+            ui->myBoard->setShip(r, c, boatId); // display
         }
+        ui->label_3->setText("Position sur le plateau, bateau #" + QString::number(length));
 
         boatNum++; //on passe au prochain bateau
         printGrid();
@@ -82,7 +92,12 @@ void MainWindow::checkBoat(){
 void MainWindow::on_Suivant_clicked()
 {
     checkBoat();
-    ui->a1->setText("🟥");
+    if (boatNum >= 5){
+        m_bleHandler->writeValue(PlayerInfoService::UUID, PlayerInfoService::GridCharacteristic::UUID, convertGrid(grid).toUtf8());
+        ui->Invalide->setText("Tous les bateaux sont en place");
+        return;
+    }
+    ui->Pos->clear();
 }
 
 void MainWindow::printGrid()
@@ -102,9 +117,9 @@ void MainWindow::printGrid()
     qDebug().noquote() << convertGrid(grid);
 }
 
-string MainWindow::convertGrid(int grid[8][8]){
+QString MainWindow::convertGrid(int grid[8][8]){
 
-    string sgrid = "";
+    QString sgrid = "";
 
     for(int i = 0; i < 8; i++){
         for (int j=0; j < 8; j++){
