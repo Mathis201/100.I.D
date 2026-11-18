@@ -1,5 +1,11 @@
-#include "devicehandler.h"
+#include "DeviceHandler.h"
 #include <QDebug>
+#include "../../Shared/BluetoothDefinitions/ble_setup.h"
+
+static QBluetoothUuid toUuid(const std::string &s)
+{
+    return QBluetoothUuid(QString::fromStdString(s));
+}
 
 DeviceHandler::DeviceHandler(QObject *parent) : QObject(parent)
 {
@@ -22,20 +28,17 @@ void DeviceHandler::addDevice(const QBluetoothDeviceInfo &device)
 {
     qDebug() << "Discovered:" << device.name() << device.address().toString();
 
-    if (device.name().contains("ESP32")) {
+    if (device.name() == QString::fromStdString(ServerSettings::serverName)) {
         qDebug() << "Robus found" << device.name();
         m_discoveryAgent->stop();
 
-        // Création du contrôleur BLE
         m_control = QLowEnergyController::createCentral(device, this);
 
         connect(m_control, &QLowEnergyController::connected, this, [this]() {
-            qDebug() << "Connected to Robus. Searching for services ";
+            qDebug() << "Connected to Robus. Searching for services";
             m_control->discoverServices();
         });
 
-        connect(m_control, &QLowEnergyController::serviceDiscovered,
-                this, &DeviceHandler::serviceDiscovered);
         connect(m_control, &QLowEnergyController::discoveryFinished,
                 this, &DeviceHandler::serviceScanDone);
 
@@ -48,41 +51,74 @@ void DeviceHandler::scanFinished()
     qDebug() << "Scan done.";
 }
 
-void DeviceHandler::serviceDiscovered(const QBluetoothUuid &gatt)
-{
-    if (gatt == SERVICE_UUID) {
-        qDebug() << "Service found.";
-    }
-}
-
 void DeviceHandler::serviceScanDone()
 {
-    m_service = m_control->createServiceObject(SERVICE_UUID, this);
-    if (!m_service) {
-        qDebug() << "Service unavailable";
-        return;
-    }
+    const std::string uuids[] = {
+        GameInfoService::UUID,
+        PlayerInfoService::UUID,
+        RobotInfoService::UUID
+    };
 
-    connect(m_service, &QLowEnergyService::stateChanged, this, [this](QLowEnergyService::ServiceState state) {
-        if (state == QLowEnergyService::RemoteServiceDiscovered) {
-            m_characteristic = m_service->characteristic(CHAR_UUID);
-            qDebug() << "System ready";
+    m_pendingServices = 0;
+    for (const auto &u : uuids) {
+        QBluetoothUuid id = toUuid(u);
+        QLowEnergyService *svc = m_control->createServiceObject(id, this);
+        if (!svc) {
+            qDebug() << "Service unavailable:" << id;
+            continue;
         }
-    });
+        m_services.insert(id, svc);
+        ++m_pendingServices;
 
-    m_service->discoverDetails();
-}
+        connect(svc, &QLowEnergyService::stateChanged, this,
+                [this](QLowEnergyService::ServiceState s) {
+                    if (s == QLowEnergyService::RemoteServiceDiscovered && --m_pendingServices == 0)
+                        emit ready();
+                });
+        connect(svc, &QLowEnergyService::characteristicRead, this,
+                [this](const QLowEnergyCharacteristic &c, const QByteArray &v) {
+                    emit valueReceived(c.uuid(), v);
+                });
+        connect(svc, &QLowEnergyService::characteristicChanged, this,
+                [this](const QLowEnergyCharacteristic &c, const QByteArray &v) {
+                    emit valueReceived(c.uuid(), v);
+                });
 
-void DeviceHandler::sendButtonClicked(bool clicked)
-{
-    if (!m_service || !m_characteristic.isValid()) {
-        qDebug() << "Error, system not ready";
-        return;
+        svc->discoverDetails();
     }
-
-    QByteArray data;
-    data.append(clicked ? static_cast<char>(0x01) : static_cast<char>(0x00));
-
-    // Écriture de la valeur sur l'ESP32
-    m_service->writeCharacteristic(m_characteristic, data, QLowEnergyService::WriteWithResponse);
 }
+
+QLowEnergyCharacteristic DeviceHandler::findChar(const std::string &serviceUuid, const std::string &charUuid)
+{
+    QLowEnergyService *svc = m_services.value(toUuid(serviceUuid), nullptr);
+    if (!svc || svc->state() != QLowEnergyService::RemoteServiceDiscovered)
+        return QLowEnergyCharacteristic();
+    return svc->characteristic(toUuid(charUuid));
+}
+
+void DeviceHandler::writeValue(const std::string &serviceUuid, const std::string &charUuid, const QByteArray &data)
+{
+    QLowEnergyCharacteristic c = findChar(serviceUuid, charUuid);
+    if (!c.isValid()) { qDebug() << "Characteristic not ready"; return; }
+    m_services[toUuid(serviceUuid)]->writeCharacteristic(c, data, QLowEnergyService::WriteWithResponse);
+}
+
+void DeviceHandler::readValue(const std::string &serviceUuid, const std::string &charUuid)
+{
+    QLowEnergyCharacteristic c = findChar(serviceUuid, charUuid);
+    if (!c.isValid()) { qDebug() << "Characteristic not ready"; return; }
+    m_services[toUuid(serviceUuid)]->readCharacteristic(c);   // result arrives via valueReceived
+}
+
+void DeviceHandler::subscribe(const std::string &serviceUuid, const std::string &charUuid)
+{
+    QLowEnergyCharacteristic c = findChar(serviceUuid, charUuid);
+    if (!c.isValid()) return;
+    QLowEnergyDescriptor cccd = c.descriptor(QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
+    if (cccd.isValid())
+        m_services[toUuid(serviceUuid)]->writeDescriptor(cccd, QByteArray::fromHex("0100"));
+}
+
+
+
+

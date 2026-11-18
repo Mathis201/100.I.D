@@ -12,22 +12,27 @@ class DeviceHandler : public QObject
 public:
     explicit DeviceHandler(QObject *parent = nullptr);
     void startScan();
-    void sendButtonClicked(bool clicked);
+
+    void writeValue(const std::string &serviceUuid, const std::string &charUuid, const QByteArray &data);
+    void readValue(const std::string &serviceUuid, const std::string &charUuid);
+    void subscribe(const std::string &serviceUuid, const std::string &charUuid); // for notifications
+
+signals:
+    void ready();                                   // all services discovered
+    void valueReceived(const QBluetoothUuid &charUuid, const QByteArray &value);
 
 private slots:
     void addDevice(const QBluetoothDeviceInfo &device);
     void scanFinished();
-    void serviceDiscovered(const QBluetoothUuid &gatt);
     void serviceScanDone();
 
 private:
+    QLowEnergyCharacteristic findChar(const std::string &serviceUuid, const std::string &charUuid);
+
     QBluetoothDeviceDiscoveryAgent *m_discoveryAgent = nullptr;
     QLowEnergyController *m_control = nullptr;
-    QLowEnergyService *m_service = nullptr;
-    QLowEnergyCharacteristic m_characteristic;
-
-    const QBluetoothUuid SERVICE_UUID = QBluetoothUuid(QStringLiteral("37d5098d-a1bd-471e-8794-aae7bf8ed532"));
-    const QBluetoothUuid CHAR_UUID    = QBluetoothUuid(QStringLiteral("4ca76883-83e7-4c4e-a3da-b433e5e8fd2a"));
+    QHash<QBluetoothUuid, QLowEnergyService*> m_services;
+    int m_pendingServices = 0;
 };
 
 #endif // DEVICEHANDLER_H

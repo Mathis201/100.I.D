@@ -19,14 +19,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked(bool checked)
-{
-    // Transmet la valeur du bouton (true/false) à l'ESP32
-    if (m_bleHandler) {
-        m_bleHandler->sendButtonClicked(checked);
-    }
-}
-
 
 void MainWindow::on_Rotation_clicked()
 {
@@ -73,7 +65,7 @@ void MainWindow::checkBoat(){
             }
         }
 
-        // PLace le bateau
+        // Place le bateau
         for (int i = 0; i < length; i++) {
             grid[row + dRow * i][col + dCol * i] = length;
             ui->label_3->setText("Position sur le plateau, bateau #" + QString::number(length));
@@ -107,4 +99,40 @@ void MainWindow::printGrid()
         out += "\n";
     }
     qDebug().noquote() << out;
+    qDebug().noquote() << convertGrid(grid);
 }
+
+string MainWindow::convertGrid(int grid[8][8]){
+
+    string sgrid = "";
+
+    for(int i = 0; i < 8; i++){
+        for (int j=0; j < 8; j++){
+            sgrid += to_string(grid[i][j]);
+        }
+    }
+    return sgrid;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

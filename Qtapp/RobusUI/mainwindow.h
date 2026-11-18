@@ -19,19 +19,20 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     bool rotation = false; //false pour horizontal et true pour vertical
-    array<array<int,8>,8> grid= {0}; //grille 8x8
+    int grid[8][8] = {0}; //grille 8x8
     int boatNum = 0; //index du bateau a placer
     int boatLength[5] = {2,3,4,4,5};
 
 
 private slots:
-    void on_pushButton_clicked(bool checked);
     void checkBoat();
     void on_Rotation_clicked();
 
     void on_Suivant_clicked();
 
     void printGrid();
+
+    std::string convertGrid(int grid[8][8]);
 
 private:
     Ui::MainWindow *ui;
