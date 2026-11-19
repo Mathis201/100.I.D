@@ -1,6 +1,6 @@
-#include "BluetoothCommunication/BLECharacteristicManager.h"
-#include "BluetoothCommunication/characteristic_ids.h"
+#include "BLECharacteristicManager.h"
 #include "ble_setup.h"
+#include "characteristic_ids.h"
 #include "data_management/serial_manager.h"
 #include "services/game_info_service.h"
 #include "services/player_info_service.h"
@@ -53,6 +53,7 @@ void setup() {
     characteristics[static_cast<int>(CharacteristicID::ROBOT_LAST_SHOT_RESULT)] = &robotLastShotResultCharacteristic;
 
     Serial.begin(9600);
+    Serial2.begin(9600);
 
     BLEDevice::init(ServerSettings::serverName);
     BLEServer *pServer = BLEDevice::createServer();
@@ -66,15 +67,21 @@ void setup() {
     pServer->getAdvertising()->start();
     pServer->setCallbacks(&serverCallbacks);
 
-    initSerialManager();
+    initSerialManager(Serial);
 
     pinMode(onboardDel, OUTPUT);
+    digitalWrite(onboardDel, LOW);
 }
 
 void loop() {
     for (auto characteristic : characteristics) {
         if (characteristic->readAndUpdateData()) {
             requestSendMessage(characteristic->getData(), static_cast<SerialMessageID>(characteristic->getMessageID()));
+        }
+
+        std::optional<std::string> newMessage = getNewMessage(static_cast<SerialMessageID>(characteristic->getMessageID()));
+        if (newMessage.has_value()) {
+            characteristic->setData(newMessage.value());
         }
     }
 

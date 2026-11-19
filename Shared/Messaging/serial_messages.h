@@ -51,7 +51,13 @@ static SerialMessageContents parseStringToMessage(std::string serialString, bool
             return contents;
         }
 
-        contents.messageID = static_cast<SerialMessageID>(std::stoi(serialString.substr(1, idLength)));
+        int id = std::stoi(serialString.substr(1, idLength));
+        if (id < 0 || id >= static_cast<int>(SerialMessageID::_COUNT)) {
+            error = true;
+            return contents;
+        }
+
+        contents.messageID = static_cast<SerialMessageID>(id);
         contents.data = serialString.substr(2 + idLength);
         return contents;
     } catch (...) {
@@ -103,7 +109,7 @@ public:
         return receivedNewData;
     }
 
-    // get current message data
+    // get current message data and remove newData flag because was read
     std::string getData() {
         receivedNewData = false;
         return messageContents.data;
