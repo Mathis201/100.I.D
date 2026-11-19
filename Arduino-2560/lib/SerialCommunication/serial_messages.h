@@ -12,14 +12,15 @@ struct SerialMessageContents {
 inline SerialMessageContents parseStringToMessage(String serialString, bool &error) {
     SerialMessageContents contents;
     error = false;
+
+    if (serialString.length() >= 2 && serialString[1] == '#') {
+        serialString = serialString.substring(1);
+    }
+
     // serial message should always be at least 4 chars long and start with # followed by a digit
     if (serialString.length() < 4 || serialString[0] != '#' || !isdigit(serialString[1])) {
         error = true;
         return contents;
-    }
-
-    if (serialString[1] == '#') {
-        serialString = serialString.substring(1);
     }
 
     int idLength = -1;
