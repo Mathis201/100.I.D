@@ -10,6 +10,7 @@ class DeviceHandler : public QObject
 {
     Q_OBJECT
 public:
+    ~DeviceHandler();
     explicit DeviceHandler(QObject *parent = nullptr);
     void startScan();
 
