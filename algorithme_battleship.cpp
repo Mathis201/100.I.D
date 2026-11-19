@@ -5,7 +5,7 @@ const int DX[4] = {0, 0, -1, 1}; // sert a calculer les coordonnees d'un deplace
 const int DY[4] = {-1, 1, 0, 0};
 const int codes_bateaux[NB_BATEAUX + 1] = {0, 20, 21, 30, 40, 50}; // sert d'ID pour les bateaux
 void initialiser_ordi(EtatOrdi &etat) {
-    etat.mode = NORMAL;
+    etat.mode = TRICHE;
     etat.nb_de_coup = 0;
     etat.dernier_resultat = RATE;
     etat.dernier_touche = {0, 0};
@@ -120,6 +120,22 @@ Coord coup_normal(
     return coup_aleatoire(grille_vue);
 }
 
+Coord coup_triche(const int grille_vue[taille_grille][taille_grille], const int grille_bateaux_adversaire[taille_grille][taille_grille]){
+
+    for (int id = 1; id < NB_BATEAUX + 1; id++){
+
+        for (int y = 0; y < taille_grille; y++){
+            for (int x = 0; x < taille_grille; x++){
+
+                if (grille_bateaux_adversaire[y][x] == id && grille_vue[y][x] == 0){
+                    return {x,y};
+                }
+            }
+        }
+    }
+    return {-1, -1};
+}
+
 Coord effectuer_prochain_coup(
     const int grille_vue[taille_grille][taille_grille],
     const int grille_bateaux_adversaire[taille_grille][taille_grille], // pour le mode triche seulement
@@ -133,8 +149,7 @@ Coord effectuer_prochain_coup(
             return coup_aleatoire(grille_vue);
 
         case TRICHE:
-            // A faire dans une fonction coup_triche. Va utiliser grille_bateaux_adversaire. Retourne une coord invalide pour l'instant 
-            return {-1, -1};
+            return coup_triche(grille_vue, grille_bateaux_adversaire);
     }
     return {-1, -1};
 }
