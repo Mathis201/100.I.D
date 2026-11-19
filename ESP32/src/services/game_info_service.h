@@ -1,6 +1,6 @@
 #pragma once
+#include <BLECharacteristicManager.h>
 #include <BLEServer.h>
-#include <BluetoothCommunication/BLECharacteristicManager.h>
 
 void setupGameInfoService(BLEServer *pServer,
                           BLECharacteristicManager<AlgorithmStrength> &algorithmStrengthCharacteristic,

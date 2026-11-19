@@ -1,5 +1,5 @@
 #include "robot_info_service.h"
-#include "BluetoothCommunication/BLECharacteristicManager.h"
+#include "BLECharacteristicManager.h"
 #include "ble_setup.h"
 #include <BLE2902.h>
 #include <BLEServer.h>
