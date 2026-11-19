@@ -6,7 +6,7 @@
 #include <string>
 
 void setupRobotInfoService(BLEServer *pServer,
-                           BLECharacteristicManager<std::string> &lastShotCoordsCharacteristic,
+                           BLECharacteristicManager<String> &lastShotCoordsCharacteristic,
                            BLECharacteristicManager<ShotResult> &lastShotResultCharacteristic) {
     BLEService *pService = pServer->createService(RobotInfoService::UUID);
 
@@ -14,7 +14,7 @@ void setupRobotInfoService(BLEServer *pServer,
                                                                                   BLECharacteristic::PROPERTY_READ |
                                                                                       BLECharacteristic::PROPERTY_NOTIFY));
     lastShotCoordsCharacteristic.getRawCharacteristic()->addDescriptor(new BLE2902());
-    lastShotCoordsCharacteristic.setData("00");
+    lastShotCoordsCharacteristic.setData("A1");
 
     lastShotResultCharacteristic.setCharacteristic(pService->createCharacteristic(RobotInfoService::LastShotResultCharacteristic::UUID,
                                                                                   BLECharacteristic::PROPERTY_READ |

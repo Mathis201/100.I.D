@@ -3,5 +3,5 @@
 #include <BLEServer.h>
 
 void setupRobotInfoService(BLEServer *pServer,
-                           BLECharacteristicManager<std::string> &lastShotCoordsCharacteristic,
+                           BLECharacteristicManager<String> &lastShotCoordsCharacteristic,
                            BLECharacteristicManager<ShotResult> &lastShotResultCharacteristic);

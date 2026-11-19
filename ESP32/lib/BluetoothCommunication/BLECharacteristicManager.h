@@ -1,13 +1,14 @@
 #pragma once
+#include "Arduino.h"
 #include "characteristic_ids.h"
 #include <BLECharacteristic.h>
 
 class BaseCharacteristicManager {
 public:
     virtual bool readAndUpdateData() = 0;
-    virtual std::string getData() = 0;
-    virtual void setData(std::string stringRepresentation) = 0;
-    virtual CharacteristicID getMessageID() = 0;
+    virtual String getData() = 0;
+    virtual void setData(String stringRepresentation) = 0;
+    virtual CharacteristicID getCharacteristicID() = 0;
 };
 
 template <typename SendableType>
@@ -19,12 +20,12 @@ public:
     bool readAndUpdateData() override;
 
     // get the current data from the bluetooth characteristic
-    std::string getData() override;
+    String getData() override;
 
     // sets the new data value, writing to the bluetooth characteristic
-    void setData(std::string stringRepresentation) override;
+    void setData(String stringRepresentation) override;
 
-    CharacteristicID getMessageID();
+    CharacteristicID getCharacteristicID();
 
     BLECharacteristic *getRawCharacteristic();
     void setCharacteristic(BLECharacteristic *characteristic);
