@@ -14,8 +14,6 @@ enum RobotState {
     WAIT_FOR_NEXT_GAME
 };
 
-unsigned long testStateSwitchTime = 0;
-
 RobotState currentRobotState;
 
 void setup() {
@@ -33,8 +31,8 @@ void loop() {
 
     switch (currentRobotState) {
     case INITIAL_SETUP: {
-        requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
-        requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
+        // requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
+        // requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
         break;
     }
 
@@ -43,7 +41,7 @@ void loop() {
     }
 
     case WAIT_FOR_PLAYER_SHOT: {
-        requestSendMessage("0", SerialMessageID::IS_PLAYER_TURN);
+        // requestSendMessage("0", SerialMessageID::IS_PLAYER_TURN);
         break;
     }
 
@@ -57,14 +55,14 @@ void loop() {
     }
 
     case MANAGE_ROBOT_SHOT: {
-        requestSendMessage("G2", SerialMessageID::ROBOT_LAST_SHOT_COORDS);
-        requestSendMessage(String(static_cast<int>(ShotResult::SINK)), SerialMessageID::ROBOT_LAST_SHOT_RESULT);
-        requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
+        // requestSendMessage("G2", SerialMessageID::ROBOT_LAST_SHOT_COORDS);
+        // requestSendMessage(String(static_cast<int>(ShotResult::SINK)), SerialMessageID::ROBOT_LAST_SHOT_RESULT);
+        // requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
         break;
     }
 
     case GAME_OVER: {
-        requestSendMessage("1", SerialMessageID::IS_GAME_OVER);
+        // requestSendMessage("1", SerialMessageID::IS_GAME_OVER);
         break;
     }
 
@@ -74,14 +72,6 @@ void loop() {
 
     default:
         break;
-    }
-
-    if (currentRobotState != WAIT_FOR_NEXT_GAME) {
-        testStateSwitchTime = millis() + 2000;
-        while (millis() < testStateSwitchTime) {
-            updateSerialManager();
-        }
-        currentRobotState = static_cast<RobotState>(static_cast<int>(currentRobotState) + 1);
     }
 
     // if (ROBUS_IsBumper(REAR)) {
