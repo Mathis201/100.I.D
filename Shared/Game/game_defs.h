@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 enum class AlgorithmStrength : uint8_t {
     RANDOM,

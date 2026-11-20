@@ -13,6 +13,8 @@ inline SerialMessageContents parseStringToMessage(String serialString, bool &err
     SerialMessageContents contents;
     error = false;
 
+    serialString.trim();
+
     if (serialString.length() >= 2 && serialString[1] == '#') {
         serialString = serialString.substring(1);
     }
