@@ -34,7 +34,7 @@ private:
     double cellSize() const;
     QPoint cellAt(const QPoint &pos) const; // (col,row) or (-1,-1)
 
-    static constexpr int N = 10;
+    static constexpr int N = 8;
     Cell m_cells[N][N] = {};
     QVector<QPoint> m_preview;
     bool m_previewValid = true;

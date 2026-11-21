@@ -22,7 +22,7 @@ public:
     bool rotation = false; //false pour horizontal et true pour vertical
     int grid[8][8] = {0}; //grille 8x8
     int boatNum = 0; //index du bateau a placer
-    int boatLength[5] = {2,3,4,4,5};
+    int boatLength[5] = {2,2,3,4,5};
     int m_nextBoatId = 1;
     QStringList algolevels = (QStringList()<<""<<"Facile"<<"Normal"<<"Difficile");
     bool IsModeChosen = false;
@@ -36,10 +36,14 @@ private slots:
 
     void on_difAlgo_currentIndexChanged(int index);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     DeviceHandler *m_bleHandler = nullptr; // Instance du gestionnaire BLE
     PlayWindow *m_PlayWindow;
+    QVector<QPoint> boatCells(int row, int col, int dRow, int dCol, int length) const;
+    bool canPlace(const QVector<QPoint> &cells) const;
 
 };
 #endif // MAINWINDOW_H

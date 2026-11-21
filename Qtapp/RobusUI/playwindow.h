@@ -14,6 +14,7 @@ class PlayWindow : public QDialog
 public:
     explicit PlayWindow(QWidget *parent = nullptr);
     ~PlayWindow();
+    void loadBoats(const int grid[8][8], const int ids[8][8] = nullptr);
 
 private:
     Ui::PlayWindow *ui;
