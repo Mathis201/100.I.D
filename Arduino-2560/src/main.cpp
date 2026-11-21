@@ -1,3 +1,4 @@
+#include "game/game_manager.h"
 #include "game_defs.h"
 #include "serial_manager.h"
 #include <LibRobus.h>
@@ -19,11 +20,15 @@ RobotState currentRobotState;
 void setup() {
     BoardInit();
     Serial2.begin(9600);
+    srand(analogRead(A0));
 
     initLineSensor();
     initSerialManager(Serial2);
 
     currentRobotState = INITIAL_SETUP;
+
+    // leave time for ESP32 to boot and start server
+    delay(2000);
 }
 
 void loop() {
@@ -31,8 +36,9 @@ void loop() {
 
     switch (currentRobotState) {
     case INITIAL_SETUP: {
-        // requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
-        // requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
+        resetGameManager();
+        requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
+        requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
         break;
     }
 
