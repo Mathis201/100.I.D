@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-MinSizeRel-b716b2339214bedd3775.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "MinSizeRel",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "RobusUI",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "RobusUI::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RobusUI-MinSizeRel-edab1a15eaf8229a17c5.json",
+					"name" : "RobusUI",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RobusUI_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RobusUI_autogen-MinSizeRel-1d2193dd9b225b1ea7f5.json",
+					"name" : "RobusUI_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RobusUI_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RobusUI_autogen_timestamp_deps-MinSizeRel-7b3b722b713c88596920.json",
+					"name" : "RobusUI_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Uni/S1/Projet/Qtapp/RobusUI/build/Qt_6_9_0_MinGW_64_bit_temporary-MinSizeRel",
+		"source" : "C:/Uni/S1/Projet/Qtapp/RobusUI"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

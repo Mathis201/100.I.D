@@ -1,32 +1,31 @@
 #include "game_info_service.h"
+#include "BLECharacteristicManager.h"
 #include "ble_setup.h"
-#include "serial_messaging/serial_manager.h"
 #include <BLE2902.h>
 #include <BLEServer.h>
 
-static BLECharacteristic *pAlgorithmStrengthCharacteristic;
-static BLECharacteristic *pIsGameOverCharacteristic;
-static BLECharacteristic *pIsPlayerTurnCharacteristic;
-
-void setupGameInfoService(BLEServer *pServer) {
+void setupGameInfoService(BLEServer *pServer,
+                          BLECharacteristicManager<AlgorithmStrength> &algorithmStrengthCharacteristic,
+                          BLECharacteristicManager<bool> &isGameOverCharacteristic,
+                          BLECharacteristicManager<bool> &isPlayerTurnCharacteristic) {
     BLEService *pService = pServer->createService(GameInfoService::UUID);
 
-    pAlgorithmStrengthCharacteristic = pService->createCharacteristic(GameInfoService::AlgorithmStrengthCharacteristic::UUID,
-                                                                      BLECharacteristic::PROPERTY_READ |
-                                                                          BLECharacteristic::PROPERTY_WRITE);
-    pAlgorithmStrengthCharacteristic->setValue((uint8_t *)&SerialDataGameInfo::algorithmStrength, sizeof(SerialDataGameInfo::algorithmStrength));
+    algorithmStrengthCharacteristic.setCharacteristic(pService->createCharacteristic(GameInfoService::AlgorithmStrengthCharacteristic::UUID,
+                                                                                     BLECharacteristic::PROPERTY_READ |
+                                                                                         BLECharacteristic::PROPERTY_WRITE));
+    algorithmStrengthCharacteristic.setData("0");
 
-    pIsGameOverCharacteristic = pService->createCharacteristic(GameInfoService::IsGameOverCharacteristic::UUID,
-                                                               BLECharacteristic::PROPERTY_READ |
-                                                                   BLECharacteristic::PROPERTY_NOTIFY);
-    pIsGameOverCharacteristic->setValue((uint8_t *)&SerialDataGameInfo::gameOver, sizeof(SerialDataGameInfo::gameOver));
-    pIsGameOverCharacteristic->addDescriptor(new BLE2902());
+    isGameOverCharacteristic.setCharacteristic(pService->createCharacteristic(GameInfoService::IsGameOverCharacteristic::UUID,
+                                                                              BLECharacteristic::PROPERTY_READ |
+                                                                                  BLECharacteristic::PROPERTY_NOTIFY));
+    isGameOverCharacteristic.getRawCharacteristic()->addDescriptor(new BLE2902());
+    isGameOverCharacteristic.setData("0");
 
-    pIsPlayerTurnCharacteristic = pService->createCharacteristic(GameInfoService::IsPlayerTurnCharacteristic::UUID,
-                                                                 BLECharacteristic::PROPERTY_READ |
-                                                                     BLECharacteristic::PROPERTY_NOTIFY);
-    pIsPlayerTurnCharacteristic->setValue((uint8_t *)&SerialDataGameInfo::isPlayerTurn, sizeof(SerialDataGameInfo::isPlayerTurn));
-    pIsPlayerTurnCharacteristic->addDescriptor(new BLE2902());
+    isPlayerTurnCharacteristic.setCharacteristic(pService->createCharacteristic(GameInfoService::IsPlayerTurnCharacteristic::UUID,
+                                                                                BLECharacteristic::PROPERTY_READ |
+                                                                                    BLECharacteristic::PROPERTY_NOTIFY));
+    isPlayerTurnCharacteristic.getRawCharacteristic()->addDescriptor(new BLE2902());
+    isPlayerTurnCharacteristic.setData("0");
 
     pService->start();
     pServer->getAdvertising()->addServiceUUID(GameInfoService::UUID);
