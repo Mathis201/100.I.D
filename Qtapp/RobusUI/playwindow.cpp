@@ -10,8 +10,6 @@ PlayWindow::PlayWindow(QWidget *parent)
     ui->setupUi(this);
     ui->myBoard->setShip(1, 1, 1);
 
-<<<<<<< Updated upstream
-=======
     //copie du .h
     /*enum states {
         playerTurn,

@@ -18,15 +18,13 @@ public:
 
 private:
     Ui::PlayWindow *ui;
-<<<<<<< Updated upstream
-=======
+
     enum states {
         playerTurn,
         robusTurn,
         gameFinished
     };
     states state = playerTurn;
->>>>>>> Stashed changes
 };
 
 #endif // PLAYWINDOW_H
