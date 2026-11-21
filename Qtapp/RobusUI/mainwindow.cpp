@@ -12,7 +12,7 @@ using namespace std;
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    m_PlayWindow = new PlayWindow(this);
+    m_PlayWindow = new PlayWindow(m_bleHandler);
     m_bleHandler = new DeviceHandler(this);
     m_bleHandler->startScan();
     ui->difAlgo->addItems(algolevels);

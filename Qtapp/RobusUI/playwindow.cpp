@@ -2,13 +2,14 @@
 #include "ui_playwindow.h"
 #include "mainwindow.h"
 #include "BoardWidget.h"
+#include <qregularexpression.h>
+#include "DeviceHandler.h"
+#include "../../Shared/Messaging/ble_setup.h"
 
-PlayWindow::PlayWindow(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::PlayWindow)
+PlayWindow::PlayWindow(DeviceHandler *ble, QWidget *parent)
+    : QDialog(parent), ui(new Ui::PlayWindow), m_bleHandler(ble)
 {
     ui->setupUi(this);
-    ui->myBoard->setShip(1, 1, 1);
 
     //copie du .h
     /*enum states {
@@ -28,8 +29,6 @@ PlayWindow::PlayWindow(QWidget *parent)
     case gameFinished:
         break;
     }
-
->>>>>>> Stashed changes
 }
 
 PlayWindow::~PlayWindow()
@@ -37,8 +36,7 @@ PlayWindow::~PlayWindow()
     delete ui;
 }
 
-// GameWindow.cpp
-void PlayWindow::loadBoats(const int grid[8][8], const int ids[8][8])
+void PlayWindow::loadBoats(const int grid[8][8])
 {
     ui->myBoard->clear();
 
@@ -47,3 +45,23 @@ void PlayWindow::loadBoats(const int grid[8][8], const int ids[8][8])
             if (grid[r][c] > 0)
                 ui->myBoard->setShip(r, c, grid[r][c]);   // the value is the boat ID
 }
+
+void PlayWindow::on_attaquer_clicked()
+{
+    if (!m_bleHandler) {
+        qDebug() << "m_bleHandler is NULL";
+        return;
+    }
+    QString coords = ui->attaqueCoords->toPlainText().trimmed();
+    static const QRegularExpression coordRegex("^[a-hA-H][1-8]$");
+
+    if (coordRegex.match(coords).hasMatch()) {
+        ui->Invalide->setText("");
+        m_bleHandler->writeValue(PlayerInfoService::UUID, PlayerInfoService::LastShotCoordsCharacteristic::UUID, coords.toUtf8());
+        state = robusTurn;
+    }
+    else {
+        ui->Invalide->setText("Entrée invalide");
+    }
+}
+
