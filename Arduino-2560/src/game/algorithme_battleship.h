@@ -12,16 +12,12 @@ struct Coord {
 
 struct Move {
     Coord coord;
-    int longueur;
 };
 
 struct EtatOrdi {
     int nb_de_coup;
-    ShotResult dernier_resultat;
-    Coord dernier_touche;
     bool bateau_actif;
     int actif_code;
-    int actif_longueur;
     Move next_boat_to_do[NB_BATEAUX];
     int nb_en_attente;
 };
@@ -46,8 +42,7 @@ Coord effectuer_prochain_coup(
 ShotResult evaluer_coup(
     Coord coup,
     const int grille_cible[kGridSize][kGridSize],
-    int grille_vue_tireur[kGridSize][kGridSize],
-    int restantes_cible[NB_BATEAUX + 1]);
+    int grille_vue_tireur[kGridSize][kGridSize]);
 
 void mettre_a_jour_stats_ordi(
     Coord coup, ShotResult resultat,

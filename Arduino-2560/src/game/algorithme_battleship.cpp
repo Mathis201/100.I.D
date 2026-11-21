@@ -7,11 +7,8 @@ const int codes_bateaux[NB_BATEAUX + 1] = {0, 20, 21, 30, 40, 50}; // sert d'ID 
 
 void initialiser_ordi(EtatOrdi &etat) {
     etat.nb_de_coup = 0;
-    etat.dernier_resultat = ShotResult::MISS;
-    etat.dernier_touche = {0, 0};
     etat.bateau_actif = false;
     etat.actif_code = 0;
-    etat.actif_longueur = 0;
     etat.nb_en_attente = 0;
 }
 
@@ -119,7 +116,6 @@ Coord coup_normal(
             continue; // verif si bateau deja coule
         etat.bateau_actif = true;
         etat.actif_code = code;
-        etat.actif_longueur = prochain.longueur;
 
         Coord coup;
         if (choisir_orientation(coup, grille_vue, etat.actif_code))
@@ -205,11 +201,9 @@ void mettre_a_jour_stats_ordi(
     const int grille_vue_ordi[kGridSize][kGridSize],
     EtatOrdi &etat) {
     etat.nb_de_coup++;
-    etat.dernier_resultat = resultat;
     if (resultat == ShotResult::MISS)
         return;
 
-    etat.dernier_touche = coup;
     int code = grille_vue_ordi[coup.y][coup.x];
     if (code < 0)
         code = -code;
@@ -238,7 +232,7 @@ void mettre_a_jour_stats_ordi(
     if (!etat.bateau_actif) {
         etat.bateau_actif = true;
         etat.actif_code = code;
-        etat.actif_longueur = (code == 20 || code == 21) ? 2 : code / 10;
+        etat.next_boat_to_do[etat.nb_en_attente] = {coup};
     } else if (code != etat.actif_code) {
         // Ne jamais ajouter deux fois le meme
         bool deja_en_attente = false;
@@ -250,7 +244,7 @@ void mettre_a_jour_stats_ordi(
             }
         }
         if (!deja_en_attente && etat.nb_en_attente < NB_BATEAUX) {
-            etat.next_boat_to_do[etat.nb_en_attente] = {coup, (code == 20 || code == 21) ? 2 : code / 10};
+            etat.next_boat_to_do[etat.nb_en_attente] = {coup};
             etat.nb_en_attente++;
         }
     }
