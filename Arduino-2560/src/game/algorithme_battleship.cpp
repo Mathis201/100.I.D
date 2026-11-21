@@ -165,29 +165,38 @@ Coord effectuer_prochain_coup(
     return {-1, -1};
 }
 
+
 ShotResult evaluer_coup(
     Coord coup,
     const int grille_cible[kGridSize][kGridSize],
-    int grille_vue_tireur[kGridSize][kGridSize],
-    int restantes_cible[NB_BATEAUX + 1]) {
+    int grille_vue_tireur[kGridSize][kGridSize])
+{
     int id = grille_cible[coup.y][coup.x];
+
     if (id == 0) {
         grille_vue_tireur[coup.y][coup.x] = -1;
         return ShotResult::MISS;
     }
 
-    restantes_cible[id]--;
     int code = codes_bateaux[id];
     grille_vue_tireur[coup.y][coup.x] = code;
-    if (restantes_cible[id] > 0)
-        return ShotResult::HIT;
 
     for (int y = 0; y < kGridSize; y++) {
         for (int x = 0; x < kGridSize; x++) {
-            if (grille_vue_tireur[y][x] == code)
-                grille_vue_tireur[y][x] = -code;
+            if (grille_cible[y][x] == id && grille_vue_tireur[y][x] == 0) {
+                return ShotResult::HIT;
+            }
         }
     }
+
+    for (int y = 0; y < kGridSize; y++) {
+        for (int x = 0; x < kGridSize; x++) {
+            if (grille_vue_tireur[y][x] == code) {
+                grille_vue_tireur[y][x] = -code;
+            }
+        }
+    }
+
     return ShotResult::SINK;
 }
 
