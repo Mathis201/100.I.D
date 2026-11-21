@@ -1,13 +1,13 @@
 #include "BLECharacteristicManager.h"
 #include "ble_setup.h"
 #include "characteristic_ids.h"
-#include "data_management/serial_manager.h"
+#include "serial_manager.h"
 #include "services/game_info_service.h"
 #include "services/player_info_service.h"
 #include "services/robot_info_service.h"
+#include "string_convert_test.h"
 
 #include <Arduino.h>
-#include <BLE2902.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 
@@ -20,14 +20,14 @@ class ServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer *pServer) {
         deviceConnected = true;
         digitalWrite(onboardDel, true);
-        requestSendMessage(std::to_string(1), SerialMessageID::BLUETOOTH_CONNECTED);
+        requestSendMessage(String(1), SerialMessageID::IS_BLUETOOTH_CONNECTED);
     };
     void onDisconnect(BLEServer *pServer) {
         deviceConnected = false;
         digitalWrite(onboardDel, false);
         pServer->getAdvertising()->stop();
         pServer->getAdvertising()->start();
-        requestSendMessage(std::to_string(0), SerialMessageID::BLUETOOTH_CONNECTED);
+        requestSendMessage(String(0), SerialMessageID::IS_BLUETOOTH_CONNECTED);
     }
 };
 
@@ -38,9 +38,9 @@ static BaseCharacteristicManager *characteristics[static_cast<int>(kCharacterist
 static BLECharacteristicManager<AlgorithmStrength> algorithmStrengthCharacteristic{CharacteristicID::ALGORITHM_STRENGTH};
 static BLECharacteristicManager<bool> isGameOverCharacteristic{CharacteristicID::IS_GAME_OVER};
 static BLECharacteristicManager<bool> isPlayerTurnCharacteristic{CharacteristicID::IS_PLAYER_TURN};
-static BLECharacteristicManager<std::string> playerLastShotCoordsCharacteristic{CharacteristicID::PLAYER_LAST_SHOT_COORDS};
-static BLECharacteristicManager<std::string> playerGridCharacteristic{CharacteristicID::PLAYER_GRID};
-static BLECharacteristicManager<std::string> robotLastShotCoordsCharacteristic{CharacteristicID::ROBOT_LAST_SHOT_COORDS};
+static BLECharacteristicManager<String> playerLastShotCoordsCharacteristic{CharacteristicID::PLAYER_LAST_SHOT_COORDS};
+static BLECharacteristicManager<String> playerGridCharacteristic{CharacteristicID::PLAYER_GRID};
+static BLECharacteristicManager<String> robotLastShotCoordsCharacteristic{CharacteristicID::ROBOT_LAST_SHOT_COORDS};
 static BLECharacteristicManager<ShotResult> robotLastShotResultCharacteristic{CharacteristicID::ROBOT_LAST_SHOT_RESULT};
 
 void setup() {
@@ -67,21 +67,24 @@ void setup() {
     pServer->getAdvertising()->start();
     pServer->setCallbacks(&serverCallbacks);
 
-    initSerialManager(Serial);
+    initSerialManager(Serial2);
 
     pinMode(onboardDel, OUTPUT);
     digitalWrite(onboardDel, LOW);
+
+    runStringToDataTests();
 }
 
 void loop() {
     for (auto characteristic : characteristics) {
         if (characteristic->readAndUpdateData()) {
-            requestSendMessage(characteristic->getData(), static_cast<SerialMessageID>(characteristic->getMessageID()));
+            requestSendMessage(characteristic->getData(), static_cast<SerialMessageID>(characteristic->getCharacteristicID()));
         }
 
-        std::optional<std::string> newMessage = getNewMessage(static_cast<SerialMessageID>(characteristic->getMessageID()));
-        if (newMessage.has_value()) {
-            characteristic->setData(newMessage.value());
+        bool isNewMessage;
+        String newMessage = getMessage(static_cast<SerialMessageID>(characteristic->getCharacteristicID()), isNewMessage);
+        if (isNewMessage) {
+            characteristic->setData(newMessage);
         }
     }
 

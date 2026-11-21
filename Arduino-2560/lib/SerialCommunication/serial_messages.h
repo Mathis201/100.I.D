@@ -1,69 +1,64 @@
 #pragma once
-#include <string>
+#include "serial_message_id.h"
 
 // sample serial message: "#3-A4"
 constexpr int messageRepetitionCount = 3;
 
-enum class SerialMessageID {
-    ALGORITHM_STRENGTH,
-    IS_GAME_OVER,
-    IS_PLAYER_TURN,
-    ROBOT_LAST_SHOT_COORDS,
-    ROBOT_LAST_SHOT_RESULT,
-    PLAYER_GRID,
-    PLAYER_LAST_SHOT_COORDS,
-    BLUETOOTH_CONNECTED,
-    _COUNT,
-    UNKNOWN
-};
-
 struct SerialMessageContents {
     SerialMessageID messageID;
-    std::string data;
+    String data;
 };
 
-static SerialMessageContents parseStringToMessage(std::string serialString, bool &error) {
+inline SerialMessageContents parseStringToMessage(String serialString, bool &error) {
     SerialMessageContents contents;
     error = false;
+
+    serialString.trim();
+
+    if (serialString.length() >= 2 && serialString[1] == '#') {
+        serialString = serialString.substring(1);
+    }
+
     // serial message should always be at least 4 chars long and start with # followed by a digit
     if (serialString.length() < 4 || serialString[0] != '#' || !isdigit(serialString[1])) {
         error = true;
         return contents;
     }
 
-    try {
-        int idLength = -1;
-        // find where the dash is, delimits id vs message
-        for (int i = 2; i < serialString.length(); i++) {
-            if (serialString[i] == '-') {
-                // if found dash, register length and quit
-                idLength = i - 1;
-                break;
-            } else if (!isdigit(serialString[i])) {
-                // if found something other than a digit before finding dash, error
-                error = true;
-                return contents;
-            }
-        }
-
-        if (idLength == -1) {
+    int idLength = -1;
+    // find where the dash is, delimits id vs message
+    for (unsigned int i = 2; i < serialString.length(); i++) {
+        if (serialString[i] == '-') {
+            // if found dash, register length and quit
+            idLength = i;
+            break;
+        } else if (!isdigit(serialString[i])) {
+            // if found something other than a digit before finding dash, error
             error = true;
             return contents;
         }
+    }
 
-        int id = std::stoi(serialString.substr(1, idLength));
-        if (id < 0 || id >= static_cast<int>(SerialMessageID::_COUNT)) {
-            error = true;
-            return contents;
-        }
-
-        contents.messageID = static_cast<SerialMessageID>(id);
-        contents.data = serialString.substr(2 + idLength);
-        return contents;
-    } catch (...) {
+    if (idLength == -1) {
         error = true;
         return contents;
     }
+
+    int id = serialString.substring(1, idLength).toInt();
+    if (id < 0 || id >= static_cast<int>(SerialMessageID::_COUNT)) {
+        error = true;
+        return contents;
+    }
+
+    String receivedData = serialString.substring(1 + idLength);
+    if (receivedData.length() == 0) {
+        error = true;
+        return contents;
+    }
+
+    contents.messageID = static_cast<SerialMessageID>(id);
+    contents.data = receivedData;
+    return contents;
 }
 
 class SerialMessage {
@@ -89,13 +84,13 @@ public:
     }
 
     // get formatted message to send via serial
-    std::string getMessageForSend() {
+    String getMessageForSend() {
         countLeftToSend--;
-        return "#" + std::to_string(static_cast<int>(messageContents.messageID)) + "-" + messageContents.data;
+        return String("##") + static_cast<int>(messageContents.messageID) + "-" + messageContents.data;
     }
 
     // sets the data for the message, can set the received data flag if want to signify this is new data
-    void setData(std::string data, bool receivedData) {
+    void setData(String data, bool receivedData) {
         if (messageContents.data != data) {
             messageContents.data = data;
             if (receivedData) {
@@ -110,7 +105,7 @@ public:
     }
 
     // get current message data and remove newData flag because was read
-    std::string getData() {
+    String getData() {
         receivedNewData = false;
         return messageContents.data;
     }

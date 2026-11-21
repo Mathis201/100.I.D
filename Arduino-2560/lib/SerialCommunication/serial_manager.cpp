@@ -1,7 +1,6 @@
 #include "serial_manager.h"
 #include "Arduino.h"
 #include "serial_messages.h"
-#include <string>
 
 static constexpr int kSerialPrintDelay = 100;
 
@@ -19,22 +18,20 @@ void initSerialManager(HardwareSerial &serial) {
     }
 }
 
-void requestSendMessage(std::string data, SerialMessageID messageID) {
+void requestSendMessage(String data, SerialMessageID messageID) {
     messages[static_cast<int>(messageID)].setData(data, false);
     messages[static_cast<int>(messageID)].resetSendCount();
 }
 
-std::optional<std::string> getNewMessage(SerialMessageID messageID) {
-    if (messages[static_cast<int>(messageID)].hasReceivedNewData()) {
-        return messages[static_cast<int>(messageID)].getData();
-    }
-    return {};
+String getMessage(SerialMessageID messageID, bool &isNewMessage) {
+    isNewMessage = messages[static_cast<int>(messageID)].hasReceivedNewData();
+    return messages[static_cast<int>(messageID)].getData();
 }
 
 void updateSerialManager() {
     while (usedSerial->available() > 0) {
-        std::string read = std::string(usedSerial->readStringUntil('\n').c_str());
-        Serial.println(("DEBUG Received message: " + read).c_str());
+        String read = usedSerial->readStringUntil('\n').c_str();
+        Serial.println("DEBUG Received message: " + read);
 
         bool error;
         SerialMessageContents messageContents = parseStringToMessage(read, error);
@@ -42,20 +39,19 @@ void updateSerialManager() {
             Serial.println("DEBUG Unable to parse message");
         } else {
             messages[static_cast<int>(messageContents.messageID)].setData(messageContents.data, true);
-            Serial.println((std::string("DEBUG Parsed message to id: ") +
-                            std::to_string(static_cast<int>(messageContents.messageID)) +
-                            " with data: " +
-                            messageContents.data)
-                               .c_str());
+            Serial.println(String("DEBUG Parsed message to id: ") +
+                           static_cast<int>(messageContents.messageID) +
+                           " with data: " +
+                           messageContents.data);
         }
     }
 
     if (millis() > printTargetTime) {
         for (int i = 0; i < static_cast<int>(SerialMessageID::_COUNT); i++) {
             if (messages[i].hasMessageToSend()) {
-                std::string message = messages[i].getMessageForSend();
-                usedSerial->println(message.c_str());
-                Serial.println(("DEBUG Sent message: " + message).c_str());
+                String message = messages[i].getMessageForSend();
+                usedSerial->println(message);
+                Serial.println("DEBUG Sent message: " + message);
             }
         }
 
