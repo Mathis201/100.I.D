@@ -6,7 +6,7 @@
 
 enum RobotState {
     INITIAL_SETUP,
-    WAIT_FOR_BOATS_AND_ALGORITHM,
+    WAIT_FOR_GRID_AND_ALGORITHM,
     WAIT_FOR_PLAYER_SHOT,
     MOVE_TO_PLAYER_SHOT,
     REGISTER_PLAYER_SHOT,
@@ -16,6 +16,9 @@ enum RobotState {
 };
 
 RobotState currentRobotState;
+
+bool receivedGrid;
+bool receivedAlgorithmStrength;
 
 void setup() {
     BoardInit();
@@ -37,12 +40,24 @@ void loop() {
     switch (currentRobotState) {
     case INITIAL_SETUP: {
         resetGameManager();
+        receivedGrid = false;
+        receivedAlgorithmStrength = false;
+
         requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
         requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
         break;
     }
 
-    case WAIT_FOR_BOATS_AND_ALGORITHM: {
+    case WAIT_FOR_GRID_AND_ALGORITHM: {
+        bool isNewMessage;
+        String receivedAlgorithm = getMessage(SerialMessageID::ALGORITHM_STRENGTH, isNewMessage);
+        if (isNewMessage) {
+        }
+
+        String receivedGrid = getMessage(SerialMessageID::PLAYER_GRID, isNewMessage);
+        if (isNewMessage) {
+        }
+
         break;
     }
 

@@ -1,20 +1,16 @@
-#include <LibRobus.h>
-#include <Arduino.h>
 #include "PID_follow_line.h"
+#include <Arduino.h>
+#include <LibRobus.h>
 
 #define LINE_SENSOR_LEFT_PIN A7
-#define LINE_SENSOR_MIDDLE_PIN A6 
+#define LINE_SENSOR_MIDDLE_PIN A6
 #define LINE_SENSOR_RIGHT_PIN A5
-
-
 
 void initLineSensor() {
     pinMode(LINE_SENSOR_LEFT_PIN, INPUT);
     pinMode(LINE_SENSOR_MIDDLE_PIN, INPUT);
     pinMode(LINE_SENSOR_RIGHT_PIN, INPUT);
 }
-
-
 
 Capteurs Binary_Conversion(int ton) {
 
@@ -38,31 +34,23 @@ Capteurs Binary_Conversion(int ton) {
     int Dif_Middle = V_Middle - Bleu_Middle;
     int Dif_Right = V_Right - Bleu_Right;
 
-
-
-    if (ton == white)
-    {
+    if (ton == white) {
         Valeurs.C_Left = constrain((Dif_Left) / (Bleu_Left - Blanc_Left), -1, 0);
         Valeurs.C_Middle = constrain((Dif_Middle) / (Bleu_Middle - Blanc_Middle), -1, 0);
         Valeurs.C_Right = constrain((Dif_Right) / (Bleu_Right - Blanc_Right), -1, 0);
     }
 
-    if (ton == black)
-    {
-        Valeurs.C_Left = constrain((Dif_Left) / (Noir_Left-Bleu_Left), 0, 1);
+    if (ton == black) {
+        Valeurs.C_Left = constrain((Dif_Left) / (Noir_Left - Bleu_Left), 0, 1);
         Valeurs.C_Middle = constrain((Dif_Middle) / (Noir_Middle - Bleu_Middle), 0, 1);
-        Valeurs.C_Right = constrain((Dif_Right) / (Noir_Right-Bleu_Right), 0, 1);
+        Valeurs.C_Right = constrain((Dif_Right) / (Noir_Right - Bleu_Right), 0, 1);
     }
 
     return Valeurs;
 }
 
-
 //_______________________________________________________________________________________________________________________________________
 //_______________________________________________________________________________________________________________________________________
-
-
-
 
 unsigned long Last_Time = 0;
 float Past_Error = 0;
@@ -81,100 +69,79 @@ void Follow_line(int ligne) {
     bool First = true;
     unsigned long Now = millis();
 
-   
-
     Capteurs Valeurs = Binary_Conversion(ligne);
 
-    if (ligne == white)
-    {
-        
-        if (Valeurs.C_Left > .9 && Valeurs.C_Right > .9)
-        {
-                MOTOR_SetSpeed(RIGHT, base_speed);
-                MOTOR_SetSpeed(LEFT, base_speed);
-        }
-        
-        else if (Valeurs.C_Left < Valeurs.C_Right) {
-                Live_Error = -(Valeurs.C_Left * ponderation - (1 + Valeurs.C_Middle));
-                if (Now - Last_Time != 0 || Now - Last_Time < 250 || First != true) {
-                    Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
-                }
+    if (ligne == white) {
 
-                MOTOR_SetSpeed(LEFT, base_speed - (Live_Error * KP_B + Deriv * KD_B));
-                MOTOR_SetSpeed(RIGHT, base_speed + (Live_Error * KP_B + Deriv * KD_B));
-                Past_Error = Live_Error;
+        if (Valeurs.C_Left > .9 && Valeurs.C_Right > .9) {
+            MOTOR_SetSpeed(RIGHT, base_speed);
+            MOTOR_SetSpeed(LEFT, base_speed);
+        }
+
+        else if (Valeurs.C_Left < Valeurs.C_Right) {
+            Live_Error = -(Valeurs.C_Left * ponderation - (1 + Valeurs.C_Middle));
+            if (Now - Last_Time != 0 || Now - Last_Time < 250 || First != true) {
+                Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
+
+            MOTOR_SetSpeed(LEFT, base_speed - (Live_Error * KP_B + Deriv * KD_B));
+            MOTOR_SetSpeed(RIGHT, base_speed + (Live_Error * KP_B + Deriv * KD_B));
+            Past_Error = Live_Error;
+        }
 
         else if (Valeurs.C_Right < Valeurs.C_Left) {
-                Live_Error = -(Valeurs.C_Right * ponderation - (1 + Valeurs.C_Middle));
-                if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
-                    Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
-                }
-                MOTOR_SetSpeed(LEFT, base_speed + (Live_Error * KP_B + Deriv * KD_B));
-                MOTOR_SetSpeed(RIGHT, base_speed - (Live_Error * KP_B + Deriv * KD_B));
-                Past_Error = Live_Error;
+            Live_Error = -(Valeurs.C_Right * ponderation - (1 + Valeurs.C_Middle));
+            if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
+                Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
+            MOTOR_SetSpeed(LEFT, base_speed + (Live_Error * KP_B + Deriv * KD_B));
+            MOTOR_SetSpeed(RIGHT, base_speed - (Live_Error * KP_B + Deriv * KD_B));
+            Past_Error = Live_Error;
+        }
 
         else {
-                MOTOR_SetSpeed(RIGHT, base_speed);
-                MOTOR_SetSpeed(LEFT, base_speed);
-            }
+            MOTOR_SetSpeed(RIGHT, base_speed);
+            MOTOR_SetSpeed(LEFT, base_speed);
+        }
     }
 
+    else if (ligne == black) {
 
-    else if (ligne == black)
-    {
-
-        if (Valeurs.C_Left < -.9 && Valeurs.C_Right < -.9)
-        {
-                MOTOR_SetSpeed(RIGHT, base_speed);
-                MOTOR_SetSpeed(LEFT, base_speed);
+        if (Valeurs.C_Left < -.9 && Valeurs.C_Right < -.9) {
+            MOTOR_SetSpeed(RIGHT, base_speed);
+            MOTOR_SetSpeed(LEFT, base_speed);
         }
 
         else if (Valeurs.C_Left > Valeurs.C_Right) {
-                Live_Error = (Valeurs.C_Left * ponderation + (1 - Valeurs.C_Middle));
-                if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
-                    Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
-                }
-
-                MOTOR_SetSpeed(LEFT, base_speed - (Live_Error * KP_N + Deriv * KD_N));
-                MOTOR_SetSpeed(RIGHT, base_speed + (Live_Error * KP_N + Deriv * KD_N));
-                Past_Error = Live_Error;
+            Live_Error = (Valeurs.C_Left * ponderation + (1 - Valeurs.C_Middle));
+            if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
+                Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
+
+            MOTOR_SetSpeed(LEFT, base_speed - (Live_Error * KP_N + Deriv * KD_N));
+            MOTOR_SetSpeed(RIGHT, base_speed + (Live_Error * KP_N + Deriv * KD_N));
+            Past_Error = Live_Error;
+        }
 
         else if (Valeurs.C_Right > Valeurs.C_Left) {
-                Live_Error = (Valeurs.C_Right * ponderation + (1 - Valeurs.C_Middle));
-                if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
-                    Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
-                }
-                MOTOR_SetSpeed(LEFT, base_speed + (Live_Error * KP_N + Deriv * KD_N));
-                MOTOR_SetSpeed(RIGHT, base_speed - (Live_Error * KP_N + Deriv * KD_N));
-                Past_Error = Live_Error;
+            Live_Error = (Valeurs.C_Right * ponderation + (1 - Valeurs.C_Middle));
+            if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true) {
+                Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
+            MOTOR_SetSpeed(LEFT, base_speed + (Live_Error * KP_N + Deriv * KD_N));
+            MOTOR_SetSpeed(RIGHT, base_speed - (Live_Error * KP_N + Deriv * KD_N));
+            Past_Error = Live_Error;
+        }
 
-            else {
-                MOTOR_SetSpeed(RIGHT, base_speed);
-                MOTOR_SetSpeed(LEFT, base_speed);
-            }
+        else {
+            MOTOR_SetSpeed(RIGHT, base_speed);
+            MOTOR_SetSpeed(LEFT, base_speed);
+        }
     }
-    
+
     Last_Time = Now;
     First = false;
-    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 int getNormalizedLineReading() {
     Serial.print("Left: ");
@@ -251,19 +218,3 @@ int getNormalizedLineReading() {
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
