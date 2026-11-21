@@ -49,7 +49,20 @@ Coord getNextRobotShot() {
 }
 
 ShotResult registerRobotShot(Coord robotShot) {
-    return evaluer_coup(robotShot, playerCreatedGrid, robotAttacksGrid);
+    ShotResult resultat = evaluer_coup(
+        robotShot,
+        playerCreatedGrid,
+        robotAttacksGrid
+    );
+
+    mettre_a_jour_stats_ordi(
+        robotShot,
+        resultat,
+        robotAttacksGrid,
+        robotAlgorithmState
+    );
+
+    return resultat;
 }
 
 ShotResult registerPlayerShot(Coord playerShot) {
