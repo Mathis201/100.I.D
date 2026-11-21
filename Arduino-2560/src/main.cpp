@@ -10,7 +10,7 @@ Date: Derniere date de modification
 Inclure les librairies de functions que vous voulez utiliser
 */
 #include <LibRobus.h>
-
+#include <MINI_MP3/audio.h>
 #define OUTPUT_LED_PIN 53
 
 /*
@@ -20,12 +20,10 @@ Fonctions d'initialisation (setup)
  -> Generalement on y initilise les variables globales
 */
 void setup() {
-    BoardInit();
-    Serial1.begin(BAUD_RATE_SERIAL0);
-
-    // initialisation
-    pinMode(OUTPUT_LED_PIN, OUTPUT);
-    digitalWrite(OUTPUT_LED_PIN, 0);
+    Serial.begin(9600);
+    audio_init();
+    Serial.print("Pistes sur la carte SD: ");
+    Serial.println(audio_nb_pistes());
 }
 
 /*
@@ -33,9 +31,10 @@ Fonctions de boucle infinie
  -> Se fait appeler perpetuellement suite au "setup"
 */
 void loop() {
-    if (Serial1.available() > 0) {
-        int newVal = Serial1.parseInt();
-        Serial.println(newVal);
-        digitalWrite(OUTPUT_LED_PIN, newVal);
-    }
+audio_jouer(Rate);
+delay(10000);
+audio_jouer(Touche);
+delay(10000);
+audio_jouer(Coule);
+delay(10000);
 }
