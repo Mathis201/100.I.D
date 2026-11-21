@@ -10,6 +10,28 @@ PlayWindow::PlayWindow(QWidget *parent)
     ui->setupUi(this);
     ui->myBoard->setShip(1, 1, 1);
 
+<<<<<<< Updated upstream
+=======
+    //copie du .h
+    /*enum states {
+        playerTurn,
+        robusTurn,
+        gameFinished
+    };
+    states state = playerTurn;*/
+
+    switch (state) {
+    case playerTurn:
+
+        break;
+    case robusTurn:
+
+        break;
+    case gameFinished:
+        break;
+    }
+
+>>>>>>> Stashed changes
 }
 
 PlayWindow::~PlayWindow()

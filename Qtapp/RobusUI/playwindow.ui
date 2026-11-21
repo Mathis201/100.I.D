@@ -39,7 +39,11 @@
     <string>Votre attaque :</string>
    </property>
   </widget>
+<<<<<<< Updated upstream
   <widget class="QPlainTextEdit" name="plainTextEdit">
+=======
+  <widget class="QPlainTextEdit" name="coupJoueur">
+>>>>>>> Stashed changes
    <property name="geometry">
     <rect>
      <x>130</x>
@@ -62,7 +66,11 @@
     <string>Dernière attaque du robot :</string>
    </property>
   </widget>
+<<<<<<< Updated upstream
   <widget class="QLabel" name="label_4">
+=======
+  <widget class="QLabel" name="coupRobus">
+>>>>>>> Stashed changes
    <property name="geometry">
     <rect>
      <x>440</x>
