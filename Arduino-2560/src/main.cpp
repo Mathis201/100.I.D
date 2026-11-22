@@ -1,3 +1,6 @@
+// #define ALGO_TEST_MODE
+
+#include "game/battleship_algo_test.h"
 #include "game/game_manager.h"
 #include "game_defs.h"
 #include "serial_manager.h"
@@ -23,9 +26,16 @@ bool receivedAlgorithmStrength;
 
 void setup() {
     BoardInit();
-    Serial2.begin(9600);
     srand(analogRead(A0));
 
+    #ifdef ALGO_TEST_MODE
+    runBattleshipTests();
+
+    while (true) {delay(1000);}
+    #endif
+
+    Serial2.begin(9600);
+    
     initLineSensor();
     initSerialManager(Serial2);
 
