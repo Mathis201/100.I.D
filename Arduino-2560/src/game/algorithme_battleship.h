@@ -5,11 +5,6 @@
 
 const int NB_BATEAUX = 5;
 
-struct Coord {
-    int x;
-    int y;
-};
-
 struct Move {
     Coord coord;
 };

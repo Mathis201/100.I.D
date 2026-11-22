@@ -9,3 +9,5 @@ void updateSerialManager();
 void requestSendMessage(String data, SerialMessageID messageId);
 
 String getMessage(SerialMessageID messageID, bool &isNewMessage);
+
+void markAllMessagesAsRead();

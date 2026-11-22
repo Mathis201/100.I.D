@@ -1,6 +1,7 @@
 #include "game/game_manager.h"
 #include "game_defs.h"
 #include "serial_manager.h"
+#include "string_data_helper.h"
 #include <LibRobus.h>
 #include <Position/PID_follow_line.h>
 
@@ -45,24 +46,46 @@ void loop() {
 
         requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
         requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
+
+        markAllMessagesAsRead();
+        currentRobotState = WAIT_FOR_GRID_AND_ALGORITHM;
         break;
     }
 
     case WAIT_FOR_GRID_AND_ALGORITHM: {
         bool isNewMessage;
-        String receivedAlgorithm = getMessage(SerialMessageID::ALGORITHM_STRENGTH, isNewMessage);
-        if (isNewMessage) {
+        if (!receivedAlgorithmStrength) {
+            String stringAlgorithm = getMessage(SerialMessageID::ALGORITHM_STRENGTH, isNewMessage);
+            if (isNewMessage) {
+                bool error;
+                AlgorithmStrength robotAlgorithmStrength = stringToData<AlgorithmStrength>(stringAlgorithm, SerialMessageID::ALGORITHM_STRENGTH, error);
+                if (!error) {
+                    setRobotAlgorithmStrength(robotAlgorithmStrength);
+                    receivedAlgorithmStrength = true;
+                }
+            }
         }
 
-        String receivedGrid = getMessage(SerialMessageID::PLAYER_GRID, isNewMessage);
-        if (isNewMessage) {
+        if (!receivedGrid) {
+            String stringGrid = getMessage(SerialMessageID::PLAYER_GRID, isNewMessage);
+            if (isNewMessage) {
+                bool error;
+                auto playerGrid = stringToData<int (*)[kGridSize]>(stringGrid, SerialMessageID::PLAYER_GRID, error);
+                if (!error) {
+                    setPlayerCreatedGrid(playerGrid);
+                    receivedAlgorithmStrength = true;
+                }
+            }
+        }
+
+        if (receivedGrid && receivedAlgorithmStrength) {
+            currentRobotState = WAIT_FOR_PLAYER_SHOT;
         }
 
         break;
     }
 
     case WAIT_FOR_PLAYER_SHOT: {
-        // requestSendMessage("0", SerialMessageID::IS_PLAYER_TURN);
         break;
     }
 

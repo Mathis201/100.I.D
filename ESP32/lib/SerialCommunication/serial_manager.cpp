@@ -18,6 +18,12 @@ void initSerialManager(HardwareSerial &serial) {
     }
 }
 
+void markAllMessagesAsRead() {
+    for (int i = 0; i < static_cast<int>(SerialMessageID::_COUNT); i++) {
+        messages[i].markMessageAsRead();
+    }
+}
+
 void requestSendMessage(String data, SerialMessageID messageID) {
     messages[static_cast<int>(messageID)].setData(data, false);
     messages[static_cast<int>(messageID)].resetSendCount();

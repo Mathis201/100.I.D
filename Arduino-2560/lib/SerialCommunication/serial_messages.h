@@ -110,6 +110,10 @@ public:
         return messageContents.data;
     }
 
+    void markMessageAsRead() {
+        receivedNewData = false;
+    }
+
 private:
     SerialMessageContents messageContents;
     int countLeftToSend;

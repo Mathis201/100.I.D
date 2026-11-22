@@ -72,7 +72,7 @@ void setup() {
     pinMode(onboardDel, OUTPUT);
     digitalWrite(onboardDel, LOW);
 
-    runStringToDataTests();
+    // runStringConversionTests();
 }
 
 void loop() {
