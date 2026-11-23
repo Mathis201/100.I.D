@@ -24,25 +24,32 @@ RobotState currentRobotState;
 bool receivedGrid;
 bool receivedAlgorithmStrength;
 
+void switchRobotState(RobotState newState) {
+    Serial.println(String("DEBUG switched state to ") + (int)newState);
+    currentRobotState = newState;
+}
+
 void setup() {
     BoardInit();
     srand(analogRead(A0));
 
-    #ifdef ALGO_TEST_MODE
+#ifdef ALGO_TEST_MODE
     runBattleshipTests();
 
-    while (true) {delay(1000);}
-    #endif
+    while (true) {
+        delay(1000);
+    }
+#endif
 
-    Serial2.begin(9600);
-    
+    Serial1.begin(9600);
+
     initLineSensor();
-    initSerialManager(Serial2);
-
-    currentRobotState = INITIAL_SETUP;
+    initSerialManager(Serial1);
 
     // leave time for ESP32 to boot and start server
-    delay(2000);
+    delay(1000);
+
+    switchRobotState(INITIAL_SETUP);
 }
 
 void loop() {
@@ -58,7 +65,7 @@ void loop() {
         requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
 
         markAllMessagesAsRead();
-        currentRobotState = WAIT_FOR_GRID_AND_ALGORITHM;
+        switchRobotState(WAIT_FOR_GRID_AND_ALGORITHM);
         break;
     }
 
@@ -70,6 +77,7 @@ void loop() {
                 bool error;
                 AlgorithmStrength robotAlgorithmStrength = stringToData<AlgorithmStrength>(stringAlgorithm, SerialMessageID::ALGORITHM_STRENGTH, error);
                 if (!error) {
+                    Serial.println(String("DEBUG updated algorithm strength to ") + (int)robotAlgorithmStrength);
                     setRobotAlgorithmStrength(robotAlgorithmStrength);
                     receivedAlgorithmStrength = true;
                 }
@@ -79,17 +87,20 @@ void loop() {
         if (!receivedGrid) {
             String stringGrid = getMessage(SerialMessageID::PLAYER_GRID, isNewMessage);
             if (isNewMessage) {
+                Serial.println(stringGrid);
                 bool error;
                 auto playerGrid = stringToData<int (*)[kGridSize]>(stringGrid, SerialMessageID::PLAYER_GRID, error);
                 if (!error) {
+                    Serial.println(String("DEBUG updated player grid"));
                     setPlayerCreatedGrid(playerGrid);
-                    receivedAlgorithmStrength = true;
+                    receivedGrid = true;
                 }
             }
         }
 
         if (receivedGrid && receivedAlgorithmStrength) {
-            currentRobotState = WAIT_FOR_PLAYER_SHOT;
+            markAllMessagesAsRead();
+            switchRobotState(WAIT_FOR_PLAYER_SHOT);
         }
 
         break;

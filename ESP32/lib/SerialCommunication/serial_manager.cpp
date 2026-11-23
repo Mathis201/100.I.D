@@ -2,7 +2,7 @@
 #include "Arduino.h"
 #include "serial_messages.h"
 
-static constexpr int kSerialPrintDelay = 100;
+static constexpr int kSerialPrintDelay = 250;
 
 static unsigned long printTargetTime = 0;
 
@@ -35,7 +35,7 @@ String getMessage(SerialMessageID messageID, bool &isNewMessage) {
 }
 
 void updateSerialManager() {
-    while (usedSerial->available() > 0) {
+    if (usedSerial->available() > 0) {
         String read = usedSerial->readStringUntil('\n').c_str();
         Serial.println("DEBUG Received message: " + read);
 
