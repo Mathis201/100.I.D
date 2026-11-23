@@ -1,6 +1,12 @@
 #include "DeviceHandler.h"
 #include <QDebug>
 #include "../../Shared/Messaging/ble_setup.h"
+DeviceHandler::~DeviceHandler()
+{
+    if (m_control) {
+        m_control->disconnectFromDevice();
+    }
+}
 
 static QBluetoothUuid toUuid(const std::string &s)
 {

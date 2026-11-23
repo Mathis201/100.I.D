@@ -14,24 +14,11 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>331</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Bienvenue dans l'interface utilisateur du battleship 100.I.D</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>60</y>
+      <y>70</y>
       <width>341</width>
       <height>21</height>
      </rect>
@@ -40,24 +27,11 @@
      <string>Positions des Bateaux :</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="TestLED">
-    <property name="geometry">
-     <rect>
-      <x>620</x>
-      <y>40</y>
-      <width>80</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Test Led</string>
-    </property>
-   </widget>
    <widget class="QPlainTextEdit" name="Pos">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>80</y>
+      <x>220</x>
+      <y>90</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -70,20 +44,20 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>80</y>
-      <width>181</width>
+      <y>90</y>
+      <width>201</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Position sur le plateau, bateau #1</string>
+     <string>Placez le  bateau #1, long de 2 cases </string>
     </property>
    </widget>
    <widget class="QPushButton" name="Rotation">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>90</y>
+      <x>310</x>
+      <y>100</y>
       <width>80</width>
       <height>18</height>
      </rect>
@@ -95,8 +69,8 @@
    <widget class="QPushButton" name="Suivant">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>90</y>
+      <x>400</x>
+      <y>100</y>
       <width>80</width>
       <height>18</height>
      </rect>
@@ -121,10 +95,33 @@
    <widget class="BoardWidget" name="myBoard" native="true">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>140</y>
-      <width>321</width>
-      <height>361</height>
+      <x>350</x>
+      <y>190</y>
+      <width>341</width>
+      <height>311</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Mode de jeu :</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="difAlgo">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>20</y>
+      <width>91</width>
+      <height>22</height>
      </rect>
     </property>
    </widget>

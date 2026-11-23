@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <stdint.h>
 
 enum class AlgorithmStrength : uint8_t {
     RANDOM,
@@ -15,6 +15,13 @@ enum class ShotResult : uint8_t {
     _COUNT
 };
 
+struct Coord {
+    int x;
+    int y;
+};
+
 constexpr int kGridSize = 8;
-const std::string kValidRows = "ABCDEFGH";
-const std::string kValidColumns = "12345678";
+inline const char *kValidRows = "ABCDEFGH";
+inline const char *kValidColumns = "12345678";
+constexpr int kNumberOfBoats = 5;
+constexpr int kBoatLengths[kNumberOfBoats] = {2, 2, 3, 4, 5};

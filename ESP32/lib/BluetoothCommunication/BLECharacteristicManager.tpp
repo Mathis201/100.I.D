@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "BLECharacteristic.h"
 #include "BLECharacteristicManager.h"
-#include "string_characteristic_helper.h"
+#include "string_data_helper.h"
 
 template <typename SendableType>
 BLECharacteristicManager<SendableType>::BLECharacteristicManager(CharacteristicID messageID) {
@@ -21,10 +21,10 @@ bool BLECharacteristicManager<SendableType>::readAndUpdateData() {
     return false;
 }
 
-// only for std::string
+// only for String
 template <>
-bool inline BLECharacteristicManager<std::string>::readAndUpdateData() {
-    std::string newData = pCharacteristic->getValue();
+bool inline BLECharacteristicManager<String>::readAndUpdateData() {
+    String newData = pCharacteristic->getValue().c_str();
     if (newData != this->data) {
         this->data = newData;
         return true;
@@ -33,57 +33,53 @@ bool inline BLECharacteristicManager<std::string>::readAndUpdateData() {
 }
 
 template <typename SendableType>
-std::string BLECharacteristicManager<SendableType>::getData() {
-    return dataToString<SendableType>(this->data, this->getMessageID());
+String BLECharacteristicManager<SendableType>::getData() {
+    return dataToString<SendableType>(this->data, static_cast<SerialMessageID>(this->getCharacteristicID()));
 }
 
 // general template
 template <typename SendableType>
-void BLECharacteristicManager<SendableType>::setData(std::string stringRepresentation) {
+void BLECharacteristicManager<SendableType>::setData(String stringRepresentation) {
     bool error;
-    SendableType temp = stringToData<SendableType>(stringRepresentation, this->getMessageID(), error);
+    SendableType temp = stringToData<SendableType>(stringRepresentation, static_cast<SerialMessageID>(this->getCharacteristicID()), error);
     if (!error) {
         this->data = temp;
         pCharacteristic->setValue((uint8_t *)&this->data, sizeof(this->data));
-        Serial.println((std::string("DEBUG Updated characteristic with id: ") +
-                        std::to_string(static_cast<int>(this->getMessageID())) +
+        Serial.println((String("DEBUG Updated characteristic with id: ") +
+                        static_cast<int>(this->getCharacteristicID()) +
                         " from string: " +
-                        stringRepresentation)
-                           .c_str());
+                        stringRepresentation));
     } else {
-        Serial.println((std::string("DEBUG Failed to update characteristic with id: ") +
-                        std::to_string(static_cast<int>(this->getMessageID())) +
-                        " from string: " +
-                        stringRepresentation)
-                           .c_str());
+        Serial.println(String("DEBUG Failed to update characteristic with id: ") +
+                       static_cast<int>(this->getCharacteristicID()) +
+                       " from string: " +
+                       stringRepresentation);
     }
 }
 
 // only for std::string
 template <>
-void inline BLECharacteristicManager<std::string>::setData(std::string stringRepresentation) {
+void inline BLECharacteristicManager<String>::setData(String stringRepresentation) {
     bool error;
-    std::string temp = stringToData<std::string>(stringRepresentation, this->getMessageID(), error);
+    String temp = stringToData<String>(stringRepresentation, static_cast<SerialMessageID>(this->getCharacteristicID()), error);
     if (!error) {
         this->data = temp;
         // Pass the string directly
-        pCharacteristic->setValue(this->data);
-        Serial.println((std::string("DEBUG Updated characteristic with id: ") +
-                        std::to_string(static_cast<int>(this->getMessageID())) +
-                        " from string: " +
-                        stringRepresentation)
-                           .c_str());
+        pCharacteristic->setValue((uint8_t *)this->data.c_str(), this->data.length());
+        Serial.println(String("DEBUG Updated characteristic with id: ") +
+                       static_cast<int>(this->getCharacteristicID()) +
+                       " from string: " +
+                       stringRepresentation);
     } else {
-        Serial.println((std::string("DEBUG Failed to update characteristic with id: ") +
-                        std::to_string(static_cast<int>(this->getMessageID())) +
-                        " from string: " +
-                        stringRepresentation)
-                           .c_str());
+        Serial.println(String("DEBUG Failed to update characteristic with id: ") +
+                       static_cast<int>(this->getCharacteristicID()) +
+                       " from string: " +
+                       stringRepresentation);
     }
 }
 
 template <typename SendableType>
-CharacteristicID BLECharacteristicManager<SendableType>::getMessageID() {
+CharacteristicID BLECharacteristicManager<SendableType>::getCharacteristicID() {
     return this->messageID;
 }
 

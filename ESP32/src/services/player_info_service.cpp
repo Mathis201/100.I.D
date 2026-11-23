@@ -6,19 +6,19 @@
 #include <string>
 
 void setupPlayerInfoService(BLEServer *pServer,
-                            BLECharacteristicManager<std::string> &gridCharacteristic,
-                            BLECharacteristicManager<std::string> &lastShotCoordsCharacteristic) {
+                            BLECharacteristicManager<String> &gridCharacteristic,
+                            BLECharacteristicManager<String> &lastShotCoordsCharacteristic) {
     BLEService *pService = pServer->createService(PlayerInfoService::UUID);
 
     gridCharacteristic.setCharacteristic(pService->createCharacteristic(PlayerInfoService::GridCharacteristic::UUID,
                                                                         BLECharacteristic::PROPERTY_READ |
                                                                             BLECharacteristic::PROPERTY_WRITE));
-    gridCharacteristic.setData(std::string(64, '0'));
+    gridCharacteristic.setData("0000000000000000000000000000000000000000000000000000000000000000");
 
     lastShotCoordsCharacteristic.setCharacteristic(pService->createCharacteristic(PlayerInfoService::LastShotCoordsCharacteristic::UUID,
                                                                                   BLECharacteristic::PROPERTY_READ |
                                                                                       BLECharacteristic::PROPERTY_WRITE));
-    lastShotCoordsCharacteristic.setData("00");
+    lastShotCoordsCharacteristic.setData("A1");
 
     pService->start();
     pServer->getAdvertising()->addServiceUUID(PlayerInfoService::UUID);

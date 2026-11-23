@@ -12,10 +12,11 @@ using namespace std;
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->TestLED->setCheckable(true);
+    m_PlayWindow = new PlayWindow(this);
     m_bleHandler = new DeviceHandler(this);
-
     m_bleHandler->startScan();
+    ui->difAlgo->addItems(algolevels);
+
 }
 
 MainWindow::~MainWindow()
@@ -39,6 +40,11 @@ void MainWindow::on_Rotation_clicked()
 }
 
 void MainWindow::checkBoat(){
+    if (!IsModeChosen){
+        ui->Invalide->setText("Choisissez un mode de jeu en premier");
+        return;
+    }
+
     QString content = ui->Pos->toPlainText().trimmed();
     static const QRegularExpression coordRegex("^[a-hA-H][1-8]$");
 
@@ -78,8 +84,9 @@ void MainWindow::checkBoat(){
 
             grid[r][c] = length;                          // your game state (unchanged)
             ui->myBoard->setShip(r, c, boatId); // display
+            ui->label_3->setText("Placez le bateau #" + QString::number(boatNum + 2) + ", long de " + QString::number(boatLength[boatNum + 1]) + " cases");
         }
-        ui->label_3->setText("Position sur le plateau, bateau #" + QString::number(length));
+
 
         boatNum++; //on passe au prochain bateau
         printGrid();
@@ -95,6 +102,8 @@ void MainWindow::on_Suivant_clicked()
     if (boatNum >= 5){
         m_bleHandler->writeValue(PlayerInfoService::UUID, PlayerInfoService::GridCharacteristic::UUID, convertGrid(grid).toUtf8());
         ui->Invalide->setText("Tous les bateaux sont en place");
+        this->hide();
+        m_PlayWindow->show();
         return;
     }
     ui->Pos->clear();
@@ -131,23 +140,14 @@ QString MainWindow::convertGrid(int grid[8][8]){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void MainWindow::on_difAlgo_currentIndexChanged(int index)
+{
+    if (index != 0){
+        m_bleHandler->writeValue(GameInfoService::UUID, GameInfoService::AlgorithmStrengthCharacteristic::UUID, QString::number(index - 1).toUtf8()); //0 facile, 1 normal, 2 difficile
+        IsModeChosen = true;
+    }
+    else{
+        IsModeChosen = false;
+    }
+}
 
