@@ -23,4 +23,13 @@ bool is_vertical_detected();
 
 bool is_horizontal_detected();
 
+void fonction_How_much_turn();
+
+void Tourner_Gauche();
+
+void Tourner_180();
+
+void Tourner_Droite();
+
+
 #endif

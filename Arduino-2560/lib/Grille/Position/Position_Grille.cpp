@@ -1,5 +1,7 @@
 
 #include "Position_Grille.h"
+#include <LibRobus.h>
+#include <Arduino.h>
 #include "PID_follow_line.h"
 #include <../../src/motors/motor_management.h>
 
@@ -68,17 +70,21 @@ bool Update_Reach_Position_XY() // Switch case
             {
                 Last_time_line_detected = millis();
 
-            if (is_horizontal_detected() && Wich_Line_Follow() == black) {
-                Action = Horizontal_Detected;
-                break;
-            } else if (is_vertical_detected() && Wich_Line_Follow() == white) {
-                Action = Vertical_Detected;
-                break;
+                if (is_horizontal_detected() && Wich_Line_Follow() == black)
+                {
+                    Action = Horizontal_Detected;
+                    break;
+                }
+                else if (is_vertical_detected() && Wich_Line_Follow() == white)
+                {
+                    Action = Vertical_Detected;
+                    break;
+                }
             }
 
             Follow_line(Wich_Line_Follow());
 
-        break;
+            break;
 
     case Horizontal_Detected:
 
@@ -99,17 +105,13 @@ bool Update_Reach_Position_XY() // Switch case
             Action = Follow_line_straight;
             
             break;
-        }
-
-        Action = Follow_line_straight;
-
-        break;
 
     case Vertical_Detected:
 
-        if (Sens_robot == X_Axis_Pos) {
-            ++X_NOW;
-        }
+            if (Sens_robot == X_Axis_Pos)
+            {
+                ++X_NOW;
+            }
 
             else if (Sens_robot == X_Axis_Neg)
             {
@@ -129,18 +131,10 @@ bool Update_Reach_Position_XY() // Switch case
                 break;
             }
 
-        if (X_NOW == Target_X && Y_NOW == Target_Y) {
-            Action = Put_Pawn;
+            
+            Action = Follow_line_straight;
             break;
-        }
-
-        else if (X_NOW == Target_X) {
-            Left_or_Right(Target_Y);
-            break;
-        }
-
-        Action = Follow_line_straight;
-        break;
+        
 
     case TurnLeft:
 
@@ -256,7 +250,11 @@ bool Update_Reach_Position_XY() // Switch case
     }
 }
 
-bool is_horizontal_detected() {
+
+
+
+
+bool is_horizontal_detected(){
 
     Capteurs Valeurs = Binary_Conversion(white);
 
@@ -273,7 +271,10 @@ bool is_horizontal_detected() {
     return false;
 }
 
-bool is_vertical_detected() {
+ 
+
+
+bool is_vertical_detected(){
 
     Capteurs Valeurs = Binary_Conversion(black);
 
@@ -290,23 +291,38 @@ bool is_vertical_detected() {
     return false;
 }
 
-void Fonc_Orientation(int ajout) {
+
+
+
+
+
+void Fonc_Orientation(int ajout){
 
     Sens_robot += ajout;
 
-    if (Sens_robot < 0) {
+    if (Sens_robot < 0)
+    {
         Sens_robot = 4 + Sens_robot;
     }
 
-    if (Sens_robot > 3) {
+    if (Sens_robot > 3)
+    {
         Sens_robot = Sens_robot - 4;
     }
 }
 
-void Left_or_Right(int Target_Y) {
 
-    if (Y_NOW < Target_Y) {
-        if (Sens_robot == X_Axis_Neg) {
+
+
+
+
+
+void Left_or_Right(int Target_Y){
+
+    if (Y_NOW<Target_Y)
+    {
+        if (Sens_robot == X_Axis_Neg)
+        {
             Action = TurnRight;
         }
         else if (Sens_robot == X_Axis_Pos)
@@ -323,9 +339,11 @@ void Left_or_Right(int Target_Y) {
         else if (Sens_robot == X_Axis_Pos)
         {
             Action = TurnRight;
-        }
+        }  
     }
 }
+
+
 
 int Wich_Line_Follow(){
 
