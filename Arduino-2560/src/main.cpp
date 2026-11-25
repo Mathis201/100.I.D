@@ -3,6 +3,7 @@
 #include "game/battleship_algo_test.h"
 #include "game/game_manager.h"
 #include "game_defs.h"
+#include "motors/servo_management.h"
 #include "serial_manager.h"
 #include "string_data_helper.h"
 #include <LibRobus.h>
@@ -47,9 +48,9 @@ void setup() {
     initSerialManager(Serial1);
 
     // leave time for ESP32 to boot and start server
-    delay(1000);
+    // delay(1000);
 
-    switchRobotState(INITIAL_SETUP);
+    switchRobotState(REGISTER_PLAYER_SHOT);
 }
 
 void loop() {
@@ -115,6 +116,16 @@ void loop() {
     }
 
     case REGISTER_PLAYER_SHOT: {
+        while (true) {
+            sendPlateToRed();
+            delay(1500);
+            sendPlateToMiddle();
+            delay(1500);
+            sendPlateToWhite();
+            delay(1500);
+            sendPlateToMiddle();
+            delay(1500);
+        }
 
         break;
     }
