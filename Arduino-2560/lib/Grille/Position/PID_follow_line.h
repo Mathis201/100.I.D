@@ -21,10 +21,10 @@ int getNormalizedLineReading();
 
 void Live_Error_Calc(int side);
 
-float motor_calc();
+float motor_calc(int ton);
 
 void Deriv_Calc_PID();
 
-void follow_line_calc();
+void follow_line_calc(int ton);
 
 #endif

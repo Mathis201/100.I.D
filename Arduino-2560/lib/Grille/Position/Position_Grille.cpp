@@ -15,7 +15,7 @@ int Y_Target = 0;
 int Sens_robot = X_Axis_Pos;
 int Action = How_much_turn;
 unsigned long Last_time_line_detected = 0;
-float pourcentage_ton_detect = .9;
+float pourcentage_ton_detect = .85;
 int Next_Step = 0;
 bool Already_Requested = false;
 bool Already_Detected = false;
@@ -71,15 +71,14 @@ bool Update_Reach_Position_XY() // Switch case
                 {
                     Capteurs Sensor = Binary_Conversion();
 
-                    if (Sensor.C_Middle <= -.9 && ((Sens_robot == X_Axis_Neg) || (Sens_robot == X_Axis_Pos)))
+                    if (Sensor.C_Middle <= -pourcentage_ton_detect && ((Sens_robot == X_Axis_Neg) || (Sens_robot == X_Axis_Pos)))
                     {
                         Already_Detected = false;
                     }
-                    else if (Sensor.C_Middle >= .9 && ((Sens_robot == Y_Axis_Neg) || (Sens_robot == Y_Axis_Pos)))
+                    else if (Sensor.C_Middle >= pourcentage_ton_detect && ((Sens_robot == Y_Axis_Neg) || (Sens_robot == Y_Axis_Pos)))
                     {
                         Already_Detected = false;
                     }
-
                 }
                 
 
@@ -92,10 +91,9 @@ bool Update_Reach_Position_XY() // Switch case
                         Action = Horizontal_Detected;
                         Already_Detected = true;
                         break;
-                    }
-                    
-                    
+                    }  
                 }
+                
                 else if (is_vertical_detected() && (Wich_Line_Follow() == white))
                 {
                     if (Already_Detected == false)
@@ -300,7 +298,7 @@ bool is_vertical_detected(){
         return true;
     }
 
-    else if (Valeurs.C_Left > pourcentage_ton_detect && Valeurs.C_Right > pourcentage_ton_detect)
+    else if ((Valeurs.C_Left > pourcentage_ton_detect && Valeurs.C_Right > pourcentage_ton_detect) || (Valeurs.C_Left > pourcentage_ton_detect && Valeurs.C_Middle > pourcentage_ton_detect) || (Valeurs.C_Middle > pourcentage_ton_detect && Valeurs.C_Right > pourcentage_ton_detect))
     {
         return true;
     }
@@ -463,7 +461,6 @@ if (X_NOW == X_Target)
                 Tourner_180();
             }
         }
-
 }
 
 

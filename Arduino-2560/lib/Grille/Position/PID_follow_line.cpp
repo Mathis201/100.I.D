@@ -101,9 +101,9 @@ unsigned long Last_Time = 0;
 float Past_Error = 0;
 float KD_N = 1;
 float KP_N = .1;
-float KD_B = .5;
-float KP_B = .05;
-
+float KD_B = 1;
+float KP_B = .1;
+ 
 float Capteurs_Left;
 float Capteurs_Middle;
 float Capteurs_Right;
@@ -131,14 +131,14 @@ void Follow_line(int ligne)
         Capteurs_Middle = -Capteurs_Middle;
         Capteurs_Right = -Capteurs_Right;
 
-        follow_line_calc();
+        follow_line_calc(white);
 
     }
 
     else if (ligne == black)
     {
 
-        follow_line_calc();
+        follow_line_calc(black);
     }
 
     Last_Time = Now;
@@ -263,16 +263,25 @@ void Deriv_Calc_PID(){
 }
 
 
-float Motor_Calc(){
+float Motor_Calc(int ton){
 
-    return (Live_Error * KP_B + Deriv * KD_B);
+    if (ton = white)
+    {
+        return (Live_Error * KP_B + Deriv * KD_B);
+    }
+    else if (ton = black)
+    {
+        return (Live_Error * KP_N + Deriv * KD_N);
+    }
+    
+    
 
 }
 
 
 
 
-void follow_line_calc(){
+void follow_line_calc(int ton){
 
     if (Capteurs_Left < -.9 && Capteurs_Right < -.9)
         {
@@ -287,8 +296,8 @@ void follow_line_calc(){
             
             Deriv_Calc_PID();
             
-            MOTOR_SetSpeed(LEFT, base_speed + Motor_Calc());
-            MOTOR_SetSpeed(RIGHT, base_speed - Motor_Calc());
+            MOTOR_SetSpeed(LEFT, base_speed + Motor_Calc(ton));
+            MOTOR_SetSpeed(RIGHT, base_speed - Motor_Calc(ton));
             Past_Error = Live_Error;
         }
 
@@ -299,8 +308,8 @@ void follow_line_calc(){
 
             Deriv_Calc_PID();
 
-            MOTOR_SetSpeed(LEFT, base_speed - Motor_Calc());
-            MOTOR_SetSpeed(RIGHT, base_speed + Motor_Calc());
+            MOTOR_SetSpeed(LEFT, base_speed - Motor_Calc(ton));
+            MOTOR_SetSpeed(RIGHT, base_speed + Motor_Calc(ton));
             Past_Error = Live_Error;
         }
 
