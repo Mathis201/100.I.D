@@ -7,6 +7,8 @@
 #include "serial_manager.h"
 #include "string_data_helper.h"
 #include <LibRobus.h>
+#include <MINI_MP3/audio.h>
+#define OUTPUT_LED_PIN 53
 #include <Position/PID_follow_line.h>
 #include <Position/Position_Grille.h>
 
