@@ -6,9 +6,9 @@
 void runStringToDataTests() {
     bool err = false;
 
-    // 1. IS_GAME_OVER, IS_PLAYER_TURN & IS_BLUETOOTH_CONNECTED (bool)
+    // 1. IS_GAME_OVER, IS_NEW_GAME_REQUESTED & IS_BLUETOOTH_CONNECTED (bool)
     assert(stringToData<bool>("0", SerialMessageID::IS_GAME_OVER, err) == false && !err);
-    assert(stringToData<bool>("1", SerialMessageID::IS_PLAYER_TURN, err) == true && !err);
+    assert(stringToData<bool>("1", SerialMessageID::IS_NEW_GAME_REQUESTED, err) == true && !err);
     assert(stringToData<bool>("1", SerialMessageID::IS_BLUETOOTH_CONNECTED, err) == true && !err);
 
     // Error flag resets to false on success
@@ -18,8 +18,8 @@ void runStringToDataTests() {
     // Invalid bool inputs
     assert(stringToData<bool>("", SerialMessageID::IS_GAME_OVER, err) == false && err);
     assert(stringToData<bool>("01", SerialMessageID::IS_GAME_OVER, err) == false && err);
-    assert(stringToData<bool>("a", SerialMessageID::IS_PLAYER_TURN, err) == false && err);
-    assert(stringToData<bool>("true", SerialMessageID::IS_PLAYER_TURN, err) == false && err);
+    assert(stringToData<bool>("a", SerialMessageID::IS_NEW_GAME_REQUESTED, err) == false && err);
+    assert(stringToData<bool>("true", SerialMessageID::IS_NEW_GAME_REQUESTED, err) == false && err);
 
     // 2. ALGORITHM_STRENGTH (RANDOM=0, NORMAL=1, PROF=2, _COUNT=3)
     assert(stringToData<AlgorithmStrength>("0", SerialMessageID::ALGORITHM_STRENGTH, err) == AlgorithmStrength::RANDOM && !err);
@@ -109,6 +109,9 @@ void runStringToDataTests() {
     assert(stringToData<ShotResult>("0", SerialMessageID::ROBOT_LAST_SHOT_RESULT, err) == ShotResult::HIT && !err);
     assert(stringToData<ShotResult>("1", SerialMessageID::ROBOT_LAST_SHOT_RESULT, err) == ShotResult::SINK && !err);
     assert(stringToData<ShotResult>("2", SerialMessageID::ROBOT_LAST_SHOT_RESULT, err) == ShotResult::MISS && !err);
+    assert(stringToData<ShotResult>("0", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult::HIT && !err);
+    assert(stringToData<ShotResult>("1", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult::SINK && !err);
+    assert(stringToData<ShotResult>("2", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult::MISS && !err);
 
     // Out of bounds / invalid ShotResult
     assert(stringToData<ShotResult>("-1", SerialMessageID::ROBOT_LAST_SHOT_RESULT, err) == ShotResult() && err);
@@ -117,6 +120,12 @@ void runStringToDataTests() {
     assert(stringToData<ShotResult>("0 ", SerialMessageID::ROBOT_LAST_SHOT_RESULT, err) == ShotResult() && err);
     assert(stringToData<ShotResult>("HIT", SerialMessageID::ROBOT_LAST_SHOT_RESULT, err) == ShotResult() && err);
     assert(stringToData<ShotResult>("", SerialMessageID::ROBOT_LAST_SHOT_RESULT, err) == ShotResult() && err);
+    assert(stringToData<ShotResult>("-1", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult() && err);
+    assert(stringToData<ShotResult>("3", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult() && err); // _COUNT
+    assert(stringToData<ShotResult>("256", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult() && err);
+    assert(stringToData<ShotResult>("0 ", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult() && err);
+    assert(stringToData<ShotResult>("HIT", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult() && err);
+    assert(stringToData<ShotResult>("", SerialMessageID::PLAYER_LAST_SHOT_RESULT, err) == ShotResult() && err);
 
     // 6. Type Mismatches & Unknown IDs
     assert(stringToData<int>("1", SerialMessageID::IS_GAME_OVER, err) == 0 && err);
@@ -129,11 +138,11 @@ void runStringToDataTests() {
 }
 
 void runDataToStringTests() {
-    // 1. IS_GAME_OVER & IS_PLAYER_TURN (bool)
+    // 1. IS_GAME_OVER & IS_NEW_GAME_REQUESTED (bool)
     assert(dataToString(false, SerialMessageID::IS_GAME_OVER) == "0");
     assert(dataToString(true, SerialMessageID::IS_GAME_OVER) == "1");
-    assert(dataToString(false, SerialMessageID::IS_PLAYER_TURN) == "0");
-    assert(dataToString(true, SerialMessageID::IS_PLAYER_TURN) == "1");
+    assert(dataToString(false, SerialMessageID::IS_NEW_GAME_REQUESTED) == "0");
+    assert(dataToString(true, SerialMessageID::IS_NEW_GAME_REQUESTED) == "1");
 
     // 2. ALGORITHM_STRENGTH
     assert(dataToString(AlgorithmStrength::RANDOM, SerialMessageID::ALGORITHM_STRENGTH) == "0");
@@ -170,6 +179,9 @@ void runDataToStringTests() {
     assert(dataToString(ShotResult::HIT, SerialMessageID::ROBOT_LAST_SHOT_RESULT) == "0");
     assert(dataToString(ShotResult::SINK, SerialMessageID::ROBOT_LAST_SHOT_RESULT) == "1");
     assert(dataToString(ShotResult::MISS, SerialMessageID::ROBOT_LAST_SHOT_RESULT) == "2");
+    assert(dataToString(ShotResult::HIT, SerialMessageID::PLAYER_LAST_SHOT_RESULT) == "0");
+    assert(dataToString(ShotResult::SINK, SerialMessageID::PLAYER_LAST_SHOT_RESULT) == "1");
+    assert(dataToString(ShotResult::MISS, SerialMessageID::PLAYER_LAST_SHOT_RESULT) == "2");
 
     // 6. Type Mismatches & Unknown IDs
     assert(dataToString(42, SerialMessageID::IS_GAME_OVER) == "");

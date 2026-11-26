@@ -105,7 +105,7 @@ void loop() {
 
         if (receivedGrid && receivedAlgorithmStrength) {
             requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
-            requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
+            requestSendMessage("1", SerialMessageID::IS_NEW_GAME_REQUESTED);
 
             markAllMessagesAsRead();
             switchRobotState(WAIT_FOR_PLAYER_SHOT);

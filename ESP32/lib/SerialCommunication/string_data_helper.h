@@ -31,7 +31,7 @@ DataType stringToData(const String &stringData, SerialMessageID messageID, bool 
 
     switch (messageID) {
     case SerialMessageID::IS_GAME_OVER:
-    case SerialMessageID::IS_PLAYER_TURN:
+    case SerialMessageID::IS_NEW_GAME_REQUESTED:
     case SerialMessageID::IS_BLUETOOTH_CONNECTED: {
         if constexpr (detail::is_same_v<DataType, bool>) {
             if (stringData == "0") {
@@ -113,7 +113,8 @@ DataType stringToData(const String &stringData, SerialMessageID messageID, bool 
         break;
     }
 
-    case SerialMessageID::ROBOT_LAST_SHOT_RESULT: {
+    case SerialMessageID::ROBOT_LAST_SHOT_RESULT:
+    case SerialMessageID::PLAYER_LAST_SHOT_RESULT: {
         if constexpr (detail::is_same_v<DataType, ShotResult>) {
             int convertedData = 0;
             if (tryParseInt(stringData, convertedData) &&
@@ -137,7 +138,7 @@ template <typename DataType>
 String dataToString(const DataType &data, SerialMessageID messageID) {
     switch (messageID) {
     case SerialMessageID::IS_GAME_OVER:
-    case SerialMessageID::IS_PLAYER_TURN:
+    case SerialMessageID::IS_NEW_GAME_REQUESTED:
     case SerialMessageID::IS_BLUETOOTH_CONNECTED:
         if constexpr (detail::is_same_v<DataType, bool>) {
             return String(static_cast<int>(data));
@@ -177,6 +178,7 @@ String dataToString(const DataType &data, SerialMessageID messageID) {
         }
         break;
     case SerialMessageID::ROBOT_LAST_SHOT_RESULT:
+    case SerialMessageID::PLAYER_LAST_SHOT_RESULT:
         if constexpr (detail::is_same_v<DataType, ShotResult>) {
             return String(static_cast<int>(data));
         }
