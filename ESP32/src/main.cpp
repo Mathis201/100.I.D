@@ -33,7 +33,7 @@ class ServerCallbacks : public BLEServerCallbacks {
 
 static ServerCallbacks serverCallbacks{};
 static BLEServer *pServer;
-static BaseCharacteristicManager *characteristics[static_cast<int>(kCharacteristicCount)];
+static BaseCharacteristicManager *characteristics[static_cast<int>(CharacteristicID::_COUNT)];
 
 static BLECharacteristicManager<AlgorithmStrength> algorithmStrengthCharacteristic{CharacteristicID::ALGORITHM_STRENGTH};
 static BLECharacteristicManager<bool> isGameOverCharacteristic{CharacteristicID::IS_GAME_OVER};
@@ -42,6 +42,12 @@ static BLECharacteristicManager<String> playerLastShotCoordsCharacteristic{Chara
 static BLECharacteristicManager<String> playerGridCharacteristic{CharacteristicID::PLAYER_GRID};
 static BLECharacteristicManager<String> robotLastShotCoordsCharacteristic{CharacteristicID::ROBOT_LAST_SHOT_COORDS};
 static BLECharacteristicManager<ShotResult> robotLastShotResultCharacteristic{CharacteristicID::ROBOT_LAST_SHOT_RESULT};
+
+void resetCharacteristicsToDefault() {
+    for (auto characteristic : characteristics) {
+        characteristic->resetCharacteristicData();
+    }
+}
 
 void setup() {
     characteristics[static_cast<int>(CharacteristicID::ALGORITHM_STRENGTH)] = &algorithmStrengthCharacteristic;
@@ -68,6 +74,8 @@ void setup() {
     pServer->setCallbacks(&serverCallbacks);
 
     initSerialManager(Serial2);
+
+    resetCharacteristicsToDefault();
 
     pinMode(onboardDel, OUTPUT);
     digitalWrite(onboardDel, LOW);

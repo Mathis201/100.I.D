@@ -11,6 +11,7 @@
 #include <Position/Position_Grille.h>
 
 enum RobotState {
+    WAIT_FOR_NEXT_GAME,
     INITIAL_SETUP,
     WAIT_FOR_GRID_AND_ALGORITHM,
     WAIT_FOR_PLAYER_SHOT,
@@ -18,7 +19,6 @@ enum RobotState {
     REGISTER_PLAYER_SHOT,
     MANAGE_ROBOT_SHOT,
     GAME_OVER,
-    WAIT_FOR_NEXT_GAME
 };
 
 RobotState currentRobotState;
@@ -47,6 +47,7 @@ void setup() {
 
     initLineSensor();
     initSerialManager(Serial1);
+    initServo();
 
     // leave time for ESP32 to boot and start server
     // delay(1000);
@@ -57,165 +58,110 @@ void setup() {
 bool a = false;
 
 void loop() {
+    updateSerialManager();
 
-
-    if (ROBUS_IsBumper(RIGHT) == true)
-    {
-
-        // Request_Reach_Position_XY(3,4);
-
-        while (true)
-        {
-            // Update_Reach_Position_XY();
-            Follow_line(white);
-            // getNormalizedLineReading();
-        }
-        
-
-    //     Request_Reach_Position_XY(3, 4);
-
-    //     a = true;
-    }
-
-    case WAIT_FOR_PLAYER_SHOT: {
+    switch (currentRobotState) {
+    case WAIT_FOR_NEXT_GAME: {
         break;
     }
 
+    case INITIAL_SETUP: {
+        resetGameManager();
+        receivedGrid = false;
+        receivedAlgorithmStrength = false;
+
+        markAllMessagesAsRead();
+        switchRobotState(WAIT_FOR_GRID_AND_ALGORITHM);
+        break;
+    }
+
+    case WAIT_FOR_GRID_AND_ALGORITHM: {
+        bool isNewMessage;
+        if (!receivedAlgorithmStrength) {
+            String stringAlgorithm = getMessage(SerialMessageID::ALGORITHM_STRENGTH, isNewMessage);
+            if (isNewMessage) {
+                bool error;
+                AlgorithmStrength robotAlgorithmStrength = stringToData<AlgorithmStrength>(stringAlgorithm, SerialMessageID::ALGORITHM_STRENGTH, error);
+                if (!error) {
+                    Serial.println(String("DEBUG updated algorithm strength to ") + (int)robotAlgorithmStrength);
+                    setRobotAlgorithmStrength(robotAlgorithmStrength);
+                    receivedAlgorithmStrength = true;
+                }
+            }
+        }
+
+        if (!receivedGrid) {
+            String stringGrid = getMessage(SerialMessageID::PLAYER_GRID, isNewMessage);
+            if (isNewMessage) {
+                bool error;
+                auto playerGrid = stringToData<int (*)[kGridSize]>(stringGrid, SerialMessageID::PLAYER_GRID, error);
+                if (!error) {
+                    Serial.println(String("DEBUG updated player grid"));
+                    setPlayerCreatedGrid(playerGrid);
+                    receivedGrid = true;
+                }
+            }
+        }
+
+        if (receivedGrid && receivedAlgorithmStrength) {
+            requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
+            requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
+
+            markAllMessagesAsRead();
+            switchRobotState(WAIT_FOR_PLAYER_SHOT);
+        }
+
+        break;
+    }
+
+    case WAIT_FOR_PLAYER_SHOT: {
+        bool isNewMessage;
+        String stringPlayerShot = getMessage(SerialMessageID::PLAYER_LAST_SHOT_COORDS, isNewMessage);
+        if (isNewMessage) {
+            bool error;
+            auto playerShot = stringToData<Coord>(stringPlayerShot, SerialMessageID::PLAYER_LAST_SHOT_COORDS, error);
+            if (!error) {
+                // TODO: evaluate player shot, pick up colored pin from dropper
+            }
+        }
+    }
+
     case MOVE_TO_PLAYER_SHOT: {
+        // TODO: move from current position to player shot
         break;
     }
 
     case REGISTER_PLAYER_SHOT: {
-        while (true) {
-            sendPlateToRed();
-            delay(1500);
-            sendPlateToMiddle();
-            delay(1500);
-            sendPlateToWhite();
-            delay(1500);
-            sendPlateToMiddle();
-            delay(1500);
-        }
-
+        /* TODO:
+        drop pin from dropper,
+        play sound,
+        send shot result,
+        decide if game is over
+        */
         break;
     }
 
     case MANAGE_ROBOT_SHOT: {
+        /* TODO:
+        generate robot shot coords,
+        evaluate shot,
+        send both info to player,
+        decide if game is over
+        */
+
         // requestSendMessage("G2", SerialMessageID::ROBOT_LAST_SHOT_COORDS);
         // requestSendMessage(String(static_cast<int>(ShotResult::SINK)), SerialMessageID::ROBOT_LAST_SHOT_RESULT);
-        // requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
+        // requestSendMessage("1", SerialMessageID::IS_NEW_GAME_REQUESTED);
         break;
     }
 
     case GAME_OVER: {
+        // TODO: send game over message, play sound?
         // requestSendMessage("1", SerialMessageID::IS_GAME_OVER);
-        break;
-    }
-
-    case WAIT_FOR_NEXT_GAME: {
         break;
     }
 
     default:
         break;
     }
-
-    // if (ROBUS_IsBumper(REAR)) {
-    //     while (true) {
-    //         Go_To_Position_XY(5, 3);
-    //     }
-    // }
-
-
-    // updateSerialManager();
-
-    // switch (currentRobotState) {
-    // case INITIAL_SETUP: {
-    //     resetGameManager();
-    //     receivedGrid = false;
-    //     receivedAlgorithmStrength = false;
-
-    //     requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
-    //     requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
-
-    //     markAllMessagesAsRead();
-    //     switchRobotState(WAIT_FOR_GRID_AND_ALGORITHM);
-    //     break;
-    // }
-
-    // case WAIT_FOR_GRID_AND_ALGORITHM: {
-    //     bool isNewMessage;
-    //     if (!receivedAlgorithmStrength) {
-    //         String stringAlgorithm = getMessage(SerialMessageID::ALGORITHM_STRENGTH, isNewMessage);
-    //         if (isNewMessage) {
-    //             bool error;
-    //             AlgorithmStrength robotAlgorithmStrength = stringToData<AlgorithmStrength>(stringAlgorithm, SerialMessageID::ALGORITHM_STRENGTH, error);
-    //             if (!error) {
-    //                 Serial.println(String("DEBUG updated algorithm strength to ") + (int)robotAlgorithmStrength);
-    //                 setRobotAlgorithmStrength(robotAlgorithmStrength);
-    //                 receivedAlgorithmStrength = true;
-    //             }
-    //         }
-    //     }
-
-    //     if (!receivedGrid) {
-    //         String stringGrid = getMessage(SerialMessageID::PLAYER_GRID, isNewMessage);
-    //         if (isNewMessage) {
-    //             Serial.println(stringGrid);
-    //             bool error;
-    //             auto playerGrid = stringToData<int (*)[kGridSize]>(stringGrid, SerialMessageID::PLAYER_GRID, error);
-    //             if (!error) {
-    //                 Serial.println(String("DEBUG updated player grid"));
-    //                 setPlayerCreatedGrid(playerGrid);
-    //                 receivedGrid = true;
-    //             }
-    //         }
-    //     }
-
-    //     if (receivedGrid && receivedAlgorithmStrength) {
-    //         markAllMessagesAsRead();
-    //         switchRobotState(WAIT_FOR_PLAYER_SHOT);
-    //     }
-
-    //     break;
-    // }
-
-    // case WAIT_FOR_PLAYER_SHOT: {
-    //     break;
-    // }
-
-    // case MOVE_TO_PLAYER_SHOT: {
-    //     break;
-    // }
-
-    // case REGISTER_PLAYER_SHOT: {
-
-    //     break;
-    // }
-
-    // case MANAGE_ROBOT_SHOT: {
-    //     // requestSendMessage("G2", SerialMessageID::ROBOT_LAST_SHOT_COORDS);
-    //     // requestSendMessage(String(static_cast<int>(ShotResult::SINK)), SerialMessageID::ROBOT_LAST_SHOT_RESULT);
-    //     // requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
-    //     break;
-    // }
-
-    // case GAME_OVER: {
-    //     // requestSendMessage("1", SerialMessageID::IS_GAME_OVER);
-    //     break;
-    // }
-
-    // case WAIT_FOR_NEXT_GAME: {
-    //     break;
-    // }
-
-    // default:
-    //     break;
-    // }
-
-    // // if (ROBUS_IsBumper(REAR)) {
-    // //     while (true) {
-    // //         Go_To_Position_XY(5, 3);
-    // //     }
-    // // }
 }

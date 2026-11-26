@@ -13,13 +13,11 @@ void setupGameInfoService(BLEServer *pServer,
     algorithmStrengthCharacteristic.setCharacteristic(pService->createCharacteristic(GameInfoService::AlgorithmStrengthCharacteristic::UUID,
                                                                                      BLECharacteristic::PROPERTY_READ |
                                                                                          BLECharacteristic::PROPERTY_WRITE));
-    algorithmStrengthCharacteristic.setData("0");
 
     isGameOverCharacteristic.setCharacteristic(pService->createCharacteristic(GameInfoService::IsGameOverCharacteristic::UUID,
                                                                               BLECharacteristic::PROPERTY_READ |
                                                                                   BLECharacteristic::PROPERTY_NOTIFY));
     isGameOverCharacteristic.getRawCharacteristic()->addDescriptor(new BLE2902());
-    isGameOverCharacteristic.setData("0");
 
     isPlayerTurnCharacteristic.setCharacteristic(pService->createCharacteristic(GameInfoService::IsPlayerTurnCharacteristic::UUID,
                                                                                 BLECharacteristic::PROPERTY_READ |

@@ -92,3 +92,8 @@ template <typename SendableType>
 void BLECharacteristicManager<SendableType>::setCharacteristic(BLECharacteristic *characteristic) {
     this->pCharacteristic = characteristic;
 }
+
+template <typename SendableType>
+void BLECharacteristicManager<SendableType>::resetCharacteristicData() {
+    pCharacteristic->setValue("");
+}
