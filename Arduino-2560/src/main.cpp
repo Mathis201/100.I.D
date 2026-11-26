@@ -52,16 +52,28 @@ void setup() {
     // leave time for ESP32 to boot and start server
     // delay(1000);
 
-    switchRobotState(REGISTER_PLAYER_SHOT);
+    switchRobotState(WAIT_FOR_NEXT_GAME);
 }
-
-bool a = false;
 
 void loop() {
     updateSerialManager();
 
     switch (currentRobotState) {
     case WAIT_FOR_NEXT_GAME: {
+        // wait for next game serial message
+        bool isNewMessage;
+        String stringRequestGame = getMessage(SerialMessageID::IS_NEW_GAME_REQUESTED, isNewMessage);
+        if (isNewMessage) {
+            bool error;
+            auto gameRequested = stringToData<bool>(stringRequestGame, SerialMessageID::IS_NEW_GAME_REQUESTED, error);
+            if (!error) {
+                Serial.println(String(F("DEBUG received game request: ")) + (int)gameRequested);
+
+                if (gameRequested) {
+                    switchRobotState(INITIAL_SETUP);
+                }
+            }
+        }
         break;
     }
 
@@ -69,6 +81,8 @@ void loop() {
         resetGameManager();
         receivedGrid = false;
         receivedAlgorithmStrength = false;
+        requestSendMessage("1", SerialMessageID::IS_RESET_REQUESTED); // ask ESP to reset bluetooth characteristics
+        requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
 
         markAllMessagesAsRead();
         switchRobotState(WAIT_FOR_GRID_AND_ALGORITHM);
@@ -83,7 +97,7 @@ void loop() {
                 bool error;
                 AlgorithmStrength robotAlgorithmStrength = stringToData<AlgorithmStrength>(stringAlgorithm, SerialMessageID::ALGORITHM_STRENGTH, error);
                 if (!error) {
-                    Serial.println(String("DEBUG updated algorithm strength to ") + (int)robotAlgorithmStrength);
+                    Serial.println(String(F("DEBUG updated algorithm strength to ")) + (int)robotAlgorithmStrength);
                     setRobotAlgorithmStrength(robotAlgorithmStrength);
                     receivedAlgorithmStrength = true;
                 }
@@ -96,7 +110,7 @@ void loop() {
                 bool error;
                 auto playerGrid = stringToData<int (*)[kGridSize]>(stringGrid, SerialMessageID::PLAYER_GRID, error);
                 if (!error) {
-                    Serial.println(String("DEBUG updated player grid"));
+                    Serial.println(String(F("DEBUG updated player grid")));
                     setPlayerCreatedGrid(playerGrid);
                     receivedGrid = true;
                 }
@@ -104,9 +118,6 @@ void loop() {
         }
 
         if (receivedGrid && receivedAlgorithmStrength) {
-            requestSendMessage("0", SerialMessageID::IS_GAME_OVER);
-            requestSendMessage("1", SerialMessageID::IS_NEW_GAME_REQUESTED);
-
             markAllMessagesAsRead();
             switchRobotState(WAIT_FOR_PLAYER_SHOT);
         }

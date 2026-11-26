@@ -32,7 +32,8 @@ DataType stringToData(const String &stringData, SerialMessageID messageID, bool 
     switch (messageID) {
     case SerialMessageID::IS_GAME_OVER:
     case SerialMessageID::IS_NEW_GAME_REQUESTED:
-    case SerialMessageID::IS_BLUETOOTH_CONNECTED: {
+    case SerialMessageID::IS_BLUETOOTH_CONNECTED:
+    case SerialMessageID::IS_RESET_REQUESTED: {
         if constexpr (detail::is_same_v<DataType, bool>) {
             if (stringData == "0") {
                 return false;
@@ -140,6 +141,7 @@ String dataToString(const DataType &data, SerialMessageID messageID) {
     case SerialMessageID::IS_GAME_OVER:
     case SerialMessageID::IS_NEW_GAME_REQUESTED:
     case SerialMessageID::IS_BLUETOOTH_CONNECTED:
+    case SerialMessageID::IS_RESET_REQUESTED:
         if constexpr (detail::is_same_v<DataType, bool>) {
             return String(static_cast<int>(data));
         }

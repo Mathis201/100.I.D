@@ -98,5 +98,17 @@ void loop() {
         }
     }
 
+    bool isNewMessage;
+    String stringResetRequested = getMessage(SerialMessageID::IS_RESET_REQUESTED, isNewMessage);
+    if (isNewMessage) {
+        bool error;
+        bool isResetRequested = stringToData<bool>(stringResetRequested, SerialMessageID::IS_RESET_REQUESTED, error);
+        if (isResetRequested && !error) {
+            resetCharacteristicsToDefault();
+            markAllMessagesAsRead();
+            Serial.println(F("DEBUG Reset all Bluetooth characteristics"));
+        }
+    }
+
     updateSerialManager();
 }

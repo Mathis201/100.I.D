@@ -10,6 +10,7 @@ void runStringToDataTests() {
     assert(stringToData<bool>("0", SerialMessageID::IS_GAME_OVER, err) == false && !err);
     assert(stringToData<bool>("1", SerialMessageID::IS_NEW_GAME_REQUESTED, err) == true && !err);
     assert(stringToData<bool>("1", SerialMessageID::IS_BLUETOOTH_CONNECTED, err) == true && !err);
+    assert(stringToData<bool>("1", SerialMessageID::IS_RESET_REQUESTED, err) == true && !err);
 
     // Error flag resets to false on success
     err = true;
@@ -17,9 +18,9 @@ void runStringToDataTests() {
 
     // Invalid bool inputs
     assert(stringToData<bool>("", SerialMessageID::IS_GAME_OVER, err) == false && err);
-    assert(stringToData<bool>("01", SerialMessageID::IS_GAME_OVER, err) == false && err);
-    assert(stringToData<bool>("a", SerialMessageID::IS_NEW_GAME_REQUESTED, err) == false && err);
-    assert(stringToData<bool>("true", SerialMessageID::IS_NEW_GAME_REQUESTED, err) == false && err);
+    assert(stringToData<bool>("01", SerialMessageID::IS_NEW_GAME_REQUESTED, err) == false && err);
+    assert(stringToData<bool>("a", SerialMessageID::IS_BLUETOOTH_CONNECTED, err) == false && err);
+    assert(stringToData<bool>("true", SerialMessageID::IS_RESET_REQUESTED, err) == false && err);
 
     // 2. ALGORITHM_STRENGTH (RANDOM=0, NORMAL=1, PROF=2, _COUNT=3)
     assert(stringToData<AlgorithmStrength>("0", SerialMessageID::ALGORITHM_STRENGTH, err) == AlgorithmStrength::RANDOM && !err);
@@ -143,6 +144,10 @@ void runDataToStringTests() {
     assert(dataToString(true, SerialMessageID::IS_GAME_OVER) == "1");
     assert(dataToString(false, SerialMessageID::IS_NEW_GAME_REQUESTED) == "0");
     assert(dataToString(true, SerialMessageID::IS_NEW_GAME_REQUESTED) == "1");
+    assert(dataToString(false, SerialMessageID::IS_BLUETOOTH_CONNECTED) == "0");
+    assert(dataToString(true, SerialMessageID::IS_BLUETOOTH_CONNECTED) == "1");
+    assert(dataToString(false, SerialMessageID::IS_RESET_REQUESTED) == "0");
+    assert(dataToString(true, SerialMessageID::IS_RESET_REQUESTED) == "1");
 
     // 2. ALGORITHM_STRENGTH
     assert(dataToString(AlgorithmStrength::RANDOM, SerialMessageID::ALGORITHM_STRENGTH) == "0");

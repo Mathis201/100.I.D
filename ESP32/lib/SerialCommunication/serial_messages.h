@@ -93,9 +93,10 @@ public:
     void setData(String data, bool receivedData) {
         if (messageContents.data != data) {
             messageContents.data = data;
-            if (receivedData) {
-                receivedNewData = true;
-            }
+        }
+
+        if (receivedData) {
+            receivedNewData = true;
         }
     }
 

@@ -34,7 +34,7 @@ public:
     void resetCharacteristicData() override;
 
 private:
-    SendableType data;
+    std::optional<SendableType> data;
     BLECharacteristic *pCharacteristic;
     CharacteristicID messageID;
 };
