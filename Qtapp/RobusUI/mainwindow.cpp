@@ -51,8 +51,8 @@ void MainWindow::checkBoat(){
     if (coordRegex.match(content).hasMatch()) {
         ui->Invalide->setText("");
         // Convert coordinate to indexes 0-7
-        int col = content[0].toUpper().unicode() - 'A';
-        int row = content[1].digitValue() - 1;
+        int row = content[0].toUpper().unicode() - 'A';
+        int col = content[1].digitValue() - 1;
 
         int length = boatLength[boatNum];
         int dRow = rotation ? 1 : 0;   // vertical: moves down
