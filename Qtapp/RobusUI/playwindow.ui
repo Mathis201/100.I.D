@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="turnIndicator">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -39,7 +39,7 @@
     <string>Votre attaque :</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="plainTextEdit">
+  <widget class="QPlainTextEdit" name="attaqueCoords">
    <property name="geometry">
     <rect>
      <x>130</x>
@@ -52,7 +52,7 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>370</x>
      <y>60</y>
      <width>141</width>
      <height>16</height>
@@ -62,10 +62,10 @@
     <string>Dernière attaque du robot :</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4">
+  <widget class="QLabel" name="attaqueRobus">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>520</x>
      <y>60</y>
      <width>41</width>
      <height>16</height>
@@ -83,6 +83,32 @@
      <width>341</width>
      <height>311</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="attaquer">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>57</y>
+     <width>80</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Attaquer</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Invalide">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>90</y>
+     <width>181</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>

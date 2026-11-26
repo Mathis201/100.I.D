@@ -60,8 +60,8 @@ void BoardWidget::paintEvent(QPaintEvent *)
     p.setPen(QColor("#8fa3b8"));
     QFont f = font(); f.setPixelSize(int(cs * 0.4)); p.setFont(f);
     for (int i = 0; i < N; ++i) {
-        p.drawText(QRectF((i + 1) * cs, 0, cs, cs), Qt::AlignCenter, QString(QChar('A' + i)));
-        p.drawText(QRectF(0, (i + 1) * cs, cs, cs), Qt::AlignCenter, QString::number(i + 1));
+        p.drawText(QRectF((i + 1) * cs, 0, cs, cs), Qt::AlignCenter, QString::number(i + 1));
+        p.drawText(QRectF(0, (i + 1) * cs, cs, cs), Qt::AlignCenter, QString(QChar('A' + i)));
     }
 
     for (int r = 0; r < N; ++r) {
