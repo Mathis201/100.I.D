@@ -18,6 +18,7 @@ unsigned long Last_time_line_detected = 0;
 float pourcentage_ton_detect = .9;
 int Next_Step = 0;
 bool Already_Requested = false;
+bool Already_Detected = false;
 long aR;
 long aL;
 
@@ -66,12 +67,30 @@ bool Update_Reach_Position_XY() // Switch case
     
     case Follow_line_straight:
 
+                if (Already_Detected == true)
+                {
+                    Capteurs Sensor = Binary_Conversion();
+
+                    if (Sensor.C_Middle <= -.9 && ((Sens_robot == X_Axis_Neg) || (Sens_robot == X_Axis_Pos)))
+                    {
+                        Already_Detected = false;
+                    }
+                    else if (Sensor.C_Middle >= .9 && ((Sens_robot == Y_Axis_Neg) || (Sens_robot == Y_Axis_Pos)))
+                    {
+                        Already_Detected = false;
+                    }
+
+                }
+                
+
+
+
                 if (is_horizontal_detected() && (Wich_Line_Follow() == black))
                 {
-                    if (millis()-Last_time_line_detected >= 750)
+                    if (Already_Detected == false)
                     {
                         Action = Horizontal_Detected;
-                        Last_time_line_detected = millis();
+                        Already_Detected = true;
                         break;
                     }
                     
@@ -79,11 +98,11 @@ bool Update_Reach_Position_XY() // Switch case
                 }
                 else if (is_vertical_detected() && (Wich_Line_Follow() == white))
                 {
-                    if (millis()-Last_time_line_detected >= 750)
+                    if (Already_Detected == false)
                     {
-                    Action = Vertical_Detected;
-                    Last_time_line_detected = millis();
-                    break;
+                        Action = Vertical_Detected;
+                        Already_Detected = true;
+                        break;
                     }
                 }
 
@@ -208,8 +227,10 @@ bool Update_Reach_Position_XY() // Switch case
                 Already_Requested = true;
             }
 
-            if (getAngleSince(aL,aR) >= 0.95*200)
+            if (getAngleSince(aL,aR) >= -0.95*200)
             {
+                Next_Step = Retrouver_ligne;
+
                 if(is_horizontal_detected() || is_vertical_detected())
                 {
 
@@ -244,9 +265,6 @@ bool Update_Reach_Position_XY() // Switch case
         updateMotorProfiles();
 
         return true;
-
-    default:
-        break;
     }
 }
 
@@ -256,7 +274,7 @@ bool Update_Reach_Position_XY() // Switch case
 
 bool is_horizontal_detected(){
 
-    Capteurs Valeurs = Binary_Conversion(white);
+    Capteurs Valeurs = Binary_Conversion();
 
     if (Next_Step == Retrouver_ligne && (Sens_robot == X_Axis_Neg || Sens_robot == X_Axis_Pos) && (Valeurs.C_Left < -pourcentage_ton_detect || Valeurs.C_Right < -pourcentage_ton_detect || Valeurs.C_Middle < -pourcentage_ton_detect))
     {
@@ -265,7 +283,6 @@ bool is_horizontal_detected(){
     
     else if ((Valeurs.C_Left < -pourcentage_ton_detect && Valeurs.C_Right < -pourcentage_ton_detect) || (Valeurs.C_Left < -pourcentage_ton_detect && Valeurs.C_Middle < -pourcentage_ton_detect) || (Valeurs.C_Middle < -pourcentage_ton_detect && Valeurs.C_Right < -pourcentage_ton_detect))
     {
-        Action = Horizontal_Detected;
         return true;
     }
     return false;
@@ -276,7 +293,7 @@ bool is_horizontal_detected(){
 
 bool is_vertical_detected(){
 
-    Capteurs Valeurs = Binary_Conversion(black);
+    Capteurs Valeurs = Binary_Conversion();
 
     if (Next_Step == Retrouver_ligne && (Sens_robot == Y_Axis_Neg || Sens_robot == Y_Axis_Pos) && (Valeurs.C_Left > pourcentage_ton_detect || Valeurs.C_Right > pourcentage_ton_detect || Valeurs.C_Middle > pourcentage_ton_detect))
     {
@@ -285,7 +302,6 @@ bool is_vertical_detected(){
 
     else if (Valeurs.C_Left > pourcentage_ton_detect && Valeurs.C_Right > pourcentage_ton_detect)
     {
-        Action = Vertical_Detected;
         return true;
     }
     return false;
@@ -319,26 +335,32 @@ void Fonc_Orientation(int ajout){
 
 void Left_or_Right(int Target_Y){
 
-    if (Y_NOW<Target_Y)
+    if (Y_NOW == Y_Target)
+    {
+        Action = Finished;
+    }
+    
+    else if (Y_NOW<Target_Y)
     {
         if (Sens_robot == X_Axis_Neg)
         {
-            Action = TurnRight;
+            Action = TurnLeft;
         }
         else if (Sens_robot == X_Axis_Pos)
         {
-            Action = TurnLeft;
+            Action = TurnRight;
         }  
     }
+
     else if (Y_NOW>Target_Y)
     {
         if (Sens_robot == X_Axis_Neg)
         {
-            Action = TurnLeft;
+            Action = TurnRight;
         }
         else if (Sens_robot == X_Axis_Pos)
         {
-            Action = TurnRight;
+            Action = TurnLeft;
         }  
     }
 }

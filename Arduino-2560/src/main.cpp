@@ -58,8 +58,13 @@ void setup() {
 void loop() {
 
     if(ROBUS_IsBumper(RIGHT)){
+
+        // Request_Reach_Position_XY(4,4);
+
+
         while(true){
-            Follow_line(white);
+            Follow_line(black);
+            // Update_Reach_Position_XY();
         }
     }
 
