@@ -88,7 +88,7 @@ void Follow_line(int ligne)
         else if (Valeurs.C_Left < Valeurs.C_Right)
         {
             Live_Error = -(Valeurs.C_Left * ponderation - (1 + Valeurs.C_Middle));
-            if (Now - Last_Time != 0 && Now - Last_Time < 250 && First != true)
+            if (Now - Last_Time != 0 && Now - Last_Time < 500 && First != true)
             {
                 Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
@@ -129,7 +129,7 @@ void Follow_line(int ligne)
         else if (Valeurs.C_Left > Valeurs.C_Right)
         {
             Live_Error = (Valeurs.C_Left * ponderation + (1 - Valeurs.C_Middle));
-            if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true)
+            if (Now - Last_Time != 0 && Now - Last_Time < 500 && First != true)
             {
                 Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
@@ -142,7 +142,7 @@ void Follow_line(int ligne)
         else if (Valeurs.C_Right > Valeurs.C_Left)
         {
             Live_Error = (Valeurs.C_Right * ponderation + (1 - Valeurs.C_Middle));
-            if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true)
+            if (Now - Last_Time != 0 && Now - Last_Time < 500 && First != true)
             {
                 Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
