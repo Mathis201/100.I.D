@@ -1,1 +1,10 @@
 *.exe
+
+#Qt creator
+.qtcreator/
+.qtcreator_backup/
+CMakeLists.txt.user*
+CMakeLists.txt.olgCld
+
+/Qtapp/RobusUI/build/
+
