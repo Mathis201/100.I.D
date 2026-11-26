@@ -30,6 +30,8 @@ private:
         gameFinished
     };
     States state = playerTurn;
+    void setState(States s);
+
     DeviceHandler *m_bleHandler = nullptr;
 };
 

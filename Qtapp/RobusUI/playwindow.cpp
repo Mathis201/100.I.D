@@ -10,26 +10,6 @@ PlayWindow::PlayWindow(DeviceHandler *ble, QWidget *parent)
     : QDialog(parent), ui(new Ui::PlayWindow), m_bleHandler(ble)
 {
     ui->setupUi(this);
-
-    //copie du .h
-    /*enum states {
-        playerTurn,
-        robusTurn,
-        gameFinished
-    };
-    states state = playerTurn;*/
-
-    switch (state) {
-    case playerTurn:
-        qDebug() << "state playerTurn";
-        state = robusTurn;
-        break;
-    case robusTurn:
-        qDebug() << "state robusTurn";
-        break;
-    case gameFinished:
-        break;
-    }
 }
 
 PlayWindow::~PlayWindow()
@@ -47,6 +27,39 @@ void PlayWindow::loadBoats(const int grid[8][8])
                 ui->myBoard->setShip(r, c, grid[r][c]);   // the value is the boat ID
 }
 
+void PlayWindow::setState(States s){
+    //copie du .h
+    /*enum states {
+        playerTurn,
+        robusTurn,
+        gameFinished
+    };
+    states state = playerTurn;*/
+
+    state = s;
+
+    switch (state) {
+    case playerTurn:
+        qDebug() << "state playerTurn";
+        ui->attaquer->setEnabled(true);
+        ui->attaqueCoords->setEnabled(true);
+        ui->turnIndicator->setText("À votre tour");
+        break;
+    case robusTurn:
+
+        ui->myBoard->setCell(0, 0, BoardWidget::Hit);
+        ui->myBoard->setCell(0, 7, BoardWidget::Miss);
+
+        ui->attaquer->setEnabled(false);
+        ui->attaqueCoords->setEnabled(false);
+        ui->turnIndicator->setText("Tour du robot, attendez le résulat");
+        qDebug() << "state robusTurn";
+        break;
+    case gameFinished:
+        break;
+    }
+}
+
 void PlayWindow::on_attaquer_clicked()
 {
     if (!m_bleHandler) {
@@ -58,8 +71,8 @@ void PlayWindow::on_attaquer_clicked()
 
     if (coordRegex.match(coords).hasMatch()) {
         ui->Invalide->setText("");
-        m_bleHandler->writeValue(PlayerInfoService::UUID, PlayerInfoService::LastShotCoordsCharacteristic::UUID, coords.toUtf8());
-        state = robusTurn;
+        m_bleHandler->writeValue(PlayerInfoService::UUID, PlayerInfoService::LastShotCoordsCharacteristic::UUID, coords.toUtf8()); //send player attack coords
+        setState(robusTurn);
     }
     else {
         ui->Invalide->setText("Entrée invalide");
