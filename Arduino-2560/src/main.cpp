@@ -3,6 +3,7 @@
 #include "game/battleship_algo_test.h"
 #include "game/game_manager.h"
 #include "game_defs.h"
+#include "motors/servo_management.h"
 #include "serial_manager.h"
 #include "string_data_helper.h"
 #include <LibRobus.h>
@@ -48,9 +49,9 @@ void setup() {
     initSerialManager(Serial1);
 
     // leave time for ESP32 to boot and start server
-    delay(1000);
+    // delay(1000);
 
-    switchRobotState(INITIAL_SETUP);
+    switchRobotState(REGISTER_PLAYER_SHOT);
 }
 
 bool a = false;
@@ -75,10 +76,54 @@ void loop() {
 
     //     a = true;
     }
-    
-    // if (a == true)
-    // {
-    //     Update_Reach_Position_XY();
+
+    case WAIT_FOR_PLAYER_SHOT: {
+        break;
+    }
+
+    case MOVE_TO_PLAYER_SHOT: {
+        break;
+    }
+
+    case REGISTER_PLAYER_SHOT: {
+        while (true) {
+            sendPlateToRed();
+            delay(1500);
+            sendPlateToMiddle();
+            delay(1500);
+            sendPlateToWhite();
+            delay(1500);
+            sendPlateToMiddle();
+            delay(1500);
+        }
+
+        break;
+    }
+
+    case MANAGE_ROBOT_SHOT: {
+        // requestSendMessage("G2", SerialMessageID::ROBOT_LAST_SHOT_COORDS);
+        // requestSendMessage(String(static_cast<int>(ShotResult::SINK)), SerialMessageID::ROBOT_LAST_SHOT_RESULT);
+        // requestSendMessage("1", SerialMessageID::IS_PLAYER_TURN);
+        break;
+    }
+
+    case GAME_OVER: {
+        // requestSendMessage("1", SerialMessageID::IS_GAME_OVER);
+        break;
+    }
+
+    case WAIT_FOR_NEXT_GAME: {
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    // if (ROBUS_IsBumper(REAR)) {
+    //     while (true) {
+    //         Go_To_Position_XY(5, 3);
+    //     }
     // }
 
 
