@@ -1,6 +1,15 @@
 #pragma once
-#include "Arduino.h"
+#include "algorithme_battleship.h"
+#include "game_defs.h"
 
 void resetGameManager();
 
-void updatePlayerGrid(String playerGridString);
+void setRobotAlgorithmStrength(AlgorithmStrength chosenStrength);
+
+void setPlayerCreatedGrid(int newPlayerGrid[kGridSize][kGridSize]);
+
+ShotResult registerRobotShot(Coord robotShot);
+
+ShotResult registerPlayerShot(Coord playerShot);
+
+Coord getNextRobotShot();

@@ -9,6 +9,7 @@ public:
     virtual String getData() = 0;
     virtual void setData(String stringRepresentation) = 0;
     virtual CharacteristicID getCharacteristicID() = 0;
+    virtual void resetCharacteristicData();
 };
 
 template <typename SendableType>
@@ -25,13 +26,15 @@ public:
     // sets the new data value, writing to the bluetooth characteristic
     void setData(String stringRepresentation) override;
 
-    CharacteristicID getCharacteristicID();
+    CharacteristicID getCharacteristicID() override;
 
     BLECharacteristic *getRawCharacteristic();
     void setCharacteristic(BLECharacteristic *characteristic);
 
+    void resetCharacteristicData() override;
+
 private:
-    SendableType data;
+    std::optional<SendableType> data;
     BLECharacteristic *pCharacteristic;
     CharacteristicID messageID;
 };

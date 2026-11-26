@@ -1,14 +1,14 @@
 #pragma once
 #include "serial_messages.h"
 
-constexpr int kCharacteristicCount = 7;
-
 enum class CharacteristicID {
     ALGORITHM_STRENGTH = static_cast<int>(SerialMessageID::ALGORITHM_STRENGTH),
     IS_GAME_OVER = static_cast<int>(SerialMessageID::IS_GAME_OVER),
-    IS_PLAYER_TURN = static_cast<int>(SerialMessageID::IS_PLAYER_TURN),
+    IS_NEW_GAME_REQUESTED = static_cast<int>(SerialMessageID::IS_NEW_GAME_REQUESTED),
     ROBOT_LAST_SHOT_COORDS = static_cast<int>(SerialMessageID::ROBOT_LAST_SHOT_COORDS),
     ROBOT_LAST_SHOT_RESULT = static_cast<int>(SerialMessageID::ROBOT_LAST_SHOT_RESULT),
     PLAYER_GRID = static_cast<int>(SerialMessageID::PLAYER_GRID),
-    PLAYER_LAST_SHOT_COORDS = static_cast<int>(SerialMessageID::PLAYER_LAST_SHOT_COORDS)
+    PLAYER_LAST_SHOT_COORDS = static_cast<int>(SerialMessageID::PLAYER_LAST_SHOT_COORDS),
+    PLAYER_LAST_SHOT_RESULT = static_cast<int>(SerialMessageID::PLAYER_LAST_SHOT_RESULT),
+    _COUNT
 };

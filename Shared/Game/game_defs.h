@@ -15,6 +15,13 @@ enum class ShotResult : uint8_t {
     _COUNT
 };
 
+struct Coord {
+    int x;
+    int y;
+};
+
 constexpr int kGridSize = 8;
-static const char *kValidRows = "ABCDEFGH";
-static const char *kValidColumns = "12345678";
+inline const char *kValidRows = "ABCDEFGH";
+inline const char *kValidColumns = "12345678";
+constexpr int kNumberOfBoats = 5;
+constexpr int kBoatLengths[kNumberOfBoats] = {2, 2, 3, 4, 5};

@@ -2,7 +2,7 @@
 #include "Arduino.h"
 #include "serial_messages.h"
 
-static constexpr int kSerialPrintDelay = 100;
+static constexpr int kSerialPrintDelay = 250;
 
 static unsigned long printTargetTime = 0;
 
@@ -18,6 +18,12 @@ void initSerialManager(HardwareSerial &serial) {
     }
 }
 
+void markAllMessagesAsRead() {
+    for (int i = 0; i < static_cast<int>(SerialMessageID::_COUNT); i++) {
+        messages[i].markMessageAsRead();
+    }
+}
+
 void requestSendMessage(String data, SerialMessageID messageID) {
     messages[static_cast<int>(messageID)].setData(data, false);
     messages[static_cast<int>(messageID)].resetSendCount();
@@ -29,7 +35,7 @@ String getMessage(SerialMessageID messageID, bool &isNewMessage) {
 }
 
 void updateSerialManager() {
-    while (usedSerial->available() > 0) {
+    if (usedSerial->available() > 0) {
         String read = usedSerial->readStringUntil('\n').c_str();
         Serial.println("DEBUG Received message: " + read);
 
