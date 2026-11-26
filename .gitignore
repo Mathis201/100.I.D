@@ -1,9 +1,8 @@
 *.exe
 
-#Qt creator configurations
-
+#Qt creator
 .qtcreator/
-.qtcreator_backup
+.qtcreator_backup/
 CMakeLists.txt.user*
 CMakeLists.txt.olgCld
 
