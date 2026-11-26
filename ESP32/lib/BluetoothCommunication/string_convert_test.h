@@ -1,2 +1,2 @@
 #pragma once
-void runStringToDataTests();
+void runStringConversionTests();

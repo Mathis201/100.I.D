@@ -4,4 +4,5 @@
 
 void setupPlayerInfoService(BLEServer *pServer,
                             BLECharacteristicManager<String> &gridCharacteristic,
-                            BLECharacteristicManager<String> &lastShotCoordsCharacteristic);
+                            BLECharacteristicManager<String> &lastShotCoordsCharacteristic,
+                            BLECharacteristicManager<ShotResult> &lastShotResultCharacteristic);

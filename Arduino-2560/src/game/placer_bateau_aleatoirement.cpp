@@ -50,7 +50,7 @@ void rajouter_bateau(int grille[kGridSize][kGridSize], int x, int y,
 }
 
 void placer_bateau(int grille[kGridSize][kGridSize],
-                   int liste_bateau[], int nb_bateau) {
+                   const int liste_bateau[], int nb_bateau) {
     const char orientations[4] = {'H', 'B', 'G', 'D'};
 
     // remet la grille à 0 à chaque appel de la fonction

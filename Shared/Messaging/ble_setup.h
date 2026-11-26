@@ -19,7 +19,7 @@ namespace GameInfoService {
         const std::string UUID = "5fc69066-dde4-4cef-b026-82c06f86a1f6";
     };
 
-    namespace IsPlayerTurnCharacteristic {
+    namespace IsNewGameRequestedCharacteristic {
         const std::string UUID = "35c5b4bd-2ed1-4b61-a257-1912c2358a49";
     }
 
@@ -34,6 +34,10 @@ namespace PlayerInfoService {
 
     namespace LastShotCoordsCharacteristic {
         const std::string UUID = "12d64fe0-eab5-4d29-988d-504ac91448c8";
+    };
+
+    namespace LastShotResultCharacteristic {
+        const std::string UUID = "e5d57da3-70ff-49ad-80b7-a5b9600e6bad";
     };
 };
 
