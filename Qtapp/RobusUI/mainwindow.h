@@ -26,6 +26,7 @@ public:
     int m_nextBoatId = 1;
     QStringList algolevels = (QStringList()<<""<<"Facile"<<"Normal"<<"Difficile");
     bool IsModeChosen = false;
+    bool apercuClicked = false;
 
 private slots:
     void checkBoat();
@@ -35,8 +36,6 @@ private slots:
     QString convertGrid(int grid[8][8]);
 
     void on_difAlgo_currentIndexChanged(int index);
-
-    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

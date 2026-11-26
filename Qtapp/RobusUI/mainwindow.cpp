@@ -12,10 +12,10 @@ using namespace std;
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    m_PlayWindow = new PlayWindow(m_bleHandler);
     m_bleHandler = new DeviceHandler(this);
     m_bleHandler->startScan();
     ui->difAlgo->addItems(algolevels);
+    m_PlayWindow = new PlayWindow(m_bleHandler);
 
 }
 
@@ -50,7 +50,6 @@ void MainWindow::checkBoat(){
 
     if (coordRegex.match(content).hasMatch()) {
         ui->Invalide->setText("");
-
         // Convert coordinate to indexes 0-7
         int col = content[0].toUpper().unicode() - 'A';
         int row = content[1].digitValue() - 1;
@@ -58,6 +57,15 @@ void MainWindow::checkBoat(){
         int length = boatLength[boatNum];
         int dRow = rotation ? 1 : 0;   // vertical: moves down
         int dCol = rotation ? 0 : 1;   // horizontal: moves right
+
+
+        if(!apercuClicked){
+            QVector<QPoint> cells = boatCells(row, col, dRow, dCol, length);
+            ui->myBoard->setPreview(cells, canPlace(cells));
+            ui->Suivant->setText("Suivant");
+            apercuClicked = true;
+            return;
+        }
 
         // Est-ce que le bateau reste dans la grid
         int endRow = row + dRow * (length - 1);
@@ -87,7 +95,7 @@ void MainWindow::checkBoat(){
             ui->label_3->setText("Placez le bateau #" + QString::number(boatNum + 2) + ", long de " + QString::number(boatLength[boatNum + 1]) + " cases");
         }
 
-
+        apercuClicked = false;
         boatNum++; //on passe au prochain bateau
         printGrid();
 
@@ -109,7 +117,10 @@ void MainWindow::on_Suivant_clicked()
         m_PlayWindow->show();
         return;
     }
-    ui->Pos->clear();
+    if(!apercuClicked){
+        ui->Pos->clear();
+    }
+
 }
 
 void MainWindow::printGrid()
@@ -173,28 +184,4 @@ bool MainWindow::canPlace(const QVector<QPoint> &cells) const
     return true;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    QString content = ui->Pos->toPlainText().trimmed();
-    static const QRegularExpression coordRegex("^[a-hA-H][1-8]$");
-
-    if (!coordRegex.match(content).hasMatch()) {
-        ui->Invalide->setText("Coordonnée invalide");   // adapt the message
-        ui->myBoard->clearPreview();
-        return;
-    }
-
-    ui->Invalide->setText("");
-
-    // Convert coordinate to indexes 0-7
-    int col = content[0].toUpper().unicode() - 'A';
-    int row = content[1].digitValue() - 1;
-
-    int length = boatLength[boatNum];
-    int dRow = rotation ? 1 : 0;   // vertical: moves down
-    int dCol = rotation ? 0 : 1;   // horizontal: moves right
-
-    QVector<QPoint> cells = boatCells(row, col, dRow, dCol, length);
-    ui->myBoard->setPreview(cells, canPlace(cells));
-}
 

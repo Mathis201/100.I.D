@@ -21,10 +21,11 @@ PlayWindow::PlayWindow(DeviceHandler *ble, QWidget *parent)
 
     switch (state) {
     case playerTurn:
-
+        qDebug() << "state playerTurn";
+        state = robusTurn;
         break;
     case robusTurn:
-
+        qDebug() << "state robusTurn";
         break;
     case gameFinished:
         break;
