@@ -2,6 +2,9 @@
 #define PLAYWINDOW_H
 
 #include <QDialog>
+#include <QBluetoothDeviceDiscoveryAgent>
+#include <QLowEnergyController>
+#include <QLowEnergyService>
 
 class DeviceHandler;
 
@@ -31,6 +34,7 @@ private:
     };
     States state = playerTurn;
     void setState(States s);
+    void onBleValue(const QBluetoothUuid &uuid, const QByteArray &value);
 
     DeviceHandler *m_bleHandler = nullptr;
 };

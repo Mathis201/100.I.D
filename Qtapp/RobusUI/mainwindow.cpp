@@ -14,6 +14,12 @@ using namespace std;
     ui->setupUi(this);
     m_bleHandler = new DeviceHandler(this);
     m_bleHandler->startScan();
+    connect(m_bleHandler, &DeviceHandler::ready, this, [this]() {
+        m_bleHandler->subscribe(RobotInfoService::UUID,
+                                RobotInfoService::LastShotCoordsCharacteristic::UUID);
+        m_bleHandler->subscribe(GameInfoService::UUID,
+                                GameInfoService::IsGameOverCharacteristic::UUID);
+    });
     ui->difAlgo->addItems(algolevels);
     m_PlayWindow = new PlayWindow(m_bleHandler);
 

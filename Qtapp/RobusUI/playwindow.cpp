@@ -79,3 +79,14 @@ void PlayWindow::on_attaquer_clicked()
     }
 }
 
+void onBleValue(const QBluetoothUuid &uuid, const QByteArray &value){
+    static const QBluetoothUuid robotCoords(QString::fromStdString(
+        RobotInfoService::LastShotCoordsCharacteristic::UUID));
+    static const QBluetoothUuid robotResult(QString::fromStdString(
+        RobotInfoService::LastShotResultCharacteristic::UUID));
+    static const QBluetoothUuid playerResult(QString::fromStdString(
+        PlayerInfoService::LastShotResultCharacteristic::UUID));
+    static const QBluetoothUuid gameOver(QString::fromStdString(
+        GameInfoService::IsGameOverCharacteristic::UUID));
+}
+
