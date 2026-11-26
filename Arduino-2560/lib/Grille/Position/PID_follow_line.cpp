@@ -65,13 +65,13 @@ void Follow_line(int ligne)
     float KD_N = 2;
     float KP_N = .2;
     float KD_B = 1;
-    float KP_B = 25;
+    float KP_B = .25;
 
     float base_speed = .25;
     float ponderation = .4;
     float Live_Error = 0;
     float Deriv = 0;
-    bool First = true;
+    static bool First = true;
     unsigned long Now = millis();
 
     Capteurs Valeurs = Binary_Conversion(ligne);
@@ -88,7 +88,7 @@ void Follow_line(int ligne)
         else if (Valeurs.C_Left < Valeurs.C_Right)
         {
             Live_Error = -(Valeurs.C_Left * ponderation - (1 + Valeurs.C_Middle));
-            if (Now - Last_Time != 0 || Now - Last_Time < 250 || First != true)
+            if (Now - Last_Time != 0 && Now - Last_Time < 250 && First != true)
             {
                 Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
@@ -101,7 +101,7 @@ void Follow_line(int ligne)
         else if (Valeurs.C_Right < Valeurs.C_Left)
         {
             Live_Error = -(Valeurs.C_Right * ponderation - (1 + Valeurs.C_Middle));
-            if (Now - Last_Time != 0 || Now - Last_Time < 500 || First != true)
+            if (Now - Last_Time != 0 && Now - Last_Time < 500 && First != true)
             {
                 Deriv = (Live_Error - Past_Error) / (Now - Last_Time);
             }
