@@ -62,6 +62,16 @@ static bool testerAlgorithme(int grille[kGridSize][kGridSize]) {
         }
     }
 
+    Serial.println("Grille des tirs de l'algorithme :");
+
+    for (int y = 0; y < kGridSize; y++) {
+        for (int x = 0; x < kGridSize; x++) {
+            Serial.print(dejaTire[x][y]);
+            Serial.print(" ");
+        }
+        Serial.println();
+    }
+
     int nombreCasesBateaux = 0;
     for (int i = 0; i < kNumberOfBoats; i++) {
         nombreCasesBateaux += kBoatLengths[i];
