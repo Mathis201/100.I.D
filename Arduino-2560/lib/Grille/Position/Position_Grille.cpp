@@ -13,7 +13,7 @@ int Y_NOW = 0;
 int X_Target = 0;
 int Y_Target = 0;
 int Sens_robot = X_Axis_Pos;
-int Action = Follow_line_straight;
+int Action = How_much_turn;
 unsigned long Last_time_line_detected = 0;
 float pourcentage_ton_detect = .9;
 int Next_Step = 0;
@@ -28,7 +28,7 @@ long aL;
 void Request_Reach_Position_XY(int Target_X, int Target_Y) // Reset la case target et remet Go_To_Position à la premiere etape
 {
 
-Action == How_much_turn;
+Action = How_much_turn;
 
 X_Target = Target_X;
 Y_Target = Target_Y;
@@ -56,7 +56,7 @@ bool Update_Reach_Position_XY() // Switch case
                 Already_Requested = true;
             }
 
-            if (areProfilesDone)
+            if (areProfilesDone())
             {
                 Already_Requested = false;
                 Action = Next_Step;
@@ -66,21 +66,27 @@ bool Update_Reach_Position_XY() // Switch case
     
     case Follow_line_straight:
 
-            if (millis()-Last_time_line_detected >= 1000)
-            {
-                Last_time_line_detected = millis();
-
-                if (is_horizontal_detected() && Wich_Line_Follow() == black)
+                if (is_horizontal_detected() && (Wich_Line_Follow() == black))
                 {
-                    Action = Horizontal_Detected;
-                    break;
+                    if (millis()-Last_time_line_detected >= 750)
+                    {
+                        Action = Horizontal_Detected;
+                        Last_time_line_detected = millis();
+                        break;
+                    }
+                    
+                    
                 }
-                else if (is_vertical_detected() && Wich_Line_Follow() == white)
+                else if (is_vertical_detected() && (Wich_Line_Follow() == white))
                 {
+                    if (millis()-Last_time_line_detected >= 750)
+                    {
                     Action = Vertical_Detected;
+                    Last_time_line_detected = millis();
                     break;
+                    }
                 }
-            }
+
 
             Follow_line(Wich_Line_Follow());
 
@@ -138,7 +144,7 @@ bool Update_Reach_Position_XY() // Switch case
 
     case TurnLeft:
 
-            if (areProfilesDone() && Already_Requested != true)
+            if (areProfilesDone() && (Already_Requested != true))
             {
                 requestTurnDegrees(105);
                 aR = ENCODER_Read(RIGHT);
@@ -156,17 +162,16 @@ bool Update_Reach_Position_XY() // Switch case
                 {
 
                     Action = Follow_line_straight;
+                    Already_Requested = false;
 
                 }
-                
-                Already_Requested = false;
             }
             
             break;
 
     case TurnRight:
 
-            if (areProfilesDone() && Already_Requested != true)
+            if (areProfilesDone() && (Already_Requested != true))
             {
                 requestTurnDegrees(-105);
                 aR = ENCODER_Read(RIGHT);
@@ -176,28 +181,24 @@ bool Update_Reach_Position_XY() // Switch case
                 Already_Requested = true;
             }
 
-            if (getAngleSince(aL,aR) >= 0.9*-105)
+            if (getAngleSince(aL,aR) <= 0.9*-105)
             {
 
                 Next_Step = Retrouver_ligne;
 
-                if(is_horizontal_detected())
+                if(is_horizontal_detected() || is_vertical_detected())
                 {
 
                     Action = Follow_line_straight;
+                    Already_Requested = false;
 
                 }
-                else if (is_vertical_detected())
-                {
-                    Action = Follow_line_straight;
-                }
-                Already_Requested = false;
             }
             
             break;
     case U_Turn:
 
-            if (areProfilesDone() && Already_Requested != true)
+            if (areProfilesDone() && (Already_Requested != true))
             {
                 requestTurnDegrees(-200);
                 updateMotorProfiles();
@@ -209,17 +210,13 @@ bool Update_Reach_Position_XY() // Switch case
 
             if (getAngleSince(aL,aR) >= 0.95*200)
             {
-                if(is_horizontal_detected())
+                if(is_horizontal_detected() || is_vertical_detected())
                 {
 
                     Action = Follow_line_straight;
+                    Already_Requested = false;
 
                 }
-                else if (is_vertical_detected())
-                {
-                    Action = Follow_line_straight;
-                }
-                Already_Requested = false;
             }
             break;
 
@@ -232,7 +229,7 @@ bool Update_Reach_Position_XY() // Switch case
         Already_Requested = true;
         }
     
-        if (areProfilesDone)
+        if (areProfilesDone())
         {
             Already_Requested = false;
             Left_or_Right(Y_Target);
@@ -243,6 +240,9 @@ bool Update_Reach_Position_XY() // Switch case
 
     case Finished:
         
+        decelerateToStop();
+        updateMotorProfiles();
+
         return true;
 
     default:
@@ -258,9 +258,9 @@ bool is_horizontal_detected(){
 
     Capteurs Valeurs = Binary_Conversion(white);
 
-    if (Next_Step = Retrouver_ligne && (Sens_robot == X_Axis_Neg || Sens_robot == X_Axis_Pos) && (Valeurs.C_Left < -pourcentage_ton_detect || Valeurs.C_Right < -pourcentage_ton_detect || Valeurs.C_Middle < -pourcentage_ton_detect))
+    if (Next_Step == Retrouver_ligne && (Sens_robot == X_Axis_Neg || Sens_robot == X_Axis_Pos) && (Valeurs.C_Left < -pourcentage_ton_detect || Valeurs.C_Right < -pourcentage_ton_detect || Valeurs.C_Middle < -pourcentage_ton_detect))
     {
-        Action = Follow_line_straight;
+        return true;
     }
     
     else if ((Valeurs.C_Left < -pourcentage_ton_detect && Valeurs.C_Right < -pourcentage_ton_detect) || (Valeurs.C_Left < -pourcentage_ton_detect && Valeurs.C_Middle < -pourcentage_ton_detect) || (Valeurs.C_Middle < -pourcentage_ton_detect && Valeurs.C_Right < -pourcentage_ton_detect))
@@ -278,9 +278,9 @@ bool is_vertical_detected(){
 
     Capteurs Valeurs = Binary_Conversion(black);
 
-    if (Next_Step = Retrouver_ligne && (Sens_robot == Y_Axis_Neg || Sens_robot == Y_Axis_Pos) && (Valeurs.C_Left > pourcentage_ton_detect || Valeurs.C_Right > pourcentage_ton_detect || Valeurs.C_Middle > pourcentage_ton_detect))
+    if (Next_Step == Retrouver_ligne && (Sens_robot == Y_Axis_Neg || Sens_robot == Y_Axis_Pos) && (Valeurs.C_Left > pourcentage_ton_detect || Valeurs.C_Right > pourcentage_ton_detect || Valeurs.C_Middle > pourcentage_ton_detect))
     {
-        Action = Follow_line_straight;
+        return true;
     }
 
     else if (Valeurs.C_Left > pourcentage_ton_detect && Valeurs.C_Right > pourcentage_ton_detect)
@@ -364,7 +364,7 @@ if (X_NOW == X_Target)
             if (Y_NOW < Y_Target)
             {
                 if (Sens_robot == Y_Axis_Pos)
-                {
+                { 
                     Action = Follow_line_straight;
                 }
                 else if (Sens_robot == X_Axis_Pos)
@@ -448,17 +448,17 @@ if (X_NOW == X_Target)
 void Tourner_180(){
 
     Next_Step = U_Turn;
-
+    Action = advance_5;
 }
 
 void Tourner_Droite(){
 
     Next_Step = TurnRight;
-
+    Action = advance_5;
 }
 
 void Tourner_Gauche(){
 
     Next_Step = TurnLeft;
-
+    Action = advance_5;
 }

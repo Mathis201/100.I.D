@@ -17,7 +17,7 @@ void Fonc_Orientation(int ajout);
 
 void Request_Reach_Position_XY(int Target_X, int Target_Y);
 
-void Update_Reach_Position_XY(int x, int y);
+bool Update_Reach_Position_XY();
 
 bool is_vertical_detected();
 
