@@ -1,6 +1,9 @@
 #include "DeviceHandler.h"
 #include <QDebug>
 #include "../../Shared/Messaging/ble_setup.h"
+#include <QCoreApplication>
+#include <QPermissions>
+
 DeviceHandler::~DeviceHandler()
 {
     if (m_control) {

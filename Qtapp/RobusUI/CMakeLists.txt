@@ -19,6 +19,20 @@ qt_add_executable(RobusUI
 
 
 )
+target_include_directories(RobusUI PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+if(APPLE)
+    set_target_properties(RobusUI PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST
+        "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist"
+    )
+
+    target_link_libraries(RobusUI PRIVATE
+        Qt6::QDarwinBluetoothPermissionPlugin
+    )
+endif()
 
 target_link_libraries(RobusUI
     PRIVATE
